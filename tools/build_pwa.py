@@ -23,6 +23,7 @@ style = style.replace('</style>', '''.login{position:fixed;inset:0;z-index:40;ba
 
 body = body.replace("Claude 사용을 허락해야 읽을 수 있어요. 다시 누르면 다시 물어봐요.", "읽기 기능을 쓸 수 없어요. 인터넷 연결을 확인해 주세요.")
 body = body.replace("É preciso permitir o Claude para ler. Toque de novo para ver o pedido.", "A leitura não está disponível. Verifique a internet.")
+body = re.sub(r"rcInPreview:'[^']*',", '', body)
 body = body.replace('<!--PWA-USER-->', '<div class="who"><span id="whoName"></span><span><button class="linkbtn" type="button" id="setupBtn"></button> · <button class="linkbtn" type="button" id="logoutBtn"></button></span></div>')
 
 login = '''<div class="login" id="login" hidden><div class="box">

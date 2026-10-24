@@ -501,7 +501,7 @@ function inputForm(preset){const L=t();
     </div>
     <input type="file" class="vh" id="rc-camIn" accept="image/*" capture="environment">
     <input type="file" class="vh" id="rc-galIn" accept="image/*" multiple>
-    ${imgOk?`<p class="hint">${L.rcCamHint}</p>`:''}
+    ${window.__preview?`<div class="advice c-sale">${L.rcInPreview}</div>`:imgOk?`<p class="hint">${L.rcCamHint}</p>`:''}
     <div class="thumbs" id="rc-thumbs"></div>
     <p class="hint" id="rc-micMsg" hidden></p>
     <textarea id="rc-text" aria-label="${L.rcTextL}" placeholder="${L.rcTextPh}"></textarea>
@@ -522,6 +522,7 @@ function inputForm(preset){const L=t();
     for(const f of files){if(rc.photos.length>=MAXIMG()){err.textContent=L.rcMax(MAXIMG());err.hidden=false;break}
       const b=await shrink(f);rc.photos.push({blob:b,url:URL.createObjectURL(b)})}
     $('#rc-busy').hidden=true;drawThumbs()};
+  ['#rc-cam','#rc-gal'].forEach(id=>{const el=$(id);if(el)el.addEventListener('click',()=>{if(rec){stopMic();$('#rc-mic').classList.remove('on');$('#rc-micTxt').textContent=L.rcMic;$('#rc-micMsg').hidden=true}})});
   if(imgOk){['#rc-cam','#rc-gal'].forEach(id=>$(id).addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$(id).click()}}));
     $('#rc-camIn').onchange=e=>{addFiles([...e.target.files]);e.target.value=''};
     $('#rc-galIn').onchange=e=>{addFiles([...e.target.files]);e.target.value=''};}
