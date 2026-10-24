@@ -226,7 +226,7 @@ ko:{h1:'재고 정리판',sub:'생산한 옷의 판매·재고·수익을 한눈
  rcCam:'사진 찍기',rcCamHint:'카메라가 안 열리면 "사진 고르기"를 누르고 카메라를 고르세요. 찍어둔 영수증 사진을 골라도 돼요.',rcGal:'사진 고르기',rcMic:'말하기',rcMicStop:'그만 말하기',
  rcTextL:'또는 글로 적기',rcTextPh:'예: 2611 원피스 20장 팔렸어, 2598 데님 입고 300장',
  rcMicHint:'여기서는 마이크를 바로 쓸 수 없어요. 아래 글 칸을 누르고 키보드의 마이크 버튼을 눌러 말하세요.',
- rcListening:'듣고 있어요… 말이 끝나면 "그만 말하기"를 누르세요.',
+ rcListening:'듣고 있어요… 한 번에 한 줄씩 짧게 말하세요. 예: "2611 스무 장 판매". 더 넣으려면 다시 누르세요.',
  rcRead:'읽고 수량 확인하기',rcNeed:'사진을 찍거나, 말하거나, 글을 적어주세요.',rcBusy:'읽는 중이에요… 사진이면 20~40초 걸려요.',
  rcNoAi:'AI 읽기는 아직 켜져 있지 않아요. Firebase 설정을 마치면 쓸 수 있어요. 지금은 아래 코드 칸에 직접 넣어주세요.',rcDenied:'읽기 기능을 쓸 수 없어요. 인터넷 연결을 확인해 주세요.',rcFail:'읽지 못했어요. 사진을 밝은 곳에서 가까이 찍거나, 글로 적어 다시 해보세요.',rcLimit:'잠시 후 다시 해보세요. 요청이 너무 많아요.',
  rcMax:n=>`사진은 한 번에 ${n}장까지 넣을 수 있어요.`,
@@ -273,7 +273,7 @@ pt:{h1:'Controle de Estoque',sub:'Vendas, estoque e lucro das peças produzidas'
  rcCam:'Tirar foto',rcCamHint:'Se a câmera não abrir, toque em "Escolher foto" e escolha a câmera, ou escolha uma foto já tirada.',rcGal:'Escolher foto',rcMic:'Falar',rcMicStop:'Parar',
  rcTextL:'Ou escreva',rcTextPh:'Ex.: vendi 20 do 2611 vestido, entrada de 300 do 2598 jeans',
  rcMicHint:'Aqui o microfone não pode ser usado direto. Toque no campo de texto abaixo e use o microfone do teclado.',
- rcListening:'Ouvindo… quando terminar, toque em "Parar".',
+ rcListening:'Ouvindo… fale uma linha curta por vez. Ex.: "2611 vinte peças vendidas". Para mais, toque de novo.',
  rcRead:'Ler e conferir quantidades',rcNeed:'Tire uma foto, fale ou escreva algo.',rcBusy:'Lendo… com foto leva de 20 a 40 segundos.',
  rcNoAi:'A leitura por IA ainda não está ativada. Funciona depois de configurar o Firebase. Por enquanto, digite o código abaixo.',rcDenied:'A leitura não está disponível. Verifique a internet.',rcFail:'Não foi possível ler. Tire a foto mais de perto e com boa luz, ou escreva, e tente de novo.',rcLimit:'Muitos pedidos. Tente de novo em instantes.',
  rcMax:n=>`Até ${n} fotos por vez.`,
@@ -504,10 +504,11 @@ function toggleMic(){const L=t(), msg=$('#rc-micMsg'), btn=$('#rc-mic');
   const hint=()=>{msg.textContent=L.rcMicHint;msg.hidden=false;btn.classList.remove('on');$('#rc-micTxt').textContent=L.rcMic;rec=null;$('#rc-text').focus()};
   if(!SR)return hint();
   try{rec=new SR()}catch(e){return hint()}
-  rec.lang=lang==='ko'?'ko-KR':'pt-BR';rec.continuous=true;rec.interimResults=true;
-  const base=$('#rc-text').value.trim();let finals='';
-  rec.onresult=e=>{let interim='';for(let k=e.resultIndex;k<e.results.length;k++){const r=e.results[k];if(r.isFinal)finals+=r[0].transcript+' ';else interim+=r[0].transcript}
-    const v=[base,(finals+interim).trim()].filter(Boolean).join('\n');$('#rc-text').value=v;rc.text=v;if(!rc.source)rc.source='voice'};
+  rec.lang=lang==='ko'?'ko-KR':'pt-BR';rec.continuous=false;rec.interimResults=true;rec.maxAlternatives=1;
+  const base=$('#rc-text').value.trim();
+  // one sentence per tap; rebuild from all results each time (Android Chrome repeats results otherwise)
+  rec.onresult=e=>{let said='';for(let k=0;k<e.results.length;k++)said+=e.results[k][0].transcript;said=said.replace(/\s+/g,' ').trim();
+    const v=[base,said].filter(Boolean).join('\n');$('#rc-text').value=v;rc.text=v;if(!rc.source)rc.source='voice'};
   rec.onerror=e=>{if(e.error==='not-allowed'||e.error==='service-not-allowed'||e.error==='audio-capture')hint()};
   rec.onend=()=>{if(rec){rec=null;btn.classList.remove('on');$('#rc-micTxt').textContent=L.rcMic;msg.hidden=true}};
   try{rec.start();btn.classList.add('on');$('#rc-micTxt').textContent=L.rcMicStop;msg.textContent=L.rcListening;msg.hidden=false}catch(e){hint()}
