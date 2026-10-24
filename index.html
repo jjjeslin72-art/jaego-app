@@ -80,6 +80,23 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .nums{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;font-size:12px;color:var(--muted)}
 .nums b{display:block;font-size:16px;color:var(--ink);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
 .nums.money2{grid-template-columns:1fr 1fr}
+.kinds{display:flex;flex-wrap:wrap;gap:6px}
+.kinds button{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:6px 11px;font-size:13px}
+.kinds button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--surface);font-weight:700}
+.chrow{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted)}
+.chrow .seg{flex:1}
+.rline.in .chrow{display:none}
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.tbl{border-collapse:collapse;width:100%;font-size:13px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.tbl th,.tbl td{padding:8px 9px;text-align:right;border-bottom:1px solid var(--line)}
+.tbl th{font-size:11.5px;color:var(--muted);font-weight:600;background:var(--bg);position:sticky;top:0}
+.tbl td.l,.tbl th.l{text-align:left}
+.tbl td.code-c{position:sticky;left:0;background:var(--surface);font-weight:700}
+.tbl th.code-c{position:sticky;left:0;z-index:1}
+.tbl tr[data-edit]{cursor:pointer}
+.tbl tr[data-edit]:active td{background:var(--accent-soft)}
+.tbl tfoot td{font-weight:700;background:var(--bg);border-bottom:0}
+.tbl .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--c);margin-right:5px;vertical-align:1px}
 .nums.money2 b{overflow-wrap:normal;white-space:nowrap}
 .bar{height:8px;background:var(--line);border-radius:4px;overflow:hidden}
 .bar i{display:block;height:100%;background:var(--c)}
@@ -166,7 +183,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
   <div class="bins" id="bins"></div>
   <div class="sum" id="sum"></div>
   <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="q" type="search" autocomplete="off"></div>
-  <div class="row"><h2 id="listTitle"></h2><button class="btn soft" type="button" id="rulesBtn"></button></div>
+  <div class="row"><h2 id="listTitle"></h2><span class="acts"><button class="btn soft" type="button" id="viewBtn"></button><button class="btn soft" type="button" id="rulesBtn"></button></span></div>
   <div class="list" id="list"></div>
   <div class="row" id="histHead"><h2 id="histTitle"></h2></div>
   <div class="hist" id="hist"></div>
@@ -186,21 +203,26 @@ const brl=n=>Number(n||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL
 const num=n=>Number(n||0).toLocaleString('pt-BR');
 const norm=s=>String(s??'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').normalize('NFC').replace(/[^0-9a-z가-힣]/g,'');
 const normCode=s=>norm(s).replace(/^(ref|codigo|cod|코드)/,'');
-const dn=i=>i?(lang==='pt'?(i.namePt||i.name||''):(i.name||i.namePt||'')):'';
+const KINDS=[['blusa','블라우스','Blusa'],['calca','바지','Calça'],['vestido','원피스','Vestido'],['saia','치마','Saia'],['short','반바지','Short'],['cropped','크롭','Cropped'],['conjunto','세트','Conjunto'],['jaqueta','재킷','Jaqueta'],['macacao','점프수트','Macacão'],['outro','기타','Outro']];
+const kindLabel=k=>{const r=KINDS.find(x=>x[0]===k);return r?(lang==='pt'?r[2]:r[1]):''};
+const KIND_WORDS=[[/블라우스|blusa|camisa|셔츠/,'blusa'],[/반바지|\bshorts?\b/,'short'],[/바지|calça|calca|팬츠|jeans/,'calca'],[/원피스|vestido/,'vestido'],[/치마|스커트|saia/,'saia'],[/크롭|cropped|\btop\b/,'cropped'],[/세트|conjunto/,'conjunto'],[/재킷|자켓|jaqueta|blazer/,'jaqueta'],[/점프수트|macac[aã]o/,'macacao']];
+const findKind=s=>{s=String(s||'').toLowerCase();for(const [re,k] of KIND_WORDS)if(re.test(s))return k;return ''};
+const kindChips=(sel,attr)=>`<div class="kinds" role="group">${KINDS.map(([k])=>`<button type="button" ${attr}="${k}" aria-pressed="${sel===k}">${kindLabel(k)}</button>`).join('')}</div>`;
+const dn=i=>{if(!i)return '';const n=lang==='pt'?(i.namePt||i.name||''):(i.name||i.namePt||'');const kl=kindLabel(i.kind);return n?(kl&&!n.includes(kl)?kl+' · '+n:n):kl};
 const lbl=i=>i?[i.ref,dn(i)].filter(Boolean).join(' · '):'';
 const hasHangul=s=>/[\uac00-\ud7a3]/.test(String(s||''));
 
 const T={
 ko:{h1:'재고 정리판',sub:'생산한 옷의 판매·재고·수익을 한눈에',monthL:(y,m)=>`${y}년 ${m}월 생산`,
- sales:'이번 달 매출',salesNote:'판매 수량 × 판매가',profit:'판매 이익',profitNote:'판매한 옷에서 남은 돈 (판매가 − 원가)',
+ sales:'이번 달 매출',salesNote:'도매 판매 × 도매가 + 소매 판매 × 소매가',profit:'판매 이익',profitNote:'판매한 옷에서 남은 돈 (판매 금액 − 원가)',
  prodCost:'생산비 총액',cash:'현금 수익',cashNote:'매출 − 생산비 (안 팔린 재고까지 뺀 금액)',stockVal:'남은 재고 가치',margin:'이익률',
  noCost:'원가가 없는 옷은 수익 계산에서 빠져요.',
- cats:{re:['재판','다시 만들 옷'],watch:['지켜보기','계속 판매'],sale:['사우드','saldão 세일'],retail:['소매 처리','소매로 남은 재고 정리'],early:['판단 이름','생산 후 기간 짧음']},
+ cats:{re:['재생산','다시 만들 옷'],watch:['지켜보기','계속 판매'],sale:['사우드','saldão 세일'],retail:['소매 처리','소매로 남은 재고 정리'],early:['아직 일러요','입고 후 기간이 짧음']},
  styles:'상품',made:'입고',sold:'판매',stock:'재고',pcs:'장',rate:'판매율',all:'전체 상품',catList:t=>`${t} 상품`,showAll:'전체 보기',
  qPh:'코드나 이름으로 찾기',searchRes:n=>`찾은 상품 ${n}개`,noFound:'찾는 상품이 없어요. 입력하기에서 코드를 넣으면 새로 등록돼요.',
  rulesBtn:'분류 기준',add:'+ 상품 등록',rcBtn:'영수증·말로 입력',noCode:'코드 없음',day:d=>`입고 ${d}일째`,noDate:'날짜 없음',
- costL:'원가',priceL:'판매가',unitProfit:'장당 이익',itemSales:'매출',itemProfit:'이익',
- adRe:(pd,q)=>`<b>재판 추천</b> · 하루 약 ${pd}장씩 팔려요. <b>${q}장</b> 정도 다시 만들면 좋아요.`,
+ costL:'원가',priceL:'도매가',priceVL:'소매가',retailN:n=>`그중 소매 ${n}`,unitProfit:'장당 이익',itemSales:'매출',itemProfit:'이익',
+ adRe:(pd,q)=>`<b>재생산 추천</b> · 하루 약 ${pd}장씩 팔려요. <b>${q}장</b> 정도 다시 만들면 좋아요.`,
  adWatch:r=>`<b>계속 판매</b> · 판매율 ${r}%. 매장 앞쪽 진열이나 SNS 홍보로 더 밀어보세요.`,
  adSale:(s,p,o)=>`<b>사우드 추천</b> · 재고 ${s}장.`+(p?` 판매가 ${p[0]} → <b>${p[1]}</b> (${o}% 할인)로 saldão에 내보세요.`:' saldão에 내보세요.'),
  belowCost:c=>` <span class="warn-t">할인가가 원가(${c})보다 낮아요.</span>`,
@@ -209,19 +231,19 @@ ko:{h1:'재고 정리판',sub:'생산한 옷의 판매·재고·수익을 한눈
  adWait:'<b>입고 대기</b> · 아직 들어온 수량이 없어요. 입고 영수증을 찍으면 수량이 올라가요.',
  sellBtn:'판매 수량 입력',edit:'수정',close:'닫기',save:'저장',
  emptyMonth:m=>`${m} 상품이 아직 없어요.<br>오른쪽 아래 <b>입력하기</b>에서 코드를 넣으면 새 상품으로 등록돼요.`,emptyCat:'이 분류에 해당하는 상품이 없어요.',loading:'불러오는 중…',
- fAdd:'상품 등록',fEdit:'상품 정보 수정',fCode:'코드 (código)',fCodePh:'예: 2611',fName:'한국어 이름 (선택)',fNamePh:'예: 린넨 롱 원피스',fNamePt:'포르투갈어 이름 (선택)',fNamePtPh:'Ex.: Vestido longo de linho',fNameHint:'상품은 코드로 구분해요. 이름은 넣고 싶을 때만 넣으세요.',fCost:'원가 (R$, 장당)',fPrice:'판매가 (R$, 장당)',
+ fAdd:'상품 등록',fEdit:'상품 정보 수정',fCode:'코드 (código)',fCodePh:'예: 2611',fName:'한국어 이름 (선택)',fNamePh:'예: 린넨 롱 원피스',fNamePt:'포르투갈어 이름 (선택)',fNamePtPh:'Ex.: Vestido longo de linho',fNameHint:'상품은 코드로 구분해요. 이름은 넣고 싶을 때만 넣으세요.',fCost:'원가 (R$, 장당)',fPrice:'도매가 atacado (R$, 장당)',fPriceV:'소매가 varejo (R$, 한 장)',fSoldV:'그중 소매 판매',fKind:'어떤 옷인가요?',eSoldV:'소매 판매가 전체 판매보다 많아요.',eKind:'처음 보는 코드예요. 어떤 옷인지 골라주세요.',chL:'판매 방식',chA:'도매',chV:'소매',viewTable:'표로 전체 보기',viewCards:'카드로 보기',thCode:'코드',thName:'상품',thCat:'분류',tblHint:'줄을 누르면 상품 정보를 고칠 수 있어요. 옆으로 밀면 더 보여요.',total:'합계',
  fMade:'입고(생산) 수량',fSold:'판매 수량',fDate:'입고일',fDateHint:'입고일의 달로 묶여서 보여요. 입고 수량은 0으로 두고 나중에 영수증으로 채워도 돼요.',
  eCode:'코드를 넣어주세요.',eName:'상품 이름을 넣어주세요.',eSold:'판매 수량이 입고 수량보다 많아요. 숫자를 확인해 주세요.',
  eDup:(n,m)=>`이 코드는 이미 같은 달의 "${n}"에 쓰이고 있어요.`,dupOpen:'그 상품 열기',
  del:'이 상품 삭제',delQ:'정말 삭제할까요? 되돌릴 수 없어요.',cancel:'취소',delete:'삭제',
  sNow:(s,k)=>`지금까지 판매 ${s}장 · 재고 ${k}장`,sAdd:'오늘 판매한 수량 더하기',sAddPh:'예: 12',sTot:'또는 총 판매 수량으로 고치기',sSave:'판매 수량 저장',sErr:m=>`입고 수량(${m}장)보다 많이 팔 수 없어요.`,
- rTitle:'분류 기준',rExpl:['판매율 = 판매 수량 ÷ 입고 수량','<b>재판</b> · 판매율이 기준 이상','<b>지켜보기</b> · 판매율이 중간','<b>사우드</b> · 판매율 낮고 재고가 많음','<b>소매 처리</b> · 판매율 낮고 재고가 조금 남음'],
- rRe:'재판 기준 판매율 (%)',rLow:'판매 부진 기준 (%)',rRetail:'소매 처리 최대 재고 (장)',rDays:'분류 시작 (입고 후 일수)',rOff:'사우드 할인율 (%)',rSave:'기준 저장',rReset:'처음 기준으로 되돌리기',rErr:'부진 기준은 재판 기준보다 낮아야 해요',
+ rTitle:'분류 기준',rExpl:['판매율 = 판매 수량 ÷ 입고 수량','<b>재생산</b> · 판매율이 기준 이상','<b>지켜보기</b> · 판매율이 중간','<b>사우드</b> · 판매율 낮고 재고가 많음','<b>소매 처리</b> · 판매율 낮고 재고가 조금 남음'],
+ rRe:'재생산 기준 판매율 (%)',rLow:'판매 부진 기준 (%)',rRetail:'소매 처리 최대 재고 (장)',rDays:'분류 시작 (입고 후 일수)',rOff:'사우드 할인율 (%)',rSave:'기준 저장',rReset:'처음 기준으로 되돌리기',rErr:'부진 기준은 재생산 기준보다 낮아야 해요',
  tSaved:'저장했어요',tDeleted:'삭제했어요',tSold:s=>`판매 ${s}장으로 저장했어요`,tRules:'기준을 저장했어요',tReset:'처음 기준으로 되돌렸어요',tSaveErr:'저장하지 못했어요. 인터넷 연결을 확인해 주세요.',tDelErr:'삭제하지 못했어요.',
  stOk:'자동 저장됨 · 휴대폰과 컴퓨터 어디서 열어도 같은 내용이 보여요',stOff:'인터넷이 끊겨도 저장돼요. 연결되면 자동으로 올라가요.',stNo:'저장 기능에 연결되지 않았어요. 지금 넣는 내용은 화면을 닫으면 사라져요.',stErr:'저장된 내용을 불러오지 못했어요. 페이지를 다시 열어주세요.',
  inTitle:'입력하기',inBtn:'입력하기',cardIn:'판매·입고 입력',inCapture:'사진이나 말로 한꺼번에 넣기',inRead:'AI로 읽어서 아래에 넣기',inLines:'입력할 내용',inAdd:'+ 코드로 한 줄 추가',
  inEmpty:'코드를 넣거나 사진·말로 읽어오세요. 새 코드를 넣으면 새 상품으로 등록돼요.',inReadDone:n=>`${n}줄을 읽었어요. 아래에서 확인하고 반영하세요.`,
- lnCode:'코드',lnNewTag:'새 상품',lnNew:'처음 보는 코드예요. 이 코드로 새 상품이 등록되고 수량은 입고로 들어가요. 이름은 넣지 않아도 돼요.',lnNoCode:'코드를 넣어주세요.',lnNoCodeName:n=>`"${n}" · 코드를 넣어주세요.`,lnMonth:'어느 달 상품인가요?',lnRemove:'지우기',eNewName:'새 상품 이름을 넣어주세요.',
+ lnCode:'코드',lnNewTag:'새 상품',lnNew:'처음 보는 코드예요. 어떤 옷인지 고르면 새 상품으로 등록되고 수량은 입고로 들어가요.',lnNoCode:'코드를 넣어주세요.',lnNoCodeName:n=>`"${n}" · 코드를 넣어주세요.`,lnMonth:'어느 달 상품인가요?',lnRemove:'지우기',eNewName:'새 상품 이름을 넣어주세요.',
  rcTitle:'영수증·말로 수량 입력',rcKind:'무엇을 입력하나요?',kAuto:'알아서',kSale:'판매·출고',kIn:'입고',
  rcCam:'사진 찍기',rcCamHint:'카메라가 안 열리면 "사진 고르기"를 누르고 카메라를 고르세요. 찍어둔 영수증 사진을 골라도 돼요.',rcGal:'사진 고르기',rcMic:'말하기',rcMicStop:'그만 말하기',
  rcTextL:'또는 글로 적기',rcTextPh:'예: 2611 원피스 20장 팔렸어, 2598 데님 입고 300장',
@@ -239,14 +261,14 @@ ko:{h1:'재고 정리판',sub:'생산한 옷의 판매·재고·수익을 한눈
  hTitle:'최근 입력 기록',hEmpty:'입력하기로 넣은 내용이 여기에 기록돼요. 잘못 넣었으면 되돌릴 수 있어요.',
  hSum:(s,i)=>[s?`판매 ${s}장`:'',i?`입고 ${i}장`:''].filter(Boolean).join(' · '),hSrc:{photo:'사진',voice:'말',text:'글',manual:'직접'},hUndo:'되돌리기',hUndoQ:'정말 되돌릴까요?',hUndone:'되돌림',tUndone:'되돌렸어요'},
 pt:{h1:'Controle de Estoque',sub:'Vendas, estoque e lucro das peças produzidas',monthL:(y,m)=>`Entrada ${String(m).padStart(2,'0')}/${y}`,
- sales:'Faturamento do mês',salesNote:'peças vendidas × preço de venda',profit:'Lucro das vendas',profitNote:'o que sobrou das peças vendidas (venda − custo)',
+ sales:'Faturamento do mês',salesNote:'vendas atacado × preço atacado + vendas varejo × preço varejo',profit:'Lucro das vendas',profitNote:'o que sobrou das peças vendidas (vendas − custo)',
  prodCost:'Custo total de produção',cash:'Resultado em caixa',cashNote:'faturamento − custo de produção (inclui o estoque parado)',stockVal:'Valor do estoque',margin:'Margem',
  noCost:'Peças sem custo ficam fora do cálculo de lucro.',
  cats:{re:['Repor','produzir de novo'],watch:['Acompanhar','continuar vendendo'],sale:['Saldão','queima no atacado'],retail:['Varejo','vender o resto no varejo'],early:['Cedo demais','pouco tempo de entrada']},
  styles:'Produtos',made:'Entrada',sold:'Vendido',stock:'Estoque',pcs:'pç',rate:'Venda',all:'Todos os produtos',catList:t=>`Produtos: ${t}`,showAll:'Ver todos',
  qPh:'Buscar por código ou nome',searchRes:n=>`${n} produto(s) encontrado(s)`,noFound:'Nenhum produto encontrado. Em Lançar, digite o código para cadastrar.',
  rulesBtn:'Critérios',add:'+ Cadastrar produto',rcBtn:'Nota · Foto · Voz',noCode:'Sem código',day:d=>`${d} dias da entrada`,noDate:'sem data',
- costL:'Custo',priceL:'Venda',unitProfit:'Lucro/pç',itemSales:'Faturamento',itemProfit:'Lucro',
+ costL:'Custo',priceL:'Atacado',priceVL:'Varejo',retailN:n=>`${n} no varejo`,unitProfit:'Lucro/pç',itemSales:'Faturamento',itemProfit:'Lucro',
  adRe:(pd,q)=>`<b>Repor</b> · Vende cerca de ${pd} pç por dia. Produza umas <b>${q} peças</b> de novo.`,
  adWatch:r=>`<b>Continuar vendendo</b> · ${r}% vendido. Destaque na vitrine ou divulgue nas redes.`,
  adSale:(s,p,o)=>`<b>Mandar pro saldão</b> · ${s} pç em estoque.`+(p?` De ${p[0]} por <b>${p[1]}</b> (${o}% de desconto).`:''),
@@ -256,7 +278,7 @@ pt:{h1:'Controle de Estoque',sub:'Vendas, estoque e lucro das peças produzidas'
  adWait:'<b>Aguardando entrada</b> · Ainda não entrou nenhuma peça. Fotografe a nota de entrada para somar.',
  sellBtn:'Lançar vendas',edit:'Editar',close:'Fechar',save:'Salvar',
  emptyMonth:m=>`Nenhum produto em ${m}.<br>Toque em <b>Lançar</b> e digite um código para cadastrar.`,emptyCat:'Nenhum produto nesta categoria.',loading:'Carregando…',
- fAdd:'Cadastrar produto',fEdit:'Editar produto',fCode:'Código',fCodePh:'Ex.: 2611',fName:'Nome em coreano (opcional)',fNamePh:'예: 린넨 롱 원피스',fNamePt:'Nome em português (opcional)',fNamePtPh:'Ex.: Vestido longo de linho',fNameHint:'Os produtos são identificados pelo código. O nome é opcional.',fCost:'Custo (R$ por peça)',fPrice:'Preço de venda (R$ por peça)',
+ fAdd:'Cadastrar produto',fEdit:'Editar produto',fCode:'Código',fCodePh:'Ex.: 2611',fName:'Nome em coreano (opcional)',fNamePh:'예: 린넨 롱 원피스',fNamePt:'Nome em português (opcional)',fNamePtPh:'Ex.: Vestido longo de linho',fNameHint:'Os produtos são identificados pelo código. O nome é opcional.',fCost:'Custo (R$ por peça)',fPrice:'Preço atacado (R$ por peça)',fPriceV:'Preço varejo (R$, peça avulsa)',fSoldV:'Desse total, vendido no varejo',fKind:'Que tipo de peça?',eSoldV:'Varejo maior que o total vendido.',eKind:'Código novo. Escolha o tipo de peça.',chL:'Tipo de venda',chA:'Atacado',chV:'Varejo',viewTable:'Ver tudo em tabela',viewCards:'Ver em cartões',thCode:'Código',thName:'Produto',thCat:'Situação',tblHint:'Toque na linha para editar o produto. Deslize para o lado para ver mais.',total:'Total',
  fMade:'Qtd. de entrada (produção)',fSold:'Qtd. vendida',fDate:'Data de entrada',fDateHint:'O produto entra no mês da data de entrada. Pode deixar a entrada em 0 e somar depois pela nota.',
  eCode:'Informe o código.',eName:'Informe o nome do produto.',eSold:'A quantidade vendida é maior que a de entrada. Confira os números.',
  eDup:(n)=>`Este código já está em uso no mesmo mês: "${n}".`,dupOpen:'Abrir esse produto',
@@ -268,7 +290,7 @@ pt:{h1:'Controle de Estoque',sub:'Vendas, estoque e lucro das peças produzidas'
  stOk:'Salvo automaticamente · aparece igual no celular e no computador',stOff:'Funciona sem internet. Sincroniza quando voltar a conexão.',stNo:'Sem conexão com o armazenamento. O que você digitar some ao fechar a página.',stErr:'Não foi possível carregar os dados. Abra a página de novo.',
  inTitle:'Lançar',inBtn:'Lançar',cardIn:'Lançar venda/entrada',inCapture:'Lançar tudo por foto ou voz',inRead:'Ler com IA e colocar abaixo',inLines:'Itens a lançar',inAdd:'+ Adicionar linha por código',
  inEmpty:'Digite um código ou leia uma foto/voz. Código novo vira produto novo.',inReadDone:n=>`${n} linha(s) lida(s). Confira abaixo e lance.`,
- lnCode:'Código',lnNewTag:'Produto novo',lnNew:'Código novo. O produto será cadastrado com este código e a quantidade entra como entrada. O nome é opcional.',lnNoCode:'Informe o código.',lnNoCodeName:n=>`"${n}" · informe o código.`,lnMonth:'De qual mês é o produto?',lnRemove:'Remover',eNewName:'Informe o nome do produto novo.',
+ lnCode:'Código',lnNewTag:'Produto novo',lnNew:'Código novo. Escolha o tipo de peça para cadastrar; a quantidade entra como entrada.',lnNoCode:'Informe o código.',lnNoCodeName:n=>`"${n}" · informe o código.`,lnMonth:'De qual mês é o produto?',lnRemove:'Remover',eNewName:'Informe o nome do produto novo.',
  rcTitle:'Lançar por nota, foto ou voz',rcKind:'O que você vai lançar?',kAuto:'Detectar',kSale:'Venda · saída',kIn:'Entrada',
  rcCam:'Tirar foto',rcCamHint:'Se a câmera não abrir, toque em "Escolher foto" e escolha a câmera, ou escolha uma foto já tirada.',rcGal:'Escolher foto',rcMic:'Falar',rcMicStop:'Parar',
  rcTextL:'Ou escreva',rcTextPh:'Ex.: vendi 20 do 2611 vestido, entrada de 300 do 2598 jeans',
@@ -290,6 +312,7 @@ let lang='ko'; try{lang=localStorage.getItem('lang')||'ko'}catch(e){}
 const t=()=>T[lang];
 
 const DEF={minDays:20,reRate:70,lowRate:40,retailMax:30,saleOff:30};
+let view='cards';try{view=localStorage.getItem('view')||'cards'}catch(e){}
 let rules={...DEF}, items=[], moves=[], db=null, ai=null, aiOpts={images:null}, filter='all', q='', loaded=false, dbState='wait', unsub=[];
 let month=new Date().toISOString().slice(0,7);
 const CLS={re:'c-re',watch:'c-watch',sale:'c-sale',retail:'c-retail',early:'c-early'};
@@ -297,9 +320,10 @@ const CLS={re:'c-re',watch:'c-watch',sale:'c-sale',retail:'c-retail',early:'c-ea
 function daysSince(d){if(!d)return 999;return Math.max(0,Math.floor((Date.now()-new Date(d+'T12:00:00').getTime())/864e5))}
 function calc(it){
   const made=+it.made||0, sold=Math.min(+it.sold||0,made), stock=made-sold, rate=made?sold/made*100:0, days=daysSince(it.madeDate);
-  const price=+it.price||0, cost=+it.cost||0;
+  const price=+it.price||0, priceV=+it.priceV||0, cost=+it.cost||0, soldV=Math.min(+it.soldV||0,sold), soldA=sold-soldV;
   let cat; if(!made)cat='early'; else if(rate>=rules.reRate)cat='re'; else if(days<rules.minDays)cat='early'; else if(rate>=rules.lowRate)cat='watch'; else cat=stock>rules.retailMax?'sale':'retail';
-  return {made,sold,stock,rate,days,cat,price,cost,perDay:sold/Math.max(days,1),sales:sold*price,profit:cost?sold*(price-cost):null,prodCost:made*cost};
+  const sales=soldA*price+soldV*(priceV||price);
+  return {made,sold,soldV,soldA,stock,rate,days,cat,price,priceV,cost,perDay:sold/Math.max(days,1),sales,profit:cost?sales-sold*cost:null,prodCost:made*cost};
 }
 function advice(j){const L=t();
   if(!j.made)return L.adWait;
@@ -315,18 +339,22 @@ const byRecent=(a,b)=>String(b.madeDate||'').localeCompare(String(a.madeDate||''
 
 function card(i){const L=t(),j=i.j;return `<div class="card ${CLS[j.cat]}">
     <div class="row"><div class="name"><span class="code big">${esc(i.ref||L.noCode)}</span>${dn(i)?`<span class="pname">${esc(dn(i))}</span>`:''}<div class="ref">${j.days===999?L.noDate:L.day(j.days)}${q?' · '+esc(mLabel(i.month||month)):''}</div></div><span class="pill">${L.cats[j.cat][0]}</span></div>
-    <div class="nums"><div>${L.made}<b>${j.made}</b></div><div>${L.sold}<b>${j.sold}</b></div><div>${L.stock}<b>${j.stock}</b></div></div>
+    <div class="nums"><div>${L.made}<b>${j.made}</b></div><div>${L.sold}<b>${j.sold}</b>${j.soldV?`<span class="ref">${L.retailN(j.soldV)}</span>`:''}</div><div>${L.stock}<b>${j.stock}</b></div></div>
     <div class="bar" role="img" aria-label="${L.rate} ${j.rate.toFixed(0)}%"><i style="width:${j.rate.toFixed(1)}%"></i></div>
-    <div class="ref">${L.rate} <b style="color:var(--ink)">${j.rate.toFixed(0)}%</b> · ${L.costL} ${j.cost?brl(j.cost):'—'} · ${L.priceL} ${j.price?brl(j.price):'—'}${j.cost&&j.price?' · '+L.unitProfit+' '+brl(j.price-j.cost):''}</div>
+    <div class="ref">${L.rate} <b style="color:var(--ink)">${j.rate.toFixed(0)}%</b> · ${L.costL} ${j.cost?brl(j.cost):'—'} · ${L.priceL} ${j.price?brl(j.price):'—'} · ${L.priceVL} ${j.priceV?brl(j.priceV):'—'}</div>
     <div class="nums money2"><div>${L.itemSales}<b>${brl(j.sales)}</b></div><div>${L.itemProfit}<b style="${j.profit<0?'color:var(--retail)':''}">${j.profit===null?'—':brl(j.profit)}</b></div></div>
     <div class="advice">${advice(j)}</div>
     <div class="acts"><button class="btn" type="button" data-in="${i.id}">${L.cardIn}</button><button class="btn soft" type="button" data-edit="${i.id}">${L.edit}</button></div>
   </div>`}
 
+function table(rows){const L=t();const T2=f=>rows.reduce((a,i)=>a+f(i.j),0);
+  return `<p class="hint">${L.tblHint}</p><div class="tablewrap"><table class="tbl"><thead><tr><th class="l code-c">${L.thCode}</th><th class="l">${L.thName}</th><th>${L.made}</th><th>${L.sold}</th><th>${L.stock}</th><th>${L.rate}</th><th class="l">${L.thCat}</th><th>${L.itemSales}</th><th>${L.itemProfit}</th></tr></thead><tbody>
+  ${rows.map(i=>{const j=i.j;return `<tr data-edit="${i.id}" class="${CLS[j.cat]}"><td class="l code-c">${esc(i.ref||'—')}</td><td class="l">${esc(dn(i)||'—')}</td><td>${num(j.made)}</td><td>${num(j.sold)}</td><td>${num(j.stock)}</td><td>${j.rate.toFixed(0)}%</td><td class="l"><span class="dot"></span>${L.cats[j.cat][0]}</td><td>${brl(j.sales)}</td><td style="${j.profit<0?'color:var(--retail)':''}">${j.profit===null?'—':brl(j.profit)}</td></tr>`}).join('')}
+  </tbody><tfoot><tr><td class="l code-c">${L.total}</td><td class="l">${rows.length}</td><td>${num(T2(j=>j.made))}</td><td>${num(T2(j=>j.sold))}</td><td>${num(T2(j=>j.stock))}</td><td></td><td></td><td>${brl(T2(j=>j.sales))}</td><td>${brl(rows.reduce((a,i)=>a+(i.j.profit||0),0))}</td></tr></tfoot></table></div>`}
 function render(){
   const L=t(); document.documentElement.lang=lang==='ko'?'ko':'pt-BR';
   document.querySelectorAll('[data-lang]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.lang===lang));
-  $('#h1').textContent=L.h1; $('#sub').textContent=L.sub; $('#rulesBtn').textContent=L.rulesBtn; $('#rcBtnTxt').textContent=L.inBtn;
+  $('#h1').textContent=L.h1; $('#sub').textContent=L.sub; $('#rulesBtn').textContent=L.rulesBtn; $('#viewBtn').textContent=view==='table'?L.viewCards:L.viewTable; $('#rcBtnTxt').textContent=L.inBtn;
   $('#q').placeholder=L.qPh; $('#q').setAttribute('aria-label',L.qPh); $('#histTitle').textContent=L.hTitle;
   $('#status').className='status'+(dbState==='ok'||dbState==='wait'?'':' warn'); $('#status').textContent={ok:L.stOk,off:L.stOff,no:L.stNo,err:L.stErr}[dbState]||'';
   if(window.App&&App.onRender)App.onRender(L);
@@ -353,12 +381,12 @@ function render(){
   if(q){const nq=norm(q);
     const found=items.filter(i=>norm(i.ref).includes(nq)||norm(i.name).includes(nq)||norm(i.namePt).includes(nq)).sort(byRecent).map(i=>({...i,j:calc(i)}));
     $('#listTitle').textContent=L.searchRes(found.length);
-    $('#list').innerHTML=found.length?found.map(card).join(''):`<div class="empty">${L.noFound}</div>`;return}
+    $('#list').innerHTML=found.length?(view==='table'?table(found):found.map(card).join('')):`<div class="empty">${L.noFound}</div>`;return}
   $('#listTitle').innerHTML=esc(filter==='all'?L.all:L.catList(L.cats[filter][0]))+(filter!=='all'?` <button type="button" class="btn soft sm" data-f="all" style="vertical-align:middle">${L.showAll}</button>`:'');
   if(!mine.length){$('#list').innerHTML=`<div class="empty">${L.emptyMonth(mLabel(month))}</div>`;return}
   const order={re:0,sale:1,retail:2,watch:3,early:4};
   const shown=mine.filter(i=>filter==='all'||i.j.cat===filter).sort((a,b)=>order[a.j.cat]-order[b.j.cat]||b.j.rate-a.j.rate);
-  $('#list').innerHTML=shown.length?shown.map(card).join(''):`<div class="empty">${L.emptyCat}</div>`;
+  $('#list').innerHTML=shown.length?(view==='table'?table(shown):shown.map(card).join('')):`<div class="empty">${L.emptyCat}</div>`;
 }
 function renderHist(){const L=t();
   if(!moves.length){$('#hist').innerHTML=`<div class="hint">${L.hEmpty}</div>`;return}
@@ -397,21 +425,25 @@ async function addMove(m){
 // ---------- product form ----------
 function dupOf(code,mon,selfId){const c=normCode(code);if(!c)return null;return items.find(i=>i.id!==selfId&&normCode(i.ref)===c&&i.month===mon)||null}
 function itemForm(it,preset){const L=t();
-  const v=it||{madeDate:new Date().toISOString().slice(0,10),made:0,sold:0,price:'',cost:'',ref:'',name:'',namePt:'',...(preset||{})};
+  const v=it||{madeDate:new Date().toISOString().slice(0,10),made:0,sold:0,price:'',priceV:'',cost:'',ref:'',name:'',namePt:'',kind:'',soldV:0,...(preset||{})};
   openSheet(`${head(it?L.fEdit:L.fAdd)}
   <div class="two"><div class="field"><label for="f-ref">${L.fCode}</label><input id="f-ref" value="${esc(v.ref)}" placeholder="${L.fCodePh}" autocomplete="off" autocapitalize="characters"></div>
   <div class="field"><label for="f-date">${L.fDate}</label><input id="f-date" type="date" value="${esc(v.madeDate)}"></div></div>
   <div id="f-dup"></div>
+  <div class="field">${L.fKind}<div id="f-kind">${kindChips(v.kind,'data-kind')}</div></div>
   <div class="two"><div class="field"><label for="f-name">${L.fName}</label><input id="f-name" value="${esc(v.name)}" placeholder="${L.fNamePh}"></div>
   <div class="field"><label for="f-namept">${L.fNamePt}</label><input id="f-namept" value="${esc(v.namePt)}" placeholder="${L.fNamePtPh}"></div></div>
   <p class="hint">${L.fNameHint}</p>
   <div class="two"><div class="field"><label for="f-cost">${L.fCost}</label><input id="f-cost" type="number" step="0.01" min="0" inputmode="decimal" value="${esc(v.cost)}"></div>
   <div class="field"><label for="f-price">${L.fPrice}</label><input id="f-price" type="number" step="0.01" min="0" inputmode="decimal" value="${esc(v.price)}"></div></div>
+  <div class="two"><div class="field"><label for="f-pricev">${L.fPriceV}</label><input id="f-pricev" type="number" step="0.01" min="0" inputmode="decimal" value="${esc(v.priceV)}"></div><div></div></div>
   <div class="two"><div class="field"><label for="f-made">${L.fMade}</label><input id="f-made" type="number" min="0" inputmode="numeric" value="${esc(v.made)}"></div>
   <div class="field"><label for="f-sold">${L.fSold}</label><input id="f-sold" type="number" min="0" inputmode="numeric" value="${esc(v.sold)}"></div></div>
+  <div class="two"><div></div><div class="field"><label for="f-soldv">${L.fSoldV}</label><input id="f-soldv" type="number" min="0" inputmode="numeric" value="${esc(v.soldV||0)}"></div></div>
   <p class="hint">${L.fDateHint}</p><p class="err" id="f-err" hidden></p>
   <button class="btn full" type="button" id="f-save">${L.save}</button>
   ${it?`<div id="delZone"><button class="btn danger full" type="button" id="f-del">${L.del}</button></div>`:''}`);
+  let fkind=v.kind||'';$('#f-kind').onclick=e=>{const b=e.target.closest('[data-kind]');if(!b)return;fkind=fkind===b.dataset.kind?'':b.dataset.kind;$('#f-kind').innerHTML=kindChips(fkind,'data-kind')};
   const checkDup=()=>{const d=dupOf($('#f-ref').value,($('#f-date').value||month).slice(0,7),it?.id);
     $('#f-dup').innerHTML=d?`<p class="err">${esc(L.eDup(lbl(d)))} <button class="btn soft sm" type="button" id="f-open">${L.dupOpen}</button></p>`:'';
     if(d)$('#f-open').onclick=()=>itemForm(d);return d};
@@ -419,8 +451,9 @@ function itemForm(it,preset){const L=t();
   $('#f-save').onclick=async()=>{
     const ref=$('#f-ref').value.trim(), name=$('#f-name').value.trim(), made=Math.max(0,Math.floor(+$('#f-made').value||0)), sold=Math.max(0,Math.floor(+$('#f-sold').value||0)), date=$('#f-date').value, err=$('#f-err');
     const bad=m=>{err.textContent=m;err.hidden=false};
-    if(!ref)return bad(L.eCode); if(sold>made)return bad(L.eSold); if(checkDup())return;
-    const data={ref,name,namePt:$('#f-namept').value.trim(),cost:+$('#f-cost').value||0,price:+$('#f-price').value||0,made,sold,madeDate:date,month:(date||month).slice(0,7),updatedAt:new Date().toISOString()};
+    const soldV=Math.max(0,Math.floor(+$('#f-soldv').value||0));
+    if(!ref)return bad(L.eCode); if(sold>made)return bad(L.eSold); if(soldV>sold)return bad(L.eSoldV); if(checkDup())return;
+    const data={ref,name,namePt:$('#f-namept').value.trim(),kind:fkind,cost:+$('#f-cost').value||0,price:+$('#f-price').value||0,priceV:+$('#f-pricev').value||0,made,sold,soldV,madeDate:date,month:(date||month).slice(0,7),updatedAt:new Date().toISOString()};
     if(await saveItem(it?.id,data)){month=data.month;q='';$('#q').value='';closeSheet();render();toast(L.tSaved)}
   };
   if(it)$('#f-del').onclick=()=>{$('#delZone').innerHTML=`<p class="hint">${L.delQ}</p><div class="two"><button class="btn soft" type="button" data-close>${L.cancel}</button><button class="btn danger" type="button" id="f-del2">${L.delete}</button></div>`;
@@ -448,8 +481,8 @@ async function shrink(file){try{const bmp=await createImageBitmap(file);const s=
   return await new Promise(r=>c.toBlob(b=>r(b||file),'image/jpeg',0.85))}catch(e){return file}}
 function stopMic(){if(rec){try{rec.stop()}catch(e){}rec=null}}
 const codeMatches=code=>{const c=normCode(code);return c?items.filter(i=>normCode(i.ref)===c).sort(byRecent):[]};
-function newLine(o){return {code:'',pick:'',name:'',namePt:'',cost:'',price:'',qty:'',type:rc&&rc.kind!=='auto'?rc.kind:'sale',read:'',...(o||{})}}
-const isBlank=l=>!String(l.code).trim()&&!l.pick&&!l.qty&&!String(l.name).trim()&&!String(l.namePt).trim();
+function newLine(o){return {code:'',pick:'',name:'',namePt:'',kind:'',cost:'',price:'',priceV:'',ch:'A',qty:'',type:rc&&rc.kind!=='auto'?rc.kind:'sale',read:'',...(o||{})}}
+const isBlank=l=>!String(l.code).trim()&&!l.pick&&!l.qty&&!String(l.name).trim()&&!String(l.namePt).trim()&&!l.kind;
 function rematch(l){const ms=codeMatches(l.code);
   if(ms.length){if(!ms.some(m=>m.id===l.pick))l.pick=ms[0].id}else l.pick=l.code.trim()?'new':'';
   if(l.pick==='new')l.type='in'}
@@ -530,10 +563,12 @@ Rules:
 - "qty": total pieces as an integer. Add up sizes or colors listed separately (P 2, M 4, G 4 = 10). Dozens (dz, dúzia, 다스) × 12.
 - One entry per product; merge repeated lines of the same product and type.
 - Do not invent lines. Skip totals, prices, taxes, payment and customer details.
+- "kind": the garment type if the record says it, one of blusa, calca, vestido, saia, short, cropped, conjunto, jaqueta, macacao, outro; null if not said.
+- "channel": "varejo" for retail or single-piece sales (varejo, avulso, unidade, 소매, 낱장); otherwise "atacado".
 - "read": a short quote of what you read for that line.
 
 Return ONLY a JSON object, no other text:
-{"lines":[{"code":"2611","name":"Vestido linho","qty":20,"type":"sale","read":"2611 vestido P4 M8 G8"}],"note":""}
+{"lines":[{"code":"2611","name":"Vestido linho","kind":"vestido","channel":"atacado","qty":20,"type":"sale","read":"2611 vestido P4 M8 G8"}],"note":""}
 "note": anything unclear, written in ${lang==='ko'?'Korean':'Portuguese'}; empty if nothing.
 ${nImg?`\n${nImg} photo(s) are attached.`:''}${text?`\nOwner's text or speech:\n"""${text}"""`:''}`;
 }
@@ -560,7 +595,8 @@ function localParse(text,kind){
       if(qty===null&&toks.length>=2){code=toks[0];qty=+toks[1].replace(/\D/g,'')||null}}
     if(qty===null){const nums=(seg.match(/\d+/g)||[]).filter(n=>n!==String(code).replace(/\D/g,''));if(nums.length)qty=+nums[nums.length-1]}
     if(!code&&!qty)continue;
-    lines.push({code,name:null,qty:qty||0,type:type||(kind!=='auto'?kind:null),read:seg})}
+    const ch=/소매|낱장|한\s*장씩|varejo|avuls|unidade/.test(low)?'varejo':null;
+    lines.push({code,name:null,kind:findKind(low)||null,channel:ch,qty:qty||0,type:type||(kind!=='auto'?kind:null),read:seg})}
   return {lines,note:''};
 }
 async function readReceipt(){const L=t(), err=$('#rc-err');err.hidden=true;stopMic();
@@ -573,7 +609,7 @@ async function readReceipt(){const L=t(), err=$('#rc-err');err.hidden=true;stopM
     const got=(Array.isArray(out?.lines)?out.lines:[]).map(l=>{const m=matchItem(l);
       const type=l.type==='sale'||l.type==='in'?l.type:(rc.kind==='auto'?'sale':rc.kind);
       const code=m?(m.ref||''):String(l.code??'').trim();
-      const line=newLine({code,pick:m?m.id:(code?'new':''),name:!m&&hasHangul(l.name)?String(l.name).trim():'',namePt:!m&&l.name&&!hasHangul(l.name)?String(l.name).trim():'',qty:Math.max(0,Math.round(+l.qty||0)),type,read:String(l.read??'')});
+      const line=newLine({code,pick:m?m.id:(code?'new':''),name:!m&&hasHangul(l.name)?String(l.name).trim():'',namePt:!m&&l.name&&!hasHangul(l.name)?String(l.name).trim():'',kind:!m?(KINDS.some(x=>x[0]===l.kind)?l.kind:findKind(l.name)):'',ch:l.channel==='varejo'?'V':'A',qty:Math.max(0,Math.round(+l.qty||0)),type,read:String(l.read??'')});
       return line});
     rc.lines=rc.lines.filter(l=>!isBlank(l)).concat(got);
     rc.note=String(out?.note||'');rc.source=rc.photos.length?'photo':(rc.source||'text');
@@ -586,9 +622,11 @@ async function readReceipt(){const L=t(), err=$('#rc-err');err.hidden=true;stopM
 }
 function lineMatchHtml(l,k){const L=t();
   if(l.pick==='new')return `<div class="newp"><span class="pill c-re" style="align-self:flex-start">${L.lnNewTag}</span><span class="hint">${L.lnNew}</span>
+      <div class="field">${L.fKind}${kindChips(l.kind,'data-lkind')}</div>
       <div class="two"><div class="field"><label for="ln-n${k}">${L.rvNewName}</label><input id="ln-n${k}" data-f="name" value="${esc(l.name)}" placeholder="${L.fNamePh}"></div><div class="field"><label for="ln-np${k}">${L.fNamePt}</label><input id="ln-np${k}" data-f="namePt" value="${esc(l.namePt)}" placeholder="${L.fNamePtPh}"></div></div>
       <div class="two"><div class="field"><label for="ln-c${k}">${L.fCost}</label><input id="ln-c${k}" data-f="cost" type="number" step="0.01" min="0" inputmode="decimal" value="${esc(l.cost)}"></div>
-      <div class="field"><label for="ln-p${k}">${L.fPrice}</label><input id="ln-p${k}" data-f="price" type="number" step="0.01" min="0" inputmode="decimal" value="${esc(l.price)}"></div></div></div>`;
+      <div class="field"><label for="ln-p${k}">${L.fPrice}</label><input id="ln-p${k}" data-f="price" type="number" step="0.01" min="0" inputmode="decimal" value="${esc(l.price)}"></div></div>
+      <div class="two"><div class="field"><label for="ln-pv${k}">${L.fPriceV}</label><input id="ln-pv${k}" data-f="priceV" type="number" step="0.01" min="0" inputmode="decimal" value="${esc(l.priceV)}"></div><div></div></div></div>`;
   if(!l.pick){const nm=l.name||l.namePt;return `<span class="hint">${nm?esc(L.lnNoCodeName(nm)):L.lnNoCode}</span>`}
   const ms=codeMatches(l.code), it=items.find(i=>i.id===l.pick);if(!it)return '';
   const j=calc(it);
@@ -601,6 +639,7 @@ function lineHtml(l,k){const L=t();return `<div class="rline ${l.type}" data-k="
     <div class="m">${lineMatchHtml(l,k)}</div>
     <div class="qtyrow"><div class="seg two-way" role="group"><button type="button" data-t="sale" aria-pressed="${l.type==='sale'}">${L.rvSale}</button><button type="button" data-t="in" aria-pressed="${l.type==='in'}">${L.rvIn}</button></div>
       <input type="number" min="0" inputmode="numeric" data-f="qty" aria-label="${L.rvQty}" placeholder="${L.rvQty}" value="${esc(l.qty)}"></div>
+    <div class="chrow"><span>${L.chL}</span><div class="seg two-way" role="group"><button type="button" data-c="A" aria-pressed="${l.ch!=='V'}">${L.chA}</button><button type="button" data-c="V" aria-pressed="${l.ch==='V'}">${L.chV}</button></div></div>
     ${l.read?`<div class="read">${L.rvRead}: “${esc(l.read)}”</div>`:''}
     <p class="err" data-e hidden></p></div>`}
 function drawLines(){const L=t();
@@ -609,12 +648,13 @@ function drawLines(){const L=t();
   validate()}
 function redrawLine(k){const el=document.querySelector(`#rv-lines .rline[data-k="${k}"]`);if(!el)return;const l=rc.lines[k];
   el.className=`rline ${l.type}`;el.querySelector('.m').innerHTML=lineMatchHtml(l,k);
-  el.querySelectorAll('[data-t]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.t===l.type));validate()}
+  el.querySelectorAll('[data-t]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.t===l.type));
+  el.querySelectorAll('[data-c]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.c===(l.ch==='V'?'V':'A')));validate()}
 function validate(){const L=t(),errs=[],eff={};
   rc.lines.forEach((l,k)=>{let e='';const qn=+l.qty||0;
     if(isBlank(l))e='';
     else if(!l.pick)e=L.lnNoCode;
-    else if(l.pick==='new'){if(l.type==='sale'&&qn>0)e=L.rvENewSale}
+    else if(l.pick==='new'){if(l.type==='sale'&&qn>0)e=L.rvENewSale;else if(!l.kind&&!String(l.name).trim()&&!String(l.namePt).trim())e=L.eKind}
     else if(qn<1)e=L.rvEQty;
     else{const it=items.find(i=>i.id===l.pick);if(it){const c=eff[it.id]||(eff[it.id]={made:+it.made||0,sold:+it.sold||0});if(l.type==='in')c.made+=qn;else c.sold+=qn}}
     errs[k]=e});
@@ -626,10 +666,12 @@ function wireLines(){const box=$('#rv-lines');
   box.addEventListener('input',e=>{const el=e.target.closest('[data-f]');if(!el)return;const k=+el.closest('.rline').dataset.k,l=rc.lines[k];
     if(el.dataset.f==='code'){l.code=el.value;rematch(l);redrawLine(k);return}
     if(el.dataset.f==='qty')l.qty=el.value===''?'':Math.max(0,Math.floor(+el.value||0));
-    if(el.dataset.f==='name')l.name=el.value;if(el.dataset.f==='namePt')l.namePt=el.value;if(el.dataset.f==='cost')l.cost=el.value;if(el.dataset.f==='price')l.price=el.value;
+    if(el.dataset.f==='name')l.name=el.value;if(el.dataset.f==='namePt')l.namePt=el.value;if(el.dataset.f==='cost')l.cost=el.value;if(el.dataset.f==='price')l.price=el.value;if(el.dataset.f==='priceV')l.priceV=el.value;
     validate()});
   box.addEventListener('change',e=>{const el=e.target.closest('[data-f="pick"]');if(!el)return;const k=+el.closest('.rline').dataset.k;rc.lines[k].pick=el.value;redrawLine(k)});
   box.addEventListener('click',e=>{const d=e.target.closest('[data-del]');if(d){rc.lines.splice(+d.dataset.del,1);drawLines();return}
+    const kb=e.target.closest('[data-lkind]');if(kb){const k=+kb.closest('.rline').dataset.k,l=rc.lines[k];l.kind=l.kind===kb.dataset.lkind?'':kb.dataset.lkind;redrawLine(k);return}
+    const cb=e.target.closest('[data-c]');if(cb){const k=+cb.closest('.rline').dataset.k;rc.lines[k].ch=cb.dataset.c;redrawLine(k);return}
     const b=e.target.closest('[data-t]');if(!b)return;const k=+b.closest('.rline').dataset.k;rc.lines[k].type=b.dataset.t;redrawLine(k)});
   $('#rv-apply').onclick=()=>applyInput();
 }
@@ -637,12 +679,12 @@ async function applyInput(){const L=t();$('#rv-apply').disabled=true;
   const now=new Date().toISOString(), today=now.slice(0,10), patches={}, logLines=[];
   try{
     for(const l of rc.lines){const qn=+l.qty||0;if(isBlank(l))continue;
-      if(l.pick==='new'){const data={ref:l.code.trim(),name:l.name.trim(),namePt:l.namePt.trim(),cost:+l.cost||0,price:+l.price||0,made:qn,sold:0,madeDate:today,month:today.slice(0,7),updatedAt:now};
-        const id=await saveItem(null,data);if(!id)throw new Error('save');logLines.push({id,code:data.ref,name:data.name||data.namePt,type:'in',qty:qn,created:true});continue}
+      if(l.pick==='new'){const data={ref:l.code.trim(),name:l.name.trim(),namePt:l.namePt.trim(),kind:l.kind||'',cost:+l.cost||0,price:+l.price||0,priceV:+l.priceV||0,made:qn,sold:0,soldV:0,madeDate:today,month:today.slice(0,7),updatedAt:now};
+        const id=await saveItem(null,data);if(!id)throw new Error('save');logLines.push({id,code:data.ref,name:dn(data),type:'in',qty:qn,created:true});continue}
       const it=items.find(i=>i.id===l.pick);if(!it)continue;
-      const p=patches[it.id]||(patches[it.id]={made:+it.made||0,sold:+it.sold||0});
-      if(l.type==='in')p.made+=qn;else p.sold+=qn;
-      logLines.push({id:it.id,code:it.ref||'',name:dn(it),type:l.type,qty:qn});
+      const p=patches[it.id]||(patches[it.id]={made:+it.made||0,sold:+it.sold||0,soldV:+it.soldV||0});
+      if(l.type==='in')p.made+=qn;else{p.sold+=qn;if(l.ch==='V')p.soldV+=qn}
+      logLines.push({id:it.id,code:it.ref||'',name:dn(it),type:l.type,qty:qn,ch:l.type==='sale'?(l.ch==='V'?'V':'A'):''});
     }
     for(const [id,p] of Object.entries(patches))await patchItem(id,{...p,updatedAt:now});
     await addMove({at:now,source:rc.source||'manual',lines:logLines,undone:false});
@@ -654,14 +696,16 @@ async function undoMove(m){const L=t();
   try{const patches={};
     for(const l of m.lines||[]){const it=items.find(i=>i.id===l.id);if(!it)continue;
       if(l.created){if(db)await db.collection('styles').doc(l.id).delete();else items=items.filter(x=>x.id!==l.id);delete patches[l.id];continue}
-      const p=patches[l.id]||(patches[l.id]={made:+it.made||0,sold:+it.sold||0});
-      if(l.type==='in')p.made=Math.max(0,p.made-l.qty);else p.sold=Math.max(0,p.sold-l.qty)}
-    for(const [id,p] of Object.entries(patches)){if(p.sold>p.made)p.sold=p.made;await patchItem(id,{...p,updatedAt:new Date().toISOString()})}
+      const p=patches[l.id]||(patches[l.id]={made:+it.made||0,sold:+it.sold||0,soldV:+it.soldV||0});
+      if(l.type==='in')p.made=Math.max(0,p.made-l.qty);else{p.sold=Math.max(0,p.sold-l.qty);if(l.ch==='V')p.soldV=Math.max(0,p.soldV-l.qty)}}
+    for(const [id,p] of Object.entries(patches)){if(p.sold>p.made)p.sold=p.made;if(p.soldV>p.sold)p.soldV=p.sold;await patchItem(id,{...p,updatedAt:new Date().toISOString()})}
     if(db)await db.collection('moves').doc(m.id).update({undone:true});else{m.undone=true}
     render();toast(L.tUndone)}catch(e){toast(L.tSaveErr)}
 }
 
-document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+document.addEventListener('click',e=>{const tr=e.target.closest('tr[data-edit]');if(tr){const it=items.find(i=>i.id===tr.dataset.edit);if(it)itemForm(it);return}
+  const b=e.target.closest('button');if(!b)return;
+  if(b.id==='viewBtn'){view=view==='table'?'cards':'table';try{localStorage.setItem('view',view)}catch(e){}render();return}
   if(b.dataset.lang){lang=b.dataset.lang;try{localStorage.setItem('lang',lang)}catch(e){}closeSheet();render()}
   if(b.dataset.f&&b.classList.contains('bin')||b.dataset.f==='all'&&!b.closest('.sheet')){filter=filter===b.dataset.f?'all':b.dataset.f;q='';$('#q').value='';render()}
   if(b.dataset.in){const it=items.find(i=>i.id===b.dataset.in);if(it)inputForm({code:it.ref||'',pick:it.id,type:'sale'})}
