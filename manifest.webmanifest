@@ -1,0 +1,37 @@
+{
+  "name": "재고 정리판 · Controle de Estoque",
+  "short_name": "재고정리판",
+  "description": "옷 생산·판매·재고·수익 관리 / Controle de produção, vendas, estoque e lucro de roupas",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f1f0f6",
+  "theme_color": "#33408f",
+  "lang": "ko",
+  "categories": [
+    "business",
+    "productivity"
+  ],
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
