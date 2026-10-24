@@ -1,17 +1,16 @@
-// ▼ 안내서 2단계: Firebase에서 복사한 내용으로 아래 PASTE... 부분을 바꿔 넣으세요.
-// ▼ Guia passo 2: substitua os valores PASTE... pelos dados copiados do Firebase.
+// 재고 정리판 Firebase 설정 (프로젝트: jaego-juya)
+// 이 값들은 앱 주소 같은 공개 정보예요. 비밀번호가 아니에요.
 window.FIREBASE_CONFIG = {
-  apiKey: "PASTE_API_KEY",
-  authDomain: "PASTE_PROJECT_ID.firebaseapp.com",
-  projectId: "PASTE_PROJECT_ID",
-  storageBucket: "PASTE_PROJECT_ID.appspot.com",
-  messagingSenderId: "PASTE_SENDER_ID",
-  appId: "PASTE_APP_ID",
+  apiKey: "AIzaSyDgSQaipLF5papkmoGYX8CJ74KuZJTY_pc",
+  authDomain: "jaego-juya.firebaseapp.com",
+  projectId: "jaego-juya",
+  storageBucket: "jaego-juya.firebasestorage.app",
+  messagingSenderId: "610006126204",
+  appId: "1:610006126204:web:43c1314729e7ac3a4203f9",
 
-  // ▼ 안내서 3-2단계: 영수증 읽기 보안 키 (reCAPTCHA Enterprise 사이트 키)
-  // ▼ Guia passo 3-2: chave do site reCAPTCHA Enterprise (App Check)
+  // 영수증 읽기 보안 키 (reCAPTCHA Enterprise 사이트 키) — 3-2단계에서 넣어요
   appCheckSiteKey: "PASTE_RECAPTCHA_SITE_KEY",
 
-  // 영수증을 읽는 AI 모델 (바꾸지 않아도 돼요) / Modelo de IA que lê as notas
+  // 영수증을 읽는 AI 모델
   aiModel: "gemini-3.5-flash"
 };
