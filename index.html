@@ -228,12 +228,12 @@ ko:{h1:'재고 정리판',sub:'생산한 옷의 판매·재고·수익을 한눈
  rcMicHint:'여기서는 마이크를 바로 쓸 수 없어요. 아래 글 칸을 누르고 키보드의 마이크 버튼을 눌러 말하세요.',
  rcListening:'듣고 있어요… 한 번에 한 줄씩 짧게 말하세요. 예: "2611 스무 장 판매". 더 넣으려면 다시 누르세요.',
  rcRead:'읽고 수량 확인하기',rcNeed:'사진을 찍거나, 말하거나, 글을 적어주세요.',rcBusy:'읽는 중이에요… 사진이면 20~40초 걸려요.',
- rcNoAi:'AI 읽기는 아직 켜져 있지 않아요. Firebase 설정을 마치면 쓸 수 있어요. 지금은 아래 코드 칸에 직접 넣어주세요.',rcDenied:'읽기 기능을 쓸 수 없어요. 인터넷 연결을 확인해 주세요.',rcFail:'읽지 못했어요. 사진을 밝은 곳에서 가까이 찍거나, 글로 적어 다시 해보세요.',rcLimit:'잠시 후 다시 해보세요. 요청이 너무 많아요.',
+ rcNoAi:'사진 읽기(AI)는 아직 켜져 있지 않아요. Firebase 설정을 마치면 쓸 수 있어요. 지금은 말하기나 글로 "2611 20장 판매"처럼 넣거나 아래 코드 칸에 직접 넣어주세요.',rcDenied:'읽기 기능을 쓸 수 없어요. 인터넷 연결을 확인해 주세요.',rcFail:'읽지 못했어요. 사진을 밝은 곳에서 가까이 찍거나, 글로 적어 다시 해보세요.',rcLimit:'잠시 후 다시 해보세요. 요청이 너무 많아요.',
  rcMax:n=>`사진은 한 번에 ${n}장까지 넣을 수 있어요.`,
  rvTitle:'읽은 내용 확인',rvLead:'틀린 곳은 고치고, 맞으면 아래 반영하기를 누르세요.',rvNone:'읽은 상품이 없어요. 사진이나 글을 확인하고 다시 해보세요.',
  rvProduct:'상품',rvNew:'+ 새 상품으로 등록',rvSkip:'건너뛰기',rvChoose:'상품을 골라주세요',rvQty:'수량(장)',rvSale:'판매',rvIn:'입고',
  rvRead:'읽은 글',rvNewCode:'새 코드',rvNewName:'한국어 이름 (선택)',
- rvEOver:(n,s)=>`"${n}" 재고가 ${s}장뿐이에요. 수량을 확인하거나 입고로 바꿔주세요.`,rvENewSale:'새 상품은 입고로만 등록할 수 있어요.',rvEPick:'상품을 고르거나 건너뛰기를 선택하세요.',rvENew:'새 상품의 코드와 이름을 넣어주세요.',rvEQty:'수량을 1장 이상 넣어주세요.',
+ rvEOver:(n,s)=>`"${n}" 재고가 ${s}장뿐이에요. 수량을 확인하거나 입고로 바꿔주세요.`,rvENewSale:'등록되지 않은 코드예요. 코드가 맞는지 확인하거나, 처음 들어온 상품이면 입고로 바꿔주세요.',rvEPick:'상품을 고르거나 건너뛰기를 선택하세요.',rvENew:'새 상품의 코드와 이름을 넣어주세요.',rvEQty:'수량을 1장 이상 넣어주세요.',
  rvApply:n=>`${n}건 반영하기`,rvBack:'다시 읽기',rvNote:'AI 메모',
  tApplied:(a,b)=>`판매 ${a}장 · 입고 ${b}장 반영했어요`,
  hTitle:'최근 입력 기록',hEmpty:'입력하기로 넣은 내용이 여기에 기록돼요. 잘못 넣었으면 되돌릴 수 있어요.',
@@ -275,12 +275,12 @@ pt:{h1:'Controle de Estoque',sub:'Vendas, estoque e lucro das peças produzidas'
  rcMicHint:'Aqui o microfone não pode ser usado direto. Toque no campo de texto abaixo e use o microfone do teclado.',
  rcListening:'Ouvindo… fale uma linha curta por vez. Ex.: "2611 vinte peças vendidas". Para mais, toque de novo.',
  rcRead:'Ler e conferir quantidades',rcNeed:'Tire uma foto, fale ou escreva algo.',rcBusy:'Lendo… com foto leva de 20 a 40 segundos.',
- rcNoAi:'A leitura por IA ainda não está ativada. Funciona depois de configurar o Firebase. Por enquanto, digite o código abaixo.',rcDenied:'A leitura não está disponível. Verifique a internet.',rcFail:'Não foi possível ler. Tire a foto mais de perto e com boa luz, ou escreva, e tente de novo.',rcLimit:'Muitos pedidos. Tente de novo em instantes.',
+ rcNoAi:'A leitura de fotos por IA ainda não está ativada. Funciona depois de configurar o Firebase. Por enquanto, fale ou escreva "2611 20 peças venda" ou digite o código abaixo.',rcDenied:'A leitura não está disponível. Verifique a internet.',rcFail:'Não foi possível ler. Tire a foto mais de perto e com boa luz, ou escreva, e tente de novo.',rcLimit:'Muitos pedidos. Tente de novo em instantes.',
  rcMax:n=>`Até ${n} fotos por vez.`,
  rvTitle:'Confira a leitura',rvLead:'Corrija o que estiver errado e toque em lançar.',rvNone:'Nenhum produto lido. Confira a foto ou o texto e tente de novo.',
  rvProduct:'Produto',rvNew:'+ Cadastrar como novo',rvSkip:'Ignorar',rvChoose:'Escolha o produto',rvQty:'Qtd. (pç)',rvSale:'Venda',rvIn:'Entrada',
  rvRead:'Texto lido',rvNewCode:'Código novo',rvNewName:'Nome em coreano (opcional)',
- rvEOver:(n,s)=>`"${n}" só tem ${s} pç em estoque. Confira a quantidade ou mude para entrada.`,rvENewSale:'Produto novo só pode entrar como entrada.',rvEPick:'Escolha o produto ou marque ignorar.',rvENew:'Informe código e nome do produto novo.',rvEQty:'Informe pelo menos 1 peça.',
+ rvEOver:(n,s)=>`"${n}" só tem ${s} pç em estoque. Confira a quantidade ou mude para entrada.`,rvENewSale:'Código não cadastrado. Confira o código ou, se for produto novo, mude para entrada.',rvEPick:'Escolha o produto ou marque ignorar.',rvENew:'Informe código e nome do produto novo.',rvEQty:'Informe pelo menos 1 peça.',
  rvApply:n=>`Lançar ${n} item(ns)`,rvBack:'Ler de novo',rvNote:'Observação da IA',
  tApplied:(a,b)=>`Lançado: ${a} pç vendidas · ${b} pç de entrada`,
  hTitle:'Últimos lançamentos',hEmpty:'Tudo que você lançar aparece aqui. Se errar, dá para desfazer.',
@@ -510,7 +510,8 @@ function toggleMic(){const L=t(), msg=$('#rc-micMsg'), btn=$('#rc-mic');
   rec.onresult=e=>{let said='';for(let k=0;k<e.results.length;k++)said+=e.results[k][0].transcript;said=said.replace(/\s+/g,' ').trim();
     const v=[base,said].filter(Boolean).join('\n');$('#rc-text').value=v;rc.text=v;if(!rc.source)rc.source='voice'};
   rec.onerror=e=>{if(e.error==='not-allowed'||e.error==='service-not-allowed'||e.error==='audio-capture')hint()};
-  rec.onend=()=>{if(rec){rec=null;btn.classList.remove('on');$('#rc-micTxt').textContent=L.rcMic;msg.hidden=true}};
+  rec.onend=()=>{if(rec){rec=null;btn.classList.remove('on');$('#rc-micTxt').textContent=L.rcMic;msg.hidden=true;
+    if(!ai&&$('#rc-text').value.trim())readReceipt()}};
   try{rec.start();btn.classList.add('on');$('#rc-micTxt').textContent=L.rcMicStop;msg.textContent=L.rcListening;msg.hidden=false}catch(e){hint()}
 }
 function buildPrompt(text,nImg,kind){
@@ -542,18 +543,38 @@ function matchItem(l){
     if(!m&&c.length>=3)m=pool.find(i=>{const r=normCode(i.ref);return r.length>=3&&(r.startsWith(c)||c.startsWith(r))})}
   return m;
 }
+// Reads short spoken/typed lines without AI: "2611 20장 판매", "2598 입고 300", "vendi 20 do 2611"
+const KNUM={'한':1,'하나':1,'두':2,'둘':2,'세':3,'셋':3,'네':4,'넷':4,'다섯':5,'여섯':6,'일곱':7,'여덟':8,'아홉':9,'열':10,'스무':20,'스물':20,'서른':30,'마흔':40,'쉰':50,'예순':60,'일흔':70,'여든':80,'아흔':90,'백':100};
+function localParse(text,kind){
+  const lines=[];
+  for(let seg of String(text).split(/\n|,|;|그리고|\be\b|\band\b/i)){seg=seg.trim();if(!seg)continue;
+    const low=seg.toLowerCase();
+    let type=/판매|팔|출고|나감|나갔|vend|saída|saida|venda/.test(low)?'sale':/입고|들어|생산|entrada|chegou|recebi|produ/.test(low)?'in':null;
+    // qty: number right before a unit, else Korean count words before a unit
+    let qty=null,m=low.match(/(\d+)\s*(장|개|벌|pç|pc|pcs|peças|pecas|peça|peca|unid)/);
+    if(m)qty=+m[1];else{const k=low.match(/((?:한|하나|두|둘|세|셋|네|넷|다섯|여섯|일곱|여덟|아홉|열|스무|스물|서른|마흔|쉰|예순|일흔|여든|아흔|백)\s*)+(?=\s*(장|개|벌))/);
+      if(k){qty=k[0].trim().split(/\s+/).join('').match(/스무|스물|서른|마흔|쉰|예순|일흔|여든|아흔|열|하나|다섯|여섯|일곱|여덟|아홉|한|두|둘|세|셋|네|넷|백/g).reduce((a,w)=>a+KNUM[w],0)}}
+    // code: explicit marker first, else the first token with digits that is not the qty
+    let code=null,c=seg.match(/(?:코드|código|codigo|cód\.?|cod\.?|ref\.?)\s*([0-9a-z\-]+)/i)||seg.match(/([0-9a-z\-]*\d[0-9a-z\-]*)\s*번/i);
+    if(c)code=c[1];else{const toks=seg.match(/[0-9a-z\-]*\d[0-9a-z\-]*/gi)||[];const q=m?m[1]:null;code=toks.find(x=>x!==q)||null;
+      if(qty===null&&toks.length>=2){code=toks[0];qty=+toks[1].replace(/\D/g,'')||null}}
+    if(qty===null){const nums=(seg.match(/\d+/g)||[]).filter(n=>n!==String(code).replace(/\D/g,''));if(nums.length)qty=+nums[nums.length-1]}
+    if(!code&&!qty)continue;
+    lines.push({code,name:null,qty:qty||0,type:type||(kind!=='auto'?kind:null),read:seg})}
+  return {lines,note:''};
+}
 async function readReceipt(){const L=t(), err=$('#rc-err');err.hidden=true;stopMic();
   const text=($('#rc-text').value||'').trim();rc.text=text;
   if(!rc.photos.length&&!text){err.textContent=L.rcNeed;err.hidden=false;return}
-  if(!ai){err.textContent=L.rcNoAi;err.hidden=false;return}
+  if(!ai&&rc.photos.length){err.textContent=L.rcNoAi;err.hidden=false;return}
   $('#rc-busy').hidden=false;$('#rc-go').disabled=true;
   try{
-    const out=await ai(buildPrompt(text,rc.photos.length,rc.kind),rc.photos.map(p=>p.blob));
+    const out=ai?await ai(buildPrompt(text,rc.photos.length,rc.kind),rc.photos.map(p=>p.blob)):localParse(text,rc.kind);
     const got=(Array.isArray(out?.lines)?out.lines:[]).map(l=>{const m=matchItem(l);
       const type=l.type==='sale'||l.type==='in'?l.type:(rc.kind==='auto'?'sale':rc.kind);
       const code=m?(m.ref||''):String(l.code??'').trim();
       const line=newLine({code,pick:m?m.id:(code?'new':''),name:!m&&hasHangul(l.name)?String(l.name).trim():'',namePt:!m&&l.name&&!hasHangul(l.name)?String(l.name).trim():'',qty:Math.max(0,Math.round(+l.qty||0)),type,read:String(l.read??'')});
-      if(line.pick==='new')line.type='in';return line});
+      return line});
     rc.lines=rc.lines.filter(l=>!isBlank(l)).concat(got);
     rc.note=String(out?.note||'');rc.source=rc.photos.length?'photo':(rc.source||'text');
     rc.photos.forEach(p=>URL.revokeObjectURL(p.url));rc.photos=[];$('#rc-thumbs').innerHTML='';$('#rc-text').value='';rc.text='';
