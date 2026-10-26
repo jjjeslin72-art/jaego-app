@@ -1,7 +1,7 @@
 {
   "name": "재고 정리판 · Controle de Estoque",
   "short_name": "재고정리판",
-  "description": "옷 생산·판매·재고·수익 관리 / Controle de produção, vendas, estoque e lucro de roupas",
+  "description": "상품 코드·입고·판매·재고·수익 관리 (의류, 식품, 화장품, 잡화 등) / Controle de estoque, vendas e lucro para qualquer ramo",
   "id": "./",
   "start_url": "./",
   "scope": "./",

@@ -170,7 +170,7 @@ headhtml = '''<!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>재고 정리판 · Controle de Estoque</title>
-<meta name="description" content="옷 상품 코드·입고·판매·재고·수익 관리 / Controle de código, entrada, vendas, estoque e lucro de roupas">
+<meta name="description" content="상품 코드·입고·판매·재고·수익 관리 / Controle de código, entrada, vendas, estoque e lucro">
 <meta name="theme-color" content="#33408f">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon-192.png">

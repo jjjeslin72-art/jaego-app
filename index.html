@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>재고 정리판 · Controle de Estoque</title>
-<meta name="description" content="옷 상품 코드·입고·판매·재고·수익 관리 / Controle de código, entrada, vendas, estoque e lucro de roupas">
+<meta name="description" content="상품 코드·입고·판매·재고·수익 관리 / Controle de código, entrada, vendas, estoque e lucro">
 <meta name="theme-color" content="#33408f">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon-192.png">
@@ -80,6 +80,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .nums{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;font-size:12px;color:var(--muted)}
 .nums b{display:block;font-size:16px;color:var(--ink);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
 .nums.money2{grid-template-columns:1fr 1fr}
+.sh{font-size:14px;margin:6px 0 0;color:var(--ink)}
 .kinds{display:flex;flex-wrap:wrap;gap:6px}
 .kinds button{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:6px 11px;font-size:13px}
 .kinds button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--surface);font-weight:700}
@@ -203,115 +204,134 @@ const brl=n=>Number(n||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL
 const num=n=>Number(n||0).toLocaleString('pt-BR');
 const norm=s=>String(s??'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').normalize('NFC').replace(/[^0-9a-z가-힣]/g,'');
 const normCode=s=>norm(s).replace(/^(ref|codigo|cod|코드)/,'');
-const KINDS=[['blusa','블라우스','Blusa'],['calca','바지','Calça'],['vestido','원피스','Vestido'],['saia','치마','Saia'],['short','반바지','Short'],['cropped','크롭','Cropped'],['conjunto','세트','Conjunto'],['jaqueta','재킷','Jaqueta'],['macacao','점프수트','Macacão'],['outro','기타','Outro']];
-const kindLabel=k=>{const r=KINDS.find(x=>x[0]===k);return r?(lang==='pt'?r[2]:r[1]):''};
+const BIZ={
+ clothes:{ko:'의류·패션',pt:'Roupas e moda',unit:['장','pç'],re:[['재생산','다시 만들 상품','다시 만들면'],['Repor','produzir de novo']],en:"women's clothing wholesaler and retailer",
+  kinds:[['blusa','블라우스','Blusa'],['calca','바지','Calça'],['vestido','원피스','Vestido'],['saia','치마','Saia'],['short','반바지','Short'],['cropped','크롭','Cropped'],['conjunto','세트','Conjunto'],['jaqueta','재킷','Jaqueta'],['macacao','점프수트','Macacão'],['outro','기타','Outro']]},
+ food:{ko:'식품·음료',pt:'Alimentos e bebidas',unit:['개','un'],re:[['재주문','다시 주문할 상품','다시 주문하면'],['Repor','pedir de novo']],en:'food and beverage shop or distributor',
+  kinds:[['snack','과자·간식','Snacks'],['bebida','음료','Bebidas'],['congelado','냉동식품','Congelados'],['molho','소스·양념','Molhos e temperos'],['massa','라면·면','Massas e lámen'],['grao','쌀·곡물','Arroz e grãos'],['outro','기타','Outro']]},
+ beauty:{ko:'화장품·미용',pt:'Cosméticos e beleza',unit:['개','un'],re:[['재주문','다시 주문할 상품','다시 주문하면'],['Repor','pedir de novo']],en:'cosmetics and beauty shop',
+  kinds:[['skincare','스킨케어','Skincare'],['make','메이크업','Maquiagem'],['cabelo','헤어','Cabelo'],['corpo','바디','Corpo'],['perfume','향수','Perfume'],['outro','기타','Outro']]},
+ goods:{ko:'잡화·액세서리',pt:'Acessórios e utilidades',unit:['개','un'],re:[['재주문','다시 주문할 상품','다시 주문하면'],['Repor','pedir de novo']],en:'accessories and household goods shop',
+  kinds:[['bolsa','가방','Bolsas'],['calcado','신발','Calçados'],['acessorio','액세서리','Acessórios'],['cozinha','주방용품','Cozinha'],['casa','생활용품','Casa'],['papelaria','문구','Papelaria'],['outro','기타','Outro']]},
+ tech:{ko:'전자·휴대폰 용품',pt:'Eletrônicos e celulares',unit:['개','un'],re:[['재주문','다시 주문할 상품','다시 주문하면'],['Repor','pedir de novo']],en:'electronics and phone accessories shop',
+  kinds:[['capa','폰케이스·필름','Capas e películas'],['audio','이어폰·스피커','Fones e caixas de som'],['cabo','충전기·케이블','Cabos e carregadores'],['eletro','소형 가전','Eletroportáteis'],['outro','기타','Outro']]},
+ other:{ko:'기타 업종',pt:'Outro ramo',unit:['개','un'],re:[['재주문','다시 주문할 상품','다시 주문하면'],['Repor','pedir de novo']],en:'retail and wholesale business',kinds:[['outro','기타','Outro']]}
+};
+const bt=()=>(typeof rules!=='undefined'&&BIZ[rules.bizType])?rules.bizType:'clothes';
+const B=()=>BIZ[bt()];
+const U=()=>lang==='pt'?((typeof rules!=='undefined'&&rules.unitPt)||B().unit[1]):((typeof rules!=='undefined'&&rules.unit)||B().unit[0]);
+const KINDS_LIST=()=>{const c=(typeof rules!=='undefined'&&Array.isArray(rules.kinds))?rules.kinds.filter(Boolean):[];return c.length?c.map(x=>[x,x,x]):B().kinds};
+const kindLabel=k=>{if(!k)return '';const r=KINDS_LIST().find(x=>x[0]===k)||Object.values(BIZ).flatMap(b=>b.kinds).find(x=>x[0]===k);return r?(lang==='pt'?r[2]:r[1]):String(k)};
 const KIND_WORDS=[[/블라우스|blusa|camisa|셔츠/,'blusa'],[/반바지|\bshorts?\b/,'short'],[/바지|calça|calca|팬츠|jeans/,'calca'],[/원피스|vestido/,'vestido'],[/치마|스커트|saia/,'saia'],[/크롭|cropped|\btop\b/,'cropped'],[/세트|conjunto/,'conjunto'],[/재킷|자켓|jaqueta|blazer/,'jaqueta'],[/점프수트|macac[aã]o/,'macacao']];
-const findKind=s=>{s=String(s||'').toLowerCase();for(const [re,k] of KIND_WORDS)if(re.test(s))return k;return ''};
-const kindChips=(sel,attr)=>`<div class="kinds" role="group">${KINDS.map(([k])=>`<button type="button" ${attr}="${k}" aria-pressed="${sel===k}">${kindLabel(k)}</button>`).join('')}</div>`;
+const findKind=s=>{s=String(s||'').toLowerCase();if(!s)return '';
+  for(const [k,ko,pt] of KINDS_LIST()){if(k==='outro')continue;for(const w of [ko,pt].join('·').toLowerCase().split(/[·\s,]+/))if(w.length>=2&&s.includes(w))return k}
+  if(bt()==='clothes')for(const [re,k] of KIND_WORDS)if(re.test(s))return k;return ''};
+const kindChips=(sel,attr)=>`<div class="kinds" role="group">${KINDS_LIST().map(([k])=>`<button type="button" ${attr}="${esc(k)}" aria-pressed="${sel===k}">${esc(kindLabel(k))}</button>`).join('')}</div>`;
 const dn=i=>{if(!i)return '';const n=lang==='pt'?(i.namePt||i.name||''):(i.name||i.namePt||'');const kl=kindLabel(i.kind);return n?(kl&&!n.includes(kl)?kl+' · '+n:n):kl};
 const lbl=i=>i?[i.ref,dn(i)].filter(Boolean).join(' · '):'';
 const hasHangul=s=>/[\uac00-\ud7a3]/.test(String(s||''));
 
 const T={
-ko:{h1:'재고 정리판',sub:'생산한 옷의 판매·재고·수익을 한눈에',monthL:(y,m)=>`${y}년 ${m}월 생산`,
- sales:'이번 달 매출',salesNote:'도매 판매 × 도매가 + 소매 판매 × 소매가',profit:'판매 이익',profitNote:'판매한 옷에서 남은 돈 (판매 금액 − 원가)',
+ko:{h1:'재고 정리판',sub:'상품의 입고·판매·재고·수익을 한눈에',monthL:(y,m)=>`${y}년 ${m}월 입고`,
+ sales:'이번 달 매출',salesNote:'도매 판매 × 도매가 + 소매 판매 × 소매가',profit:'판매 이익',profitNote:'판매한 상품에서 남은 돈 (판매 금액 − 원가)',
  prodCost:'생산비 총액',cash:'현금 수익',cashNote:'매출 − 생산비 (안 팔린 재고까지 뺀 금액)',stockVal:'남은 재고 가치',margin:'이익률',
- noCost:'원가가 없는 옷은 수익 계산에서 빠져요.',
+ noCost:'원가가 없는 상품은 수익 계산에서 빠져요.',
  cats:{re:['재생산','다시 만들 옷'],watch:['지켜보기','계속 판매'],sale:['사우드','saldão 세일'],retail:['소매 처리','소매로 남은 재고 정리'],early:['아직 일러요','입고 후 기간이 짧음']},
- styles:'상품',made:'입고',sold:'판매',stock:'재고',pcs:'장',rate:'판매율',all:'전체 상품',catList:t=>`${t} 상품`,showAll:'전체 보기',
+ styles:'상품',made:'입고',sold:'판매',stock:'재고',get pcs(){return U()},rate:'판매율',all:'전체 상품',catList:t=>`${t} 상품`,showAll:'전체 보기',
  qPh:'코드나 이름으로 찾기',searchRes:n=>`찾은 상품 ${n}개`,noFound:'찾는 상품이 없어요. 입력하기에서 코드를 넣으면 새로 등록돼요.',
- rulesBtn:'분류 기준',add:'+ 상품 등록',rcBtn:'영수증·말로 입력',noCode:'코드 없음',day:d=>`입고 ${d}일째`,noDate:'날짜 없음',
- costL:'원가',priceL:'도매가',priceVL:'소매가',retailN:n=>`그중 소매 ${n}`,unitProfit:'장당 이익',itemSales:'매출',itemProfit:'이익',
- adRe:(pd,q)=>`<b>재생산 추천</b> · 하루 약 ${pd}장씩 팔려요. <b>${q}장</b> 정도 다시 만들면 좋아요.`,
+ rulesBtn:'설정',add:'+ 상품 등록',rcBtn:'영수증·말로 입력',noCode:'코드 없음',day:d=>`입고 ${d}일째`,noDate:'날짜 없음',
+ costL:'원가',priceL:'도매가',priceVL:'소매가',retailN:n=>`그중 소매 ${n}`,get unitProfit(){return `1${U()}당 이익`},itemSales:'매출',itemProfit:'이익',
+ adRe:(pd,q)=>`<b>${B().re[0][0]} 추천</b> · 하루 약 ${pd}${U()}씩 팔려요. <b>${q}${U()}</b> 정도 ${B().re[0][2]} 좋아요.`,
  adWatch:r=>`<b>계속 판매</b> · 판매율 ${r}%. 매장 앞쪽 진열이나 SNS 홍보로 더 밀어보세요.`,
- adSale:(s,p,o)=>`<b>사우드 추천</b> · 재고 ${s}장.`+(p?` 판매가 ${p[0]} → <b>${p[1]}</b> (${o}% 할인)로 saldão에 내보세요.`:' saldão에 내보세요.'),
+ adSale:(s,p,o)=>`<b>사우드 추천</b> · 재고 ${s}${U()}.`+(p?` 판매가 ${p[0]} → <b>${p[1]}</b> (${o}% 할인)로 saldão에 내보세요.`:' saldão에 내보세요.'),
  belowCost:c=>` <span class="warn-t">할인가가 원가(${c})보다 낮아요.</span>`,
- adRetail:s=>`<b>소매 처리</b> · 남은 ${s}장은 도매로 팔기엔 적어요. 매장 소매, 인스타·틱톡샵으로 정리하세요.`,
+ adRetail:s=>`<b>소매 처리</b> · 남은 ${s}${U()}은 도매로 팔기엔 적어요. 매장 소매, 인스타·틱톡샵으로 정리하세요.`,
  adEarly:(d,m)=>`<b>조금 더 지켜보세요</b> · 입고 ${d}일째예요. ${m}일이 지나면 분류해 드려요.`,
  adWait:'<b>입고 대기</b> · 아직 들어온 수량이 없어요. 입고 영수증을 찍으면 수량이 올라가요.',
  sellBtn:'판매 수량 입력',edit:'수정',close:'닫기',save:'저장',
  emptyMonth:m=>`${m} 상품이 아직 없어요.<br>오른쪽 아래 <b>입력하기</b>에서 코드를 넣으면 새 상품으로 등록돼요.`,emptyCat:'이 분류에 해당하는 상품이 없어요.',loading:'불러오는 중…',
- fAdd:'상품 등록',fEdit:'상품 정보 수정',fCode:'코드 (código)',fCodePh:'예: 2611',fName:'한국어 이름 (선택)',fNamePh:'예: 린넨 롱 원피스',fNamePt:'포르투갈어 이름 (선택)',fNamePtPh:'Ex.: Vestido longo de linho',fNameHint:'상품은 코드로 구분해요. 이름은 넣고 싶을 때만 넣으세요.',fCost:'원가 (R$, 장당)',fPrice:'도매가 atacado (R$, 장당)',fPriceV:'소매가 varejo (R$, 한 장)',fSoldV:'그중 소매 판매',fKind:'어떤 옷인가요?',eSoldV:'소매 판매가 전체 판매보다 많아요.',eKind:'처음 보는 코드예요. 어떤 옷인지 골라주세요.',chL:'판매 방식',chA:'도매',chV:'소매',viewTable:'표로 전체 보기',viewCards:'카드로 보기',thCode:'코드',thName:'상품',thCat:'분류',tblHint:'줄을 누르면 상품 정보를 고칠 수 있어요. 옆으로 밀면 더 보여요.',total:'합계',
+ fAdd:'상품 등록',fEdit:'상품 정보 수정',fCode:'코드 (código)',fCodePh:'예: 2611',fName:'한국어 이름 (선택)',fNamePh:'예: 린넨 롱 원피스',fNamePt:'포르투갈어 이름 (선택)',fNamePtPh:'Ex.: Vestido longo de linho',fNameHint:'상품은 코드로 구분해요. 이름은 넣고 싶을 때만 넣으세요.',get fCost(){return `원가 (R$, 1${U()}당)`},get fPrice(){return `도매가 atacado (R$, 1${U()}당)`},get fPriceV(){return `소매가 varejo (R$, 1${U()})`},fSoldV:'그중 소매 판매',fKind:'어떤 종류인가요?',eSoldV:'소매 판매가 전체 판매보다 많아요.',eKind:'처음 보는 코드예요. 어떤 종류인지 골라주세요.',chL:'판매 방식',chA:'도매',chV:'소매',viewTable:'표로 전체 보기',viewCards:'카드로 보기',thCode:'코드',thName:'상품',thCat:'분류',tblHint:'줄을 누르면 상품 정보를 고칠 수 있어요. 옆으로 밀면 더 보여요.',total:'합계',
  fMade:'입고(생산) 수량',fSold:'판매 수량',fDate:'입고일',fDateHint:'입고일의 달로 묶여서 보여요. 입고 수량은 0으로 두고 나중에 영수증으로 채워도 돼요.',
  eCode:'코드를 넣어주세요.',eName:'상품 이름을 넣어주세요.',eSold:'판매 수량이 입고 수량보다 많아요. 숫자를 확인해 주세요.',
  eDup:(n,m)=>`이 코드는 이미 같은 달의 "${n}"에 쓰이고 있어요.`,dupOpen:'그 상품 열기',
  del:'이 상품 삭제',delQ:'정말 삭제할까요? 되돌릴 수 없어요.',cancel:'취소',delete:'삭제',
- sNow:(s,k)=>`지금까지 판매 ${s}장 · 재고 ${k}장`,sAdd:'오늘 판매한 수량 더하기',sAddPh:'예: 12',sTot:'또는 총 판매 수량으로 고치기',sSave:'판매 수량 저장',sErr:m=>`입고 수량(${m}장)보다 많이 팔 수 없어요.`,
- rTitle:'분류 기준',rExpl:['판매율 = 판매 수량 ÷ 입고 수량','<b>재생산</b> · 판매율이 기준 이상','<b>지켜보기</b> · 판매율이 중간','<b>사우드</b> · 판매율 낮고 재고가 많음','<b>소매 처리</b> · 판매율 낮고 재고가 조금 남음'],
- rRe:'재생산 기준 판매율 (%)',rLow:'판매 부진 기준 (%)',rRetail:'소매 처리 최대 재고 (장)',rDays:'분류 시작 (입고 후 일수)',rOff:'사우드 할인율 (%)',rSave:'기준 저장',rReset:'처음 기준으로 되돌리기',rErr:'부진 기준은 재생산 기준보다 낮아야 해요',
- tSaved:'저장했어요',tDeleted:'삭제했어요',tSold:s=>`판매 ${s}장으로 저장했어요`,tRules:'기준을 저장했어요',tReset:'처음 기준으로 되돌렸어요',tSaveErr:'저장하지 못했어요. 인터넷 연결을 확인해 주세요.',tDelErr:'삭제하지 못했어요.',
+ sNow:(s,k)=>`지금까지 판매 ${s}${U()} · 재고 ${k}${U()}`,sAdd:'오늘 판매한 수량 더하기',sAddPh:'예: 12',sTot:'또는 총 판매 수량으로 고치기',sSave:'판매 수량 저장',sErr:m=>`입고 수량(${m}${U()})보다 많이 팔 수 없어요.`,
+ rTitle:'설정',rExpl:['판매율 = 판매 수량 ÷ 입고 수량','<b>재생산·재주문</b> · 판매율이 기준 이상','<b>지켜보기</b> · 판매율이 중간','<b>사우드</b> · 판매율 낮고 재고가 많음','<b>소매 처리</b> · 판매율 낮고 재고가 조금 남음'],
+ bizPick:'처음이면 먼저 업종·품목 고르기',bizH:'업종과 품목',bizL:'어떤 상품을 파세요?',unitL:'수량 단위 (한국어)',unitPtL:'수량 단위 (포르투갈어)',kindsL:'품목 종류 (쉼표로 나누기, 비우면 기본값)',kindsHint:'예: 가방, 신발, 모자. 새 상품을 등록할 때 이 종류 중에서 골라요.',rulesH:'분류 기준',rRe:'재생산·재주문 기준 판매율 (%)',rLow:'판매 부진 기준 (%)',get rRetail(){return `소매 처리 최대 재고 (${U()})`},rDays:'분류 시작 (입고 후 일수)',rOff:'사우드 할인율 (%)',rSave:'기준 저장',rReset:'처음 기준으로 되돌리기',rErr:'부진 기준은 재생산 기준보다 낮아야 해요',
+ tSaved:'저장했어요',tDeleted:'삭제했어요',tSold:s=>`판매 ${s}${U()}으로 저장했어요`,tRules:'기준을 저장했어요',tReset:'처음 기준으로 되돌렸어요',tSaveErr:'저장하지 못했어요. 인터넷 연결을 확인해 주세요.',tDelErr:'삭제하지 못했어요.',
  stOk:'자동 저장됨 · 휴대폰과 컴퓨터 어디서 열어도 같은 내용이 보여요',stOff:'인터넷이 끊겨도 저장돼요. 연결되면 자동으로 올라가요.',stNo:'저장 기능에 연결되지 않았어요. 지금 넣는 내용은 화면을 닫으면 사라져요.',stErr:'저장된 내용을 불러오지 못했어요. 페이지를 다시 열어주세요.',
  inTitle:'입력하기',inBtn:'입력하기',cardIn:'판매·입고 입력',inCapture:'사진이나 말로 한꺼번에 넣기',inRead:'AI로 읽어서 아래에 넣기',inLines:'입력할 내용',inAdd:'+ 코드로 한 줄 추가',
  inEmpty:'코드를 넣거나 사진·말로 읽어오세요. 새 코드를 넣으면 새 상품으로 등록돼요.',inReadDone:n=>`${n}줄을 읽었어요. 아래에서 확인하고 반영하세요.`,
- lnCode:'코드',lnNewTag:'새 상품',lnNew:'처음 보는 코드예요. 어떤 옷인지 고르면 새 상품으로 등록되고 수량은 입고로 들어가요.',lnNoCode:'코드를 넣어주세요.',lnNoCodeName:n=>`"${n}" · 코드를 넣어주세요.`,lnMonth:'어느 달 상품인가요?',lnRemove:'지우기',eNewName:'새 상품 이름을 넣어주세요.',
+ lnCode:'코드',lnNewTag:'새 상품',lnNew:'처음 보는 코드예요. 종류를 고르면 새 상품으로 등록되고 수량은 입고로 들어가요.',lnNoCode:'코드를 넣어주세요.',lnNoCodeName:n=>`"${n}" · 코드를 넣어주세요.`,lnMonth:'어느 달 상품인가요?',lnRemove:'지우기',eNewName:'새 상품 이름을 넣어주세요.',
  rcTitle:'영수증·말로 수량 입력',rcKind:'무엇을 입력하나요?',kAuto:'알아서',kSale:'판매·출고',kIn:'입고',
  rcCam:'사진 찍기',rcCamHint:'카메라가 안 열리면 "사진 고르기"를 누르고 카메라를 고르세요. 찍어둔 영수증 사진을 골라도 돼요.',rcGal:'사진 고르기',rcMic:'말하기',rcMicStop:'그만 말하기',
- rcTextL:'또는 글로 적기',rcTextPh:'예: 2611 원피스 20장 팔렸어, 2598 데님 입고 300장',
+ rcTextL:'또는 글로 적기',get rcTextPh(){return `예: 2611 20${U()} 팔렸어, 2598 입고 300${U()}`},
  rcMicHint:'여기서는 마이크를 바로 쓸 수 없어요. 아래 글 칸을 누르고 키보드의 마이크 버튼을 눌러 말하세요.',
  rcListening:'듣고 있어요… 한 번에 한 줄씩 짧게 말하세요. 예: "2611 스무 장 판매". 더 넣으려면 다시 누르세요.',
  rcRead:'읽고 수량 확인하기',rcNeed:'사진을 찍거나, 말하거나, 글을 적어주세요.',rcBusy:'읽는 중이에요… 사진이면 20~40초 걸려요.',
  rcNoAi:'사진 읽기(AI)는 아직 켜져 있지 않아요. Firebase 설정을 마치면 쓸 수 있어요. 지금은 말하기나 글로 "2611 20장 판매"처럼 넣거나 아래 코드 칸에 직접 넣어주세요.',rcDenied:'읽기 기능을 쓸 수 없어요. 인터넷 연결을 확인해 주세요.',rcFail:'읽지 못했어요. 사진을 밝은 곳에서 가까이 찍거나, 글로 적어 다시 해보세요.',rcLimit:'잠시 후 다시 해보세요. 요청이 너무 많아요.',
- rcMax:n=>`사진은 한 번에 ${n}장까지 넣을 수 있어요.`,
+ rcMax:n=>`사진은 한 번에 ${n}${U()}까지 넣을 수 있어요.`,
  rvTitle:'읽은 내용 확인',rvLead:'틀린 곳은 고치고, 맞으면 아래 반영하기를 누르세요.',rvNone:'읽은 상품이 없어요. 사진이나 글을 확인하고 다시 해보세요.',
- rvProduct:'상품',rvNew:'+ 새 상품으로 등록',rvSkip:'건너뛰기',rvChoose:'상품을 골라주세요',rvQty:'수량(장)',rvSale:'판매',rvIn:'입고',
+ rvProduct:'상품',rvNew:'+ 새 상품으로 등록',rvSkip:'건너뛰기',rvChoose:'상품을 골라주세요',get rvQty(){return `수량(${U()})`},rvSale:'판매',rvIn:'입고',
  rvRead:'읽은 글',rvNewCode:'새 코드',rvNewName:'한국어 이름 (선택)',
- rvEOver:(n,s)=>`"${n}" 재고가 ${s}장뿐이에요. 수량을 확인하거나 입고로 바꿔주세요.`,rvENewSale:'등록되지 않은 코드예요. 코드가 맞는지 확인하거나, 처음 들어온 상품이면 입고로 바꿔주세요.',rvEPick:'상품을 고르거나 건너뛰기를 선택하세요.',rvENew:'새 상품의 코드와 이름을 넣어주세요.',rvEQty:'수량을 1장 이상 넣어주세요.',
+ rvEOver:(n,s)=>`"${n}" 재고가 ${s}${U()}뿐이에요. 수량을 확인하거나 입고로 바꿔주세요.`,rvENewSale:'등록되지 않은 코드예요. 코드가 맞는지 확인하거나, 처음 들어온 상품이면 입고로 바꿔주세요.',rvEPick:'상품을 고르거나 건너뛰기를 선택하세요.',rvENew:'새 상품의 코드와 이름을 넣어주세요.',rvEQty:'수량을 1장 이상 넣어주세요.',
  rvApply:n=>`${n}건 반영하기`,rvBack:'다시 읽기',rvNote:'AI 메모',
- tApplied:(a,b)=>`판매 ${a}장 · 입고 ${b}장 반영했어요`,
+ tApplied:(a,b)=>`판매 ${a}${U()} · 입고 ${b}${U()} 반영했어요`,
  hTitle:'최근 입력 기록',hEmpty:'입력하기로 넣은 내용이 여기에 기록돼요. 잘못 넣었으면 되돌릴 수 있어요.',
- hSum:(s,i)=>[s?`판매 ${s}장`:'',i?`입고 ${i}장`:''].filter(Boolean).join(' · '),hSrc:{photo:'사진',voice:'말',text:'글',manual:'직접'},hUndo:'되돌리기',hUndoQ:'정말 되돌릴까요?',hUndone:'되돌림',tUndone:'되돌렸어요'},
-pt:{h1:'Controle de Estoque',sub:'Vendas, estoque e lucro das peças produzidas',monthL:(y,m)=>`Entrada ${String(m).padStart(2,'0')}/${y}`,
- sales:'Faturamento do mês',salesNote:'vendas atacado × preço atacado + vendas varejo × preço varejo',profit:'Lucro das vendas',profitNote:'o que sobrou das peças vendidas (vendas − custo)',
+ hSum:(s,i)=>[s?`판매 ${s}${U()}`:'',i?`입고 ${i}${U()}`:''].filter(Boolean).join(' · '),hSrc:{photo:'사진',voice:'말',text:'글',manual:'직접'},hUndo:'되돌리기',hUndoQ:'정말 되돌릴까요?',hUndone:'되돌림',tUndone:'되돌렸어요'},
+pt:{h1:'Controle de Estoque',sub:'Entrada, vendas, estoque e lucro dos produtos',monthL:(y,m)=>`Entrada ${String(m).padStart(2,'0')}/${y}`,
+ sales:'Faturamento do mês',salesNote:'vendas atacado × preço atacado + vendas varejo × preço varejo',profit:'Lucro das vendas',profitNote:'o que sobrou dos produtos vendidos (vendas − custo)',
  prodCost:'Custo total de produção',cash:'Resultado em caixa',cashNote:'faturamento − custo de produção (inclui o estoque parado)',stockVal:'Valor do estoque',margin:'Margem',
- noCost:'Peças sem custo ficam fora do cálculo de lucro.',
+ noCost:'Produtos sem custo ficam fora do cálculo de lucro.',
  cats:{re:['Repor','produzir de novo'],watch:['Acompanhar','continuar vendendo'],sale:['Saldão','queima no atacado'],retail:['Varejo','vender o resto no varejo'],early:['Cedo demais','pouco tempo de entrada']},
- styles:'Produtos',made:'Entrada',sold:'Vendido',stock:'Estoque',pcs:'pç',rate:'Venda',all:'Todos os produtos',catList:t=>`Produtos: ${t}`,showAll:'Ver todos',
+ styles:'Produtos',made:'Entrada',sold:'Vendido',stock:'Estoque',get pcs(){return U()},rate:'Venda',all:'Todos os produtos',catList:t=>`Produtos: ${t}`,showAll:'Ver todos',
  qPh:'Buscar por código ou nome',searchRes:n=>`${n} produto(s) encontrado(s)`,noFound:'Nenhum produto encontrado. Em Lançar, digite o código para cadastrar.',
- rulesBtn:'Critérios',add:'+ Cadastrar produto',rcBtn:'Nota · Foto · Voz',noCode:'Sem código',day:d=>`${d} dias da entrada`,noDate:'sem data',
- costL:'Custo',priceL:'Atacado',priceVL:'Varejo',retailN:n=>`${n} no varejo`,unitProfit:'Lucro/pç',itemSales:'Faturamento',itemProfit:'Lucro',
- adRe:(pd,q)=>`<b>Repor</b> · Vende cerca de ${pd} pç por dia. Produza umas <b>${q} peças</b> de novo.`,
+ rulesBtn:'Configurações',add:'+ Cadastrar produto',rcBtn:'Nota · Foto · Voz',noCode:'Sem código',day:d=>`${d} dias da entrada`,noDate:'sem data',
+ costL:'Custo',priceL:'Atacado',priceVL:'Varejo',retailN:n=>`${n} no varejo`,get unitProfit(){return `Lucro/${U()}`},itemSales:'Faturamento',itemProfit:'Lucro',
+ adRe:(pd,q)=>`<b>Repor</b> · Vende cerca de ${pd} ${U()} por dia. Reponha umas <b>${q} ${U()}</b>.`,
  adWatch:r=>`<b>Continuar vendendo</b> · ${r}% vendido. Destaque na vitrine ou divulgue nas redes.`,
- adSale:(s,p,o)=>`<b>Mandar pro saldão</b> · ${s} pç em estoque.`+(p?` De ${p[0]} por <b>${p[1]}</b> (${o}% de desconto).`:''),
+ adSale:(s,p,o)=>`<b>Mandar pro saldão</b> · ${s} ${U()} em estoque.`+(p?` De ${p[0]} por <b>${p[1]}</b> (${o}% de desconto).`:''),
  belowCost:c=>` <span class="warn-t">O preço com desconto fica abaixo do custo (${c}).</span>`,
- adRetail:s=>`<b>Varejo</b> · Sobraram ${s} pç, pouco para o atacado. Venda na loja, Instagram ou TikTok Shop.`,
+ adRetail:s=>`<b>Varejo</b> · Sobraram ${s} ${U()}, pouco para o atacado. Venda na loja, Instagram ou TikTok Shop.`,
  adEarly:(d,m)=>`<b>Aguarde</b> · ${d} dias da entrada. Classificamos depois de ${m} dias.`,
  adWait:'<b>Aguardando entrada</b> · Ainda não entrou nenhuma peça. Fotografe a nota de entrada para somar.',
  sellBtn:'Lançar vendas',edit:'Editar',close:'Fechar',save:'Salvar',
  emptyMonth:m=>`Nenhum produto em ${m}.<br>Toque em <b>Lançar</b> e digite um código para cadastrar.`,emptyCat:'Nenhum produto nesta categoria.',loading:'Carregando…',
- fAdd:'Cadastrar produto',fEdit:'Editar produto',fCode:'Código',fCodePh:'Ex.: 2611',fName:'Nome em coreano (opcional)',fNamePh:'예: 린넨 롱 원피스',fNamePt:'Nome em português (opcional)',fNamePtPh:'Ex.: Vestido longo de linho',fNameHint:'Os produtos são identificados pelo código. O nome é opcional.',fCost:'Custo (R$ por peça)',fPrice:'Preço atacado (R$ por peça)',fPriceV:'Preço varejo (R$, peça avulsa)',fSoldV:'Desse total, vendido no varejo',fKind:'Que tipo de peça?',eSoldV:'Varejo maior que o total vendido.',eKind:'Código novo. Escolha o tipo de peça.',chL:'Tipo de venda',chA:'Atacado',chV:'Varejo',viewTable:'Ver tudo em tabela',viewCards:'Ver em cartões',thCode:'Código',thName:'Produto',thCat:'Situação',tblHint:'Toque na linha para editar o produto. Deslize para o lado para ver mais.',total:'Total',
+ fAdd:'Cadastrar produto',fEdit:'Editar produto',fCode:'Código',fCodePh:'Ex.: 2611',fName:'Nome em coreano (opcional)',fNamePh:'예: 린넨 롱 원피스',fNamePt:'Nome em português (opcional)',fNamePtPh:'Ex.: Vestido longo de linho',fNameHint:'Os produtos são identificados pelo código. O nome é opcional.',get fCost(){return `Custo (R$ por ${U()})`},get fPrice(){return `Preço atacado (R$ por ${U()})`},get fPriceV(){return `Preço varejo (R$ por ${U()})`},fSoldV:'Desse total, vendido no varejo',fKind:'Que tipo de produto?',eSoldV:'Varejo maior que o total vendido.',eKind:'Código novo. Escolha o tipo de produto.',chL:'Tipo de venda',chA:'Atacado',chV:'Varejo',viewTable:'Ver tudo em tabela',viewCards:'Ver em cartões',thCode:'Código',thName:'Produto',thCat:'Situação',tblHint:'Toque na linha para editar o produto. Deslize para o lado para ver mais.',total:'Total',
  fMade:'Qtd. de entrada (produção)',fSold:'Qtd. vendida',fDate:'Data de entrada',fDateHint:'O produto entra no mês da data de entrada. Pode deixar a entrada em 0 e somar depois pela nota.',
  eCode:'Informe o código.',eName:'Informe o nome do produto.',eSold:'A quantidade vendida é maior que a de entrada. Confira os números.',
  eDup:(n)=>`Este código já está em uso no mesmo mês: "${n}".`,dupOpen:'Abrir esse produto',
  del:'Excluir este produto',delQ:'Excluir mesmo? Não dá para desfazer.',cancel:'Cancelar',delete:'Excluir',
- sNow:(s,k)=>`Vendido até agora: ${s} pç · Estoque: ${k} pç`,sAdd:'Somar vendas de hoje',sAddPh:'Ex.: 12',sTot:'Ou corrigir o total vendido',sSave:'Salvar vendas',sErr:m=>`Não dá para vender mais que a entrada (${m} pç).`,
- rTitle:'Critérios',rExpl:['% vendido = vendido ÷ entrada','<b>Repor</b> · % vendido acima do critério','<b>Acompanhar</b> · % vendido médio','<b>Saldão</b> · venda fraca e muito estoque','<b>Varejo</b> · venda fraca e pouco estoque'],
- rRe:'Repor a partir de (%)',rLow:'Venda fraca abaixo de (%)',rRetail:'Varejo até (peças)',rDays:'Classificar após (dias)',rOff:'Desconto do saldão (%)',rSave:'Salvar critérios',rReset:'Voltar ao padrão',rErr:'Venda fraca precisa ser menor que o critério de repor',
- tSaved:'Salvo',tDeleted:'Excluído',tSold:s=>`Vendas salvas: ${s} pç`,tRules:'Critérios salvos',tReset:'Critérios voltaram ao padrão',tSaveErr:'Não foi possível salvar. Verifique a internet.',tDelErr:'Não foi possível excluir.',
+ sNow:(s,k)=>`Vendido até agora: ${s} ${U()} · Estoque: ${k} ${U()}`,sAdd:'Somar vendas de hoje',sAddPh:'Ex.: 12',sTot:'Ou corrigir o total vendido',sSave:'Salvar vendas',sErr:m=>`Não dá para vender mais que a entrada (${m} ${U()}).`,
+ rTitle:'Configurações',rExpl:['% vendido = vendido ÷ entrada','<b>Repor</b> · % vendido acima do critério','<b>Acompanhar</b> · % vendido médio','<b>Saldão</b> · venda fraca e muito estoque','<b>Varejo</b> · venda fraca e pouco estoque'],
+ bizPick:'Primeiro uso? Escolha seu ramo',bizH:'Ramo e tipos de produto',bizL:'O que você vende?',unitL:'Unidade (coreano)',unitPtL:'Unidade (português)',kindsL:'Tipos de produto (separe por vírgula; vazio = padrão)',kindsHint:'Ex.: bolsas, sapatos, bonés. Ao cadastrar um produto novo você escolhe um desses tipos.',rulesH:'Critérios',rRe:'Repor a partir de (%)',rLow:'Venda fraca abaixo de (%)',get rRetail(){return `Varejo até (${U()})`},rDays:'Classificar após (dias)',rOff:'Desconto do saldão (%)',rSave:'Salvar critérios',rReset:'Voltar ao padrão',rErr:'Venda fraca precisa ser menor que o critério de repor',
+ tSaved:'Salvo',tDeleted:'Excluído',tSold:s=>`Vendas salvas: ${s} ${U()}`,tRules:'Critérios salvos',tReset:'Critérios voltaram ao padrão',tSaveErr:'Não foi possível salvar. Verifique a internet.',tDelErr:'Não foi possível excluir.',
  stOk:'Salvo automaticamente · aparece igual no celular e no computador',stOff:'Funciona sem internet. Sincroniza quando voltar a conexão.',stNo:'Sem conexão com o armazenamento. O que você digitar some ao fechar a página.',stErr:'Não foi possível carregar os dados. Abra a página de novo.',
  inTitle:'Lançar',inBtn:'Lançar',cardIn:'Lançar venda/entrada',inCapture:'Lançar tudo por foto ou voz',inRead:'Ler com IA e colocar abaixo',inLines:'Itens a lançar',inAdd:'+ Adicionar linha por código',
  inEmpty:'Digite um código ou leia uma foto/voz. Código novo vira produto novo.',inReadDone:n=>`${n} linha(s) lida(s). Confira abaixo e lance.`,
- lnCode:'Código',lnNewTag:'Produto novo',lnNew:'Código novo. Escolha o tipo de peça para cadastrar; a quantidade entra como entrada.',lnNoCode:'Informe o código.',lnNoCodeName:n=>`"${n}" · informe o código.`,lnMonth:'De qual mês é o produto?',lnRemove:'Remover',eNewName:'Informe o nome do produto novo.',
+ lnCode:'Código',lnNewTag:'Produto novo',lnNew:'Código novo. Escolha o tipo para cadastrar; a quantidade entra como entrada.',lnNoCode:'Informe o código.',lnNoCodeName:n=>`"${n}" · informe o código.`,lnMonth:'De qual mês é o produto?',lnRemove:'Remover',eNewName:'Informe o nome do produto novo.',
  rcTitle:'Lançar por nota, foto ou voz',rcKind:'O que você vai lançar?',kAuto:'Detectar',kSale:'Venda · saída',kIn:'Entrada',
  rcCam:'Tirar foto',rcCamHint:'Se a câmera não abrir, toque em "Escolher foto" e escolha a câmera, ou escolha uma foto já tirada.',rcGal:'Escolher foto',rcMic:'Falar',rcMicStop:'Parar',
- rcTextL:'Ou escreva',rcTextPh:'Ex.: vendi 20 do 2611 vestido, entrada de 300 do 2598 jeans',
+ rcTextL:'Ou escreva',get rcTextPh(){return `Ex.: vendi 20 ${U()} do 2611, entrada de 300 ${U()} do 2598`},
  rcMicHint:'Aqui o microfone não pode ser usado direto. Toque no campo de texto abaixo e use o microfone do teclado.',
  rcListening:'Ouvindo… fale uma linha curta por vez. Ex.: "2611 vinte peças vendidas". Para mais, toque de novo.',
  rcRead:'Ler e conferir quantidades',rcNeed:'Tire uma foto, fale ou escreva algo.',rcBusy:'Lendo… com foto leva de 20 a 40 segundos.',
  rcNoAi:'A leitura de fotos por IA ainda não está ativada. Funciona depois de configurar o Firebase. Por enquanto, fale ou escreva "2611 20 peças venda" ou digite o código abaixo.',rcDenied:'A leitura não está disponível. Verifique a internet.',rcFail:'Não foi possível ler. Tire a foto mais de perto e com boa luz, ou escreva, e tente de novo.',rcLimit:'Muitos pedidos. Tente de novo em instantes.',
  rcMax:n=>`Até ${n} fotos por vez.`,
  rvTitle:'Confira a leitura',rvLead:'Corrija o que estiver errado e toque em lançar.',rvNone:'Nenhum produto lido. Confira a foto ou o texto e tente de novo.',
- rvProduct:'Produto',rvNew:'+ Cadastrar como novo',rvSkip:'Ignorar',rvChoose:'Escolha o produto',rvQty:'Qtd. (pç)',rvSale:'Venda',rvIn:'Entrada',
+ rvProduct:'Produto',rvNew:'+ Cadastrar como novo',rvSkip:'Ignorar',rvChoose:'Escolha o produto',get rvQty(){return `Qtd. (${U()})`},rvSale:'Venda',rvIn:'Entrada',
  rvRead:'Texto lido',rvNewCode:'Código novo',rvNewName:'Nome em coreano (opcional)',
- rvEOver:(n,s)=>`"${n}" só tem ${s} pç em estoque. Confira a quantidade ou mude para entrada.`,rvENewSale:'Código não cadastrado. Confira o código ou, se for produto novo, mude para entrada.',rvEPick:'Escolha o produto ou marque ignorar.',rvENew:'Informe código e nome do produto novo.',rvEQty:'Informe pelo menos 1 peça.',
+ rvEOver:(n,s)=>`"${n}" só tem ${s} ${U()} em estoque. Confira a quantidade ou mude para entrada.`,rvENewSale:'Código não cadastrado. Confira o código ou, se for produto novo, mude para entrada.',rvEPick:'Escolha o produto ou marque ignorar.',rvENew:'Informe código e nome do produto novo.',rvEQty:'Informe pelo menos 1 peça.',
  rvApply:n=>`Lançar ${n} item(ns)`,rvBack:'Ler de novo',rvNote:'Observação da IA',
- tApplied:(a,b)=>`Lançado: ${a} pç vendidas · ${b} pç de entrada`,
+ tApplied:(a,b)=>`Lançado: ${a} ${U()} vendidas · ${b} ${U()} de entrada`,
  hTitle:'Últimos lançamentos',hEmpty:'Tudo que você lançar aparece aqui. Se errar, dá para desfazer.',
- hSum:(s,i)=>[s?`${s} pç vendidas`:'',i?`${i} pç de entrada`:''].filter(Boolean).join(' · '),hSrc:{photo:'Foto',voice:'Voz',text:'Texto',manual:'Manual'},hUndo:'Desfazer',hUndoQ:'Desfazer mesmo?',hUndone:'Desfeito',tUndone:'Desfeito'}
+ hSum:(s,i)=>[s?`${s} ${U()} vendidas`:'',i?`${i} ${U()} de entrada`:''].filter(Boolean).join(' · '),hSrc:{photo:'Foto',voice:'Voz',text:'Texto',manual:'Manual'},hUndo:'Desfazer',hUndoQ:'Desfazer mesmo?',hUndone:'Desfeito',tUndone:'Desfeito'}
 };
+for(const lg of ['ko','pt']){const base=T[lg].cats;Object.defineProperty(T[lg],'cats',{get(){return {...base,re:B().re[lg==='ko'?0:1].slice(0,2)}}})}
 let lang='ko'; try{lang=localStorage.getItem('lang')||'ko'}catch(e){}
 const t=()=>T[lang];
 
-const DEF={minDays:20,reRate:70,lowRate:40,retailMax:30,saleOff:30};
+const DEF={minDays:20,reRate:70,lowRate:40,retailMax:30,saleOff:30,bizType:'clothes',unit:'',unitPt:'',kinds:[]};
 let view='cards';try{view=localStorage.getItem('view')||'cards'}catch(e){}
 let rules={...DEF}, items=[], moves=[], db=null, ai=null, aiOpts={images:null}, filter='all', q='', loaded=false, dbState='wait', unsub=[];
 let month=new Date().toISOString().slice(0,7);
@@ -383,7 +403,7 @@ function render(){
     $('#listTitle').textContent=L.searchRes(found.length);
     $('#list').innerHTML=found.length?(view==='table'?table(found):found.map(card).join('')):`<div class="empty">${L.noFound}</div>`;return}
   $('#listTitle').innerHTML=esc(filter==='all'?L.all:L.catList(L.cats[filter][0]))+(filter!=='all'?` <button type="button" class="btn soft sm" data-f="all" style="vertical-align:middle">${L.showAll}</button>`:'');
-  if(!mine.length){$('#list').innerHTML=`<div class="empty">${L.emptyMonth(mLabel(month))}</div>`;return}
+  if(!mine.length){$('#list').innerHTML=`<div class="empty">${L.emptyMonth(mLabel(month))}${!items.length?`<br><br><button class="btn soft sm" type="button" id="bizPick">${L.bizPick}</button>`:''}</div>`;return}
   const order={re:0,sale:1,retail:2,watch:3,early:4};
   const shown=mine.filter(i=>filter==='all'||i.j.cat===filter).sort((a,b)=>order[a.j.cat]-order[b.j.cat]||b.j.rate-a.j.rate);
   $('#list').innerHTML=shown.length?(view==='table'?table(shown):shown.map(card).join('')):`<div class="empty">${L.emptyCat}</div>`;
@@ -460,18 +480,30 @@ function itemForm(it,preset){const L=t();
     $('#f-del2').onclick=async()=>{await removeItem(it.id);closeSheet();toast(L.tDeleted)}};
 }
 function rulesForm(){const L=t();
-  openSheet(`${head(L.rTitle)}<div class="rules">${L.rExpl.map(x=>`<span>${x}</span>`).join('')}</div>
+  const custom=Array.isArray(rules.kinds)?rules.kinds.join(', '):'';
+  openSheet(`${head(L.rTitle)}
+  <h3 class="sh">${L.bizH}</h3>
+  <div class="field"><label for="r-biz">${L.bizL}</label><select id="r-biz">${Object.entries(BIZ).map(([k,b])=>`<option value="${k}" ${bt()===k?'selected':''}>${lang==='pt'?b.pt:b.ko}</option>`).join('')}</select></div>
+  <div class="two"><div class="field"><label for="r-unit">${L.unitL}</label><input id="r-unit" value="${esc(rules.unit||'')}" placeholder="${esc(B().unit[0])}"></div>
+  <div class="field"><label for="r-unitpt">${L.unitPtL}</label><input id="r-unitpt" value="${esc(rules.unitPt||'')}" placeholder="${esc(B().unit[1])}"></div></div>
+  <div class="field"><label for="r-kinds">${L.kindsL}</label><input id="r-kinds" value="${esc(custom)}" placeholder="${esc(B().kinds.map(x=>lang==='pt'?x[2]:x[1]).join(', '))}"></div>
+  <p class="hint">${L.kindsHint}</p>
+  <h3 class="sh">${L.rulesH}</h3>
+  <div class="rules">${L.rExpl.map(x=>`<span>${x}</span>`).join('')}</div>
   <div class="two"><div class="field"><label for="r-re">${L.rRe}</label><input id="r-re" type="number" value="${rules.reRate}"></div>
   <div class="field"><label for="r-low">${L.rLow}</label><input id="r-low" type="number" value="${rules.lowRate}"></div></div>
   <div class="two"><div class="field"><label for="r-retail">${L.rRetail}</label><input id="r-retail" type="number" value="${rules.retailMax}"></div>
   <div class="field"><label for="r-days">${L.rDays}</label><input id="r-days" type="number" value="${rules.minDays}"></div></div>
   <div class="field"><label for="r-off">${L.rOff}</label><input id="r-off" type="number" value="${rules.saleOff}"></div>
   <button class="btn full" type="button" id="r-save">${L.rSave}</button><button class="btn soft full" type="button" id="r-reset">${L.rReset}</button>`);
+  $('#r-biz').onchange=e=>{const b=BIZ[e.target.value];$('#r-unit').placeholder=b.unit[0];$('#r-unitpt').placeholder=b.unit[1];$('#r-kinds').placeholder=b.kinds.map(x=>lang==='pt'?x[2]:x[1]).join(', ')};
   $('#r-save').onclick=async()=>{const n=(id,d)=>{const x=+$(id).value;return Number.isFinite(x)&&x>=0?x:d};
-    const r={reRate:n('#r-re',DEF.reRate),lowRate:n('#r-low',DEF.lowRate),retailMax:n('#r-retail',DEF.retailMax),minDays:n('#r-days',DEF.minDays),saleOff:n('#r-off',DEF.saleOff)};
+    const kinds=$('#r-kinds').value.split(/[,\n]/).map(x=>x.trim()).filter(Boolean).slice(0,30);
+    const r={reRate:n('#r-re',DEF.reRate),lowRate:n('#r-low',DEF.lowRate),retailMax:n('#r-retail',DEF.retailMax),minDays:n('#r-days',DEF.minDays),saleOff:n('#r-off',DEF.saleOff),
+      bizType:$('#r-biz').value,unit:$('#r-unit').value.trim().slice(0,8),unitPt:$('#r-unitpt').value.trim().slice(0,8),kinds};
     if(r.lowRate>=r.reRate){toast(L.rErr);return}
     rules=r;if(db){db.doc('config/rules').set(r).catch(()=>toast(L.tSaveErr))}closeSheet();render();toast(L.tRules)};
-  $('#r-reset').onclick=async()=>{rules={...DEF};if(db){db.doc('config/rules').set(rules).catch(()=>{})}closeSheet();render();toast(L.tReset)};
+  $('#r-reset').onclick=async()=>{rules={...DEF,bizType:rules.bizType,unit:rules.unit,unitPt:rules.unitPt,kinds:rules.kinds};if(db){db.doc('config/rules').set(rules).catch(()=>{})}closeSheet();render();toast(L.tReset)};
 }
 
 // ---------- one input screen: code entry, photo, voice, text, new product ----------
@@ -550,9 +582,9 @@ function toggleMic(){const L=t(), msg=$('#rc-micMsg'), btn=$('#rc-mic');
 }
 function buildPrompt(text,nImg,kind){
   const list=[...items].sort(byRecent).slice(0,400).map(i=>`${i.ref||'-'} | ${i.name||''} | ${i.namePt||''}`).join('\n');
-  return `You read stock-movement records for a women's clothing wholesaler in Bom Retiro, São Paulo, Brazil. A record can be a photo of a sales receipt or order (pedido, nota, romaneio, cupom), a delivery slip from a sewing workshop (oficina, facção), a handwritten notebook page, or a sentence the owner typed or spoke, in Korean or Portuguese.
+  return `You read stock-movement records for a ${B().en} in São Paulo, Brazil. A record can be a photo of a sales receipt or order (pedido, nota, romaneio, cupom, nota fiscal), a supplier or workshop delivery slip, a handwritten notebook page, or a sentence the owner typed or spoke, in Korean or Portuguese.
 
-Task: list every product line with its total quantity in pieces.
+Task: list every product line with its total quantity in units (the owner counts in "${U()}").
 
 Products are identified by their code (código). Registered products (code | Korean name | Portuguese name, names may be empty):
 ${list||'(none yet)'}
@@ -561,10 +593,10 @@ Rules:
 - "type": "sale" for sales or goods leaving (venda, pedido, saída, vendido, 판매, 출고, 팔림, 나감); "in" for goods arriving (entrada, recebido, produção, oficina entregou, 입고, 들어옴, 생산); null if unclear.${kind!=='auto'?` The owner says this whole record is a ${kind==='sale'?'SALE':'STOCK ARRIVAL (in)'}; use that unless a line clearly says otherwise.`:''}
 - "code": the product code (código, cód., REF, ref, 코드). Prefer the exact registered code it matches. Remove size or color suffixes such as "-P", "/M", " AZUL". If the record gives only a name, look up its code in the list above; if you cannot find it, use null.
 - "name": the product name as written in the record, null if none.
-- "qty": total pieces as an integer. Add up sizes or colors listed separately (P 2, M 4, G 4 = 10). Dozens (dz, dúzia, 다스) × 12.
+- "qty": total pieces as an integer. Add up sizes, colors or variants listed separately (P 2, M 4, G 4 = 10). Dozens (dz, dúzia, 다스) × 12. Boxes (cx, caixa, 박스) count as boxes unless the units per box are written.
 - One entry per product; merge repeated lines of the same product and type.
 - Do not invent lines. Skip totals, prices, taxes, payment and customer details.
-- "kind": the garment type if the record says it, one of blusa, calca, vestido, saia, short, cropped, conjunto, jaqueta, macacao, outro; null if not said.
+- "kind": the product type if the record says it, one of ${KINDS_LIST().map(x=>x[0]).join(', ')}; null if not said.
 - "channel": "varejo" for retail or single-piece sales (varejo, avulso, unidade, 소매, 낱장); otherwise "atacado".
 - "read": a short quote of what you read for that line.
 
@@ -587,7 +619,7 @@ function localParse(text,kind){
     const low=seg.toLowerCase();
     let type=/판매|팔|출고|나감|나갔|vend|saída|saida|venda/.test(low)?'sale':/입고|들어|생산|entrada|chegou|recebi|produ/.test(low)?'in':null;
     // qty: number right before a unit, else Korean count words before a unit
-    let qty=null,m=low.match(/(\d+)\s*(장|개|벌|pç|pc|pcs|peças|pecas|peça|peca|unid)/);
+    let qty=null,m=low.match(/(\d+)\s*(장|개|벌|박스|상자|병|팩|봉지|켤레|kg|pç|pc|pcs|peças|pecas|peça|peca|unid|un\b|cx|caixas?|pares?|pacotes?|garrafas?)/);
     if(m)qty=+m[1];else{const k=low.match(/((?:한|하나|두|둘|세|셋|네|넷|다섯|여섯|일곱|여덟|아홉|열|스무|스물|서른|마흔|쉰|예순|일흔|여든|아흔|백)\s*)+(?=\s*(장|개|벌))/);
       if(k){qty=k[0].trim().split(/\s+/).join('').match(/스무|스물|서른|마흔|쉰|예순|일흔|여든|아흔|열|하나|다섯|여섯|일곱|여덟|아홉|한|두|둘|세|셋|네|넷|백/g).reduce((a,w)=>a+KNUM[w],0)}}
     // code: explicit marker first, else the first token with digits that is not the qty
@@ -610,7 +642,7 @@ async function readReceipt(){const L=t(), err=$('#rc-err');err.hidden=true;stopM
     const got=(Array.isArray(out?.lines)?out.lines:[]).map(l=>{const m=matchItem(l);
       const type=l.type==='sale'||l.type==='in'?l.type:(rc.kind==='auto'?'sale':rc.kind);
       const code=m?(m.ref||''):String(l.code??'').trim();
-      const line=newLine({code,pick:m?m.id:(code?'new':''),name:!m&&hasHangul(l.name)?String(l.name).trim():'',namePt:!m&&l.name&&!hasHangul(l.name)?String(l.name).trim():'',kind:!m?(KINDS.some(x=>x[0]===l.kind)?l.kind:findKind(l.name)):'',ch:l.channel==='varejo'?'V':'A',qty:Math.max(0,Math.round(+l.qty||0)),type,read:String(l.read??'')});
+      const line=newLine({code,pick:m?m.id:(code?'new':''),name:!m&&hasHangul(l.name)?String(l.name).trim():'',namePt:!m&&l.name&&!hasHangul(l.name)?String(l.name).trim():'',kind:!m?(KINDS_LIST().some(x=>x[0]===l.kind)?l.kind:findKind(l.name)):'',ch:l.channel==='varejo'?'V':'A',qty:Math.max(0,Math.round(+l.qty||0)),type,read:String(l.read??'')});
       return line});
     rc.lines=rc.lines.filter(l=>!isBlank(l)).concat(got);
     rc.note=String(out?.note||'');rc.source=rc.photos.length?'photo':(rc.source||'text');
@@ -713,7 +745,7 @@ document.addEventListener('click',e=>{const tr=e.target.closest('tr[data-edit]')
   if(b.dataset.edit)itemForm(items.find(i=>i.id===b.dataset.edit));
   if(b.dataset.undo){if(b.dataset.armed){const m=moves.find(x=>x.id===b.dataset.undo);if(m)undoMove(m)}else{b.dataset.armed='1';b.textContent=t().hUndoQ;b.classList.replace('soft','danger');setTimeout(()=>{if(b.isConnected){delete b.dataset.armed;b.textContent=t().hUndo;b.classList.replace('danger','soft')}},4000)}}
   if(b.id==='rcBtn')inputForm();
-  if(b.id==='rulesBtn')rulesForm();
+  if(b.id==='rulesBtn'||b.id==='bizPick')rulesForm();
 });
 $('#month').addEventListener('change',e=>{month=e.target.value;filter='all';render()});
 let qt;$('#q').addEventListener('input',e=>{clearTimeout(qt);qt=setTimeout(()=>{q=e.target.value.trim();render()},150)});
