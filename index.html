@@ -264,7 +264,7 @@ ko:{h1:'재고 정리판',sub:'상품의 입고·판매·재고·수익을 한�
  inEmpty:'코드를 넣거나 사진·말로 읽어오세요. 새 코드를 넣으면 새 상품으로 등록돼요.',inReadDone:n=>`${n}줄을 읽었어요. 아래에서 확인하고 반영하세요.`,
  lnCode:'코드',lnNewTag:'새 상품',lnNew:'처음 보는 코드예요. 종류를 고르면 새 상품으로 등록되고 수량은 입고로 들어가요.',lnNoCode:'코드를 넣어주세요.',lnNoCodeName:n=>`"${n}" · 코드를 넣어주세요.`,lnMonth:'어느 달 상품인가요?',lnRemove:'지우기',eNewName:'새 상품 이름을 넣어주세요.',
  rcTitle:'영수증·말로 수량 입력',rcKind:'무엇을 입력하나요?',kAuto:'알아서',kSale:'판매·출고',kIn:'입고',
- rcCam:'사진 찍기',rcCamHint:'카메라가 안 열리면 "사진 고르기"를 누르고 카메라를 고르세요. 찍어둔 영수증 사진을 골라도 돼요.',rcGal:'사진 고르기',rcMic:'말하기',rcMicStop:'그만 말하기',
+ rcCam:'사진 찍기',rcAiOff:'사진 AI 읽기가 아직 켜져 있지 않아요. Firebase에서 AI Logic을 켜면 돼요. 지금은 말이나 글로 "2611 20 판매"처럼 넣어주세요.',rcCamHint:'카메라가 안 열리면 "사진 고르기"를 누르고 카메라를 고르세요. 찍어둔 영수증 사진을 골라도 돼요.',rcGal:'사진 고르기',rcMic:'말하기',rcMicStop:'그만 말하기',
  rcTextL:'또는 글로 적기',get rcTextPh(){return `예: 2611 20${U()} 팔렸어, 2598 입고 300${U()}`},
  rcMicHint:'여기서는 마이크를 바로 쓸 수 없어요. 아래 글 칸을 누르고 키보드의 마이크 버튼을 눌러 말하세요.',
  rcListening:'듣고 있어요… 한 번에 한 줄씩 짧게 말하세요. 예: "2611 스무 장 판매". 더 넣으려면 다시 누르세요.',
@@ -311,7 +311,7 @@ pt:{h1:'Controle de Estoque',sub:'Entrada, vendas, estoque e lucro dos produtos'
  inEmpty:'Digite um código ou leia uma foto/voz. Código novo vira produto novo.',inReadDone:n=>`${n} linha(s) lida(s). Confira abaixo e lance.`,
  lnCode:'Código',lnNewTag:'Produto novo',lnNew:'Código novo. Escolha o tipo para cadastrar; a quantidade entra como entrada.',lnNoCode:'Informe o código.',lnNoCodeName:n=>`"${n}" · informe o código.`,lnMonth:'De qual mês é o produto?',lnRemove:'Remover',eNewName:'Informe o nome do produto novo.',
  rcTitle:'Lançar por nota, foto ou voz',rcKind:'O que você vai lançar?',kAuto:'Detectar',kSale:'Venda · saída',kIn:'Entrada',
- rcCam:'Tirar foto',rcCamHint:'Se a câmera não abrir, toque em "Escolher foto" e escolha a câmera, ou escolha uma foto já tirada.',rcGal:'Escolher foto',rcMic:'Falar',rcMicStop:'Parar',
+ rcCam:'Tirar foto',rcAiOff:'A leitura de fotos por IA ainda não está ativada (falta ligar o AI Logic no Firebase). Por enquanto fale ou escreva "2611 20 venda".',rcCamHint:'Se a câmera não abrir, toque em "Escolher foto" e escolha a câmera, ou escolha uma foto já tirada.',rcGal:'Escolher foto',rcMic:'Falar',rcMicStop:'Parar',
  rcTextL:'Ou escreva',get rcTextPh(){return `Ex.: vendi 20 ${U()} do 2611, entrada de 300 ${U()} do 2598`},
  rcMicHint:'Aqui o microfone não pode ser usado direto. Toque no campo de texto abaixo e use o microfone do teclado.',
  rcListening:'Ouvindo… fale uma linha curta por vez. Ex.: "2611 vinte peças vendidas". Para mais, toque de novo.',
@@ -638,7 +638,11 @@ async function readReceipt(){const L=t(), err=$('#rc-err');err.hidden=true;stopM
   if(!ai&&rc.photos.length){err.textContent=L.rcNoAi;err.hidden=false;return}
   $('#rc-busy').hidden=false;$('#rc-go').disabled=true;
   try{
-    const out=ai?await ai(buildPrompt(text,rc.photos.length,rc.kind),rc.photos.map(p=>p.blob)):localParse(text,rc.kind);
+    // text only: read it here first (fast, free, works without AI); use AI for photos or text we can't read
+    const lp=text?localParse(text,rc.kind):{lines:[]};let out;
+    if(!rc.photos.length&&lp.lines.length)out=lp;
+    else if(ai){try{out=await ai(buildPrompt(text,rc.photos.length,rc.kind),rc.photos.map(p=>p.blob))}catch(e){if(!rc.photos.length&&lp.lines.length)out=lp;else throw e}}
+    else out=lp;
     const got=(Array.isArray(out?.lines)?out.lines:[]).map(l=>{const m=matchItem(l);
       const type=l.type==='sale'||l.type==='in'?l.type:(rc.kind==='auto'?'sale':rc.kind);
       const code=m?(m.ref||''):String(l.code??'').trim();
@@ -650,7 +654,8 @@ async function readReceipt(){const L=t(), err=$('#rc-err');err.hidden=true;stopM
     err.textContent=got.length?L.inReadDone(got.length):L.rvNone;err.hidden=false;err.className=got.length?'hint':'err';
     drawLines();
   }catch(e){const c=e&&e.code;err.className='err';
-    err.textContent=c==='not_granted'?L.rcDenied:c==='rate_limited'?L.rcLimit:L.rcFail;err.hidden=false}
+    const msg=String((e&&(e.message||e.code))||'');
+    err.textContent=c==='not_granted'?L.rcDenied:c==='rate_limited'?L.rcLimit:/not.?enabled|has not been used|permission|app.?check|api.?key|403|forbidden|billing|disabled/i.test(msg)?L.rcAiOff:L.rcFail;err.hidden=false;try{console.warn('AI read failed',e)}catch(_){}}
   $('#rc-busy').hidden=true;$('#rc-go').disabled=false;
 }
 function lineMatchHtml(l,k){const L=t();
