@@ -80,6 +80,14 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .nums{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;font-size:12px;color:var(--muted)}
 .nums b{display:block;font-size:16px;color:var(--ink);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
 .nums.money2{grid-template-columns:1fr 1fr}
+.cthumb{border:0;padding:0;background:none;flex:none;width:64px;height:64px;border-radius:10px;overflow:hidden;align-self:flex-start}
+.cthumb img{width:100%;height:100%;object-fit:cover;display:block}
+.tthumb{width:28px;height:28px;object-fit:cover;border-radius:6px;vertical-align:middle;margin-right:6px}
+.lthumb{width:48px;height:48px;object-fit:cover;border-radius:8px;float:left;margin-right:10px}
+.found{overflow:hidden}
+.phrow{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.pthumb{width:56px;height:56px;object-fit:cover;border-radius:8px}
+.pthumb.big{width:96px;height:96px}
 .sh{font-size:14px;margin:6px 0 0;color:var(--ink)}
 .kinds{display:flex;flex-wrap:wrap;gap:6px}
 .kinds button{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:6px 11px;font-size:13px}
@@ -264,7 +272,7 @@ ko:{h1:'재고 정리판',sub:'상품의 입고·판매·재고·수익을 한�
  inEmpty:'코드를 넣거나 사진·말로 읽어오세요. 새 코드를 넣으면 새 상품으로 등록돼요.',inReadDone:n=>`${n}줄을 읽었어요. 아래에서 확인하고 반영하세요.`,
  lnCode:'코드',lnNewTag:'새 상품',lnNew:'처음 보는 코드예요. 종류를 고르면 새 상품으로 등록되고 수량은 입고로 들어가요.',lnNoCode:'코드를 넣어주세요.',lnNoCodeName:n=>`"${n}" · 코드를 넣어주세요.`,lnMonth:'어느 달 상품인가요?',lnRemove:'지우기',eNewName:'새 상품 이름을 넣어주세요.',
  rcTitle:'영수증·말로 수량 입력',rcKind:'무엇을 입력하나요?',kAuto:'알아서',kSale:'판매·출고',kIn:'입고',
- rcCam:'사진 찍기',rcAiOff:'사진 AI 읽기가 아직 켜져 있지 않아요. Firebase에서 AI Logic을 켜면 돼요. 지금은 말이나 글로 "2611 20 판매"처럼 넣어주세요.',rcCamHint:'카메라가 안 열리면 "사진 고르기"를 누르고 카메라를 고르세요. 찍어둔 영수증 사진을 골라도 돼요.',rcGal:'사진 고르기',rcMic:'말하기',rcMicStop:'그만 말하기',
+ rcCam:'사진 찍기',phTitle:'상품 사진',phCam:'사진 찍기',phGal:'사진 고르기',phDel:'사진 지우기',phErr:'사진을 넣지 못했어요. 다른 사진으로 해보세요.',rcAiOff:'사진 AI 읽기가 아직 켜져 있지 않아요. Firebase에서 AI Logic을 켜면 돼요. 지금은 말이나 글로 "2611 20 판매"처럼 넣어주세요.',rcCamHint:'카메라가 안 열리면 "사진 고르기"를 누르고 카메라를 고르세요. 찍어둔 영수증 사진을 골라도 돼요.',rcGal:'사진 고르기',rcMic:'말하기',rcMicStop:'그만 말하기',
  rcTextL:'또는 글로 적기',get rcTextPh(){return `예: 2611 20${U()} 팔렸어, 2598 입고 300${U()}`},
  rcMicHint:'여기서는 마이크를 바로 쓸 수 없어요. 아래 글 칸을 누르고 키보드의 마이크 버튼을 눌러 말하세요.',
  rcListening:'듣고 있어요… 한 번에 한 줄씩 짧게 말하세요. 예: "2611 스무 장 판매". 더 넣으려면 다시 누르세요.',
@@ -311,7 +319,7 @@ pt:{h1:'Controle de Estoque',sub:'Entrada, vendas, estoque e lucro dos produtos'
  inEmpty:'Digite um código ou leia uma foto/voz. Código novo vira produto novo.',inReadDone:n=>`${n} linha(s) lida(s). Confira abaixo e lance.`,
  lnCode:'Código',lnNewTag:'Produto novo',lnNew:'Código novo. Escolha o tipo para cadastrar; a quantidade entra como entrada.',lnNoCode:'Informe o código.',lnNoCodeName:n=>`"${n}" · informe o código.`,lnMonth:'De qual mês é o produto?',lnRemove:'Remover',eNewName:'Informe o nome do produto novo.',
  rcTitle:'Lançar por nota, foto ou voz',rcKind:'O que você vai lançar?',kAuto:'Detectar',kSale:'Venda · saída',kIn:'Entrada',
- rcCam:'Tirar foto',rcAiOff:'A leitura de fotos por IA ainda não está ativada (falta ligar o AI Logic no Firebase). Por enquanto fale ou escreva "2611 20 venda".',rcCamHint:'Se a câmera não abrir, toque em "Escolher foto" e escolha a câmera, ou escolha uma foto já tirada.',rcGal:'Escolher foto',rcMic:'Falar',rcMicStop:'Parar',
+ rcCam:'Tirar foto',phTitle:'Foto do produto',phCam:'Tirar foto',phGal:'Escolher foto',phDel:'Remover foto',phErr:'Não foi possível usar essa foto. Tente outra.',rcAiOff:'A leitura de fotos por IA ainda não está ativada (falta ligar o AI Logic no Firebase). Por enquanto fale ou escreva "2611 20 venda".',rcCamHint:'Se a câmera não abrir, toque em "Escolher foto" e escolha a câmera, ou escolha uma foto já tirada.',rcGal:'Escolher foto',rcMic:'Falar',rcMicStop:'Parar',
  rcTextL:'Ou escreva',get rcTextPh(){return `Ex.: vendi 20 ${U()} do 2611, entrada de 300 ${U()} do 2598`},
  rcMicHint:'Aqui o microfone não pode ser usado direto. Toque no campo de texto abaixo e use o microfone do teclado.',
  rcListening:'Ouvindo… fale uma linha curta por vez. Ex.: "2611 vinte peças vendidas". Para mais, toque de novo.',
@@ -357,8 +365,15 @@ function monthsList(){const s=new Set(items.map(i=>i.month).filter(Boolean));s.a
 function mLabel(m){const [y,mm]=m.split('-');return t().monthL(y,+mm)}
 const byRecent=(a,b)=>String(b.madeDate||'').localeCompare(String(a.madeDate||''));
 
+// product photo: shrunk to a small JPEG and kept inside the product record
+async function makeThumb(file){const bmp=await createImageBitmap(file);let side=360,q=0.72,url='';
+  for(let k=0;k<4;k++){const sc=Math.min(1,side/Math.max(bmp.width,bmp.height));const c=document.createElement('canvas');c.width=Math.round(bmp.width*sc);c.height=Math.round(bmp.height*sc);
+    c.getContext('2d').drawImage(bmp,0,0,c.width,c.height);url=c.toDataURL('image/jpeg',q);if(url.length<70000)break;side=Math.round(side*0.8);q=Math.max(0.5,q-0.08)}
+  bmp.close&&bmp.close();return url}
+const safeImg=u=>typeof u==='string'&&u.startsWith('data:image/')?u:'';
+function photoView(src){if(!safeImg(src))return;const L=t();openSheet(`${head(L.phTitle)}<img src="${safeImg(src)}" alt="" style="width:100%;border-radius:12px">`)}
 function card(i){const L=t(),j=i.j;return `<div class="card ${CLS[j.cat]}">
-    <div class="row"><div class="name"><span class="code big">${esc(i.ref||L.noCode)}</span>${dn(i)?`<span class="pname">${esc(dn(i))}</span>`:''}<div class="ref">${j.days===999?L.noDate:L.day(j.days)}${q?' · '+esc(mLabel(i.month||month)):''}</div></div><span class="pill">${L.cats[j.cat][0]}</span></div>
+    <div class="row">${safeImg(i.photo)?`<button type="button" class="cthumb" data-view="${i.id}" aria-label="${L.phTitle}"><img src="${safeImg(i.photo)}" alt=""></button>`:''}<div class="name" style="flex:1"><span class="code big">${esc(i.ref||L.noCode)}</span>${dn(i)?`<span class="pname">${esc(dn(i))}</span>`:''}<div class="ref">${j.days===999?L.noDate:L.day(j.days)}${q?' · '+esc(mLabel(i.month||month)):''}</div></div><span class="pill">${L.cats[j.cat][0]}</span></div>
     <div class="nums"><div>${L.made}<b>${j.made}</b></div><div>${L.sold}<b>${j.sold}</b>${j.soldV?`<span class="ref">${L.retailN(j.soldV)}</span>`:''}</div><div>${L.stock}<b>${j.stock}</b></div></div>
     <div class="bar" role="img" aria-label="${L.rate} ${j.rate.toFixed(0)}%"><i style="width:${j.rate.toFixed(1)}%"></i></div>
     <div class="ref">${L.rate} <b style="color:var(--ink)">${j.rate.toFixed(0)}%</b> · ${L.costL} ${j.cost?brl(j.cost):'—'} · ${L.priceL} ${j.price?brl(j.price):'—'} · ${L.priceVL} ${j.priceV?brl(j.priceV):'—'}</div>
@@ -369,7 +384,7 @@ function card(i){const L=t(),j=i.j;return `<div class="card ${CLS[j.cat]}">
 
 function table(rows){const L=t();const T2=f=>rows.reduce((a,i)=>a+f(i.j),0);
   return `<p class="hint">${L.tblHint}</p><div class="tablewrap"><table class="tbl"><thead><tr><th class="l code-c">${L.thCode}</th><th class="l">${L.thName}</th><th>${L.made}</th><th>${L.sold}</th><th>${L.stock}</th><th>${L.rate}</th><th class="l">${L.thCat}</th><th>${L.itemSales}</th><th>${L.itemProfit}</th></tr></thead><tbody>
-  ${rows.map(i=>{const j=i.j;return `<tr data-edit="${i.id}" class="${CLS[j.cat]}"><td class="l code-c">${esc(i.ref||'—')}</td><td class="l">${esc(dn(i)||'—')}</td><td>${num(j.made)}</td><td>${num(j.sold)}</td><td>${num(j.stock)}</td><td>${j.rate.toFixed(0)}%</td><td class="l"><span class="dot"></span>${L.cats[j.cat][0]}</td><td>${brl(j.sales)}</td><td style="${j.profit<0?'color:var(--retail)':''}">${j.profit===null?'—':brl(j.profit)}</td></tr>`}).join('')}
+  ${rows.map(i=>{const j=i.j;return `<tr data-edit="${i.id}" class="${CLS[j.cat]}"><td class="l code-c">${safeImg(i.photo)?`<img class="tthumb" src="${safeImg(i.photo)}" alt="">`:''}${esc(i.ref||'—')}</td><td class="l">${esc(dn(i)||'—')}</td><td>${num(j.made)}</td><td>${num(j.sold)}</td><td>${num(j.stock)}</td><td>${j.rate.toFixed(0)}%</td><td class="l"><span class="dot"></span>${L.cats[j.cat][0]}</td><td>${brl(j.sales)}</td><td style="${j.profit<0?'color:var(--retail)':''}">${j.profit===null?'—':brl(j.profit)}</td></tr>`}).join('')}
   </tbody><tfoot><tr><td class="l code-c">${L.total}</td><td class="l">${rows.length}</td><td>${num(T2(j=>j.made))}</td><td>${num(T2(j=>j.sold))}</td><td>${num(T2(j=>j.stock))}</td><td></td><td></td><td>${brl(T2(j=>j.sales))}</td><td>${brl(rows.reduce((a,i)=>a+(i.j.profit||0),0))}</td></tr></tfoot></table></div>`}
 function render(){
   const L=t(); document.documentElement.lang=lang==='ko'?'ko':'pt-BR';
@@ -450,6 +465,7 @@ function itemForm(it,preset){const L=t();
   <div class="two"><div class="field"><label for="f-ref">${L.fCode}</label><input id="f-ref" value="${esc(v.ref)}" placeholder="${L.fCodePh}" autocomplete="off" autocapitalize="characters"></div>
   <div class="field"><label for="f-date">${L.fDate}</label><input id="f-date" type="date" value="${esc(v.madeDate)}"></div></div>
   <div id="f-dup"></div>
+  <div class="field">${L.phTitle}<div class="phrow" id="f-ph"></div></div>
   <div class="field">${L.fKind}<div id="f-kind">${kindChips(v.kind,'data-kind')}</div></div>
   <div class="two"><div class="field"><label for="f-name">${L.fName}</label><input id="f-name" value="${esc(v.name)}" placeholder="${L.fNamePh}"></div>
   <div class="field"><label for="f-namept">${L.fNamePt}</label><input id="f-namept" value="${esc(v.namePt)}" placeholder="${L.fNamePtPh}"></div></div>
@@ -463,6 +479,11 @@ function itemForm(it,preset){const L=t();
   <p class="hint">${L.fDateHint}</p><p class="err" id="f-err" hidden></p>
   <button class="btn full" type="button" id="f-save">${L.save}</button>
   ${it?`<div id="delZone"><button class="btn danger full" type="button" id="f-del">${L.del}</button></div>`:''}`);
+  let fphoto=v.photo||'';
+  const drawPh=()=>{$('#f-ph').innerHTML=`${safeImg(fphoto)?`<img class="pthumb big" src="${safeImg(fphoto)}" alt="">`:''}<label class="btn soft sm" for="f-pc">${L.phCam}</label><input class="vh" type="file" accept="image/*" capture="environment" id="f-pc"><label class="btn soft sm" for="f-pg">${L.phGal}</label><input class="vh" type="file" accept="image/*" id="f-pg">${fphoto?`<button type="button" class="btn soft sm" id="f-phdel">${L.phDel}</button>`:''}`;
+    ['#f-pc','#f-pg'].forEach(id=>$(id).onchange=async e=>{const f=e.target.files&&e.target.files[0];if(!f)return;try{fphoto=await makeThumb(f)}catch(_){toast(L.phErr)}drawPh()});
+    if($('#f-phdel'))$('#f-phdel').onclick=()=>{fphoto='';drawPh()}};
+  drawPh();
   let fkind=v.kind||'';$('#f-kind').onclick=e=>{const b=e.target.closest('[data-kind]');if(!b)return;fkind=fkind===b.dataset.kind?'':b.dataset.kind;$('#f-kind').innerHTML=kindChips(fkind,'data-kind')};
   const checkDup=()=>{const d=dupOf($('#f-ref').value,($('#f-date').value||month).slice(0,7),it?.id);
     $('#f-dup').innerHTML=d?`<p class="err">${esc(L.eDup(lbl(d)))} <button class="btn soft sm" type="button" id="f-open">${L.dupOpen}</button></p>`:'';
@@ -473,7 +494,7 @@ function itemForm(it,preset){const L=t();
     const bad=m=>{err.textContent=m;err.hidden=false};
     const soldV=Math.max(0,Math.floor(+$('#f-soldv').value||0));
     if(!ref)return bad(L.eCode); if(sold>made)return bad(L.eSold); if(soldV>sold)return bad(L.eSoldV); if(checkDup())return;
-    const data={ref,name,namePt:$('#f-namept').value.trim(),kind:fkind,cost:+$('#f-cost').value||0,price:+$('#f-price').value||0,priceV:+$('#f-pricev').value||0,made,sold,soldV,madeDate:date,month:(date||month).slice(0,7),updatedAt:new Date().toISOString()};
+    const data={photo:safeImg(fphoto),ref,name,namePt:$('#f-namept').value.trim(),kind:fkind,cost:+$('#f-cost').value||0,price:+$('#f-price').value||0,priceV:+$('#f-pricev').value||0,made,sold,soldV,madeDate:date,month:(date||month).slice(0,7),updatedAt:new Date().toISOString()};
     if(await saveItem(it?.id,data)){month=data.month;q='';$('#q').value='';closeSheet();render();toast(L.tSaved)}
   };
   if(it)$('#f-del').onclick=()=>{$('#delZone').innerHTML=`<p class="hint">${L.delQ}</p><div class="two"><button class="btn soft" type="button" data-close>${L.cancel}</button><button class="btn danger" type="button" id="f-del2">${L.delete}</button></div>`;
@@ -660,6 +681,7 @@ async function readReceipt(){const L=t(), err=$('#rc-err');err.hidden=true;stopM
 }
 function lineMatchHtml(l,k){const L=t();
   if(l.pick==='new')return `<div class="newp"><span class="pill c-re" style="align-self:flex-start">${L.lnNewTag}</span><span class="hint">${L.lnNew}</span>
+      <div class="phrow">${safeImg(l.photo)?`<img class="pthumb" src="${safeImg(l.photo)}" alt="">`:''}<label class="btn soft sm" for="ln-pc${k}">${L.phCam}</label><input class="vh" type="file" accept="image/*" capture="environment" id="ln-pc${k}" data-photo="${k}"><label class="btn soft sm" for="ln-pg${k}">${L.phGal}</label><input class="vh" type="file" accept="image/*" id="ln-pg${k}" data-photo="${k}">${l.photo?`<button type="button" class="btn soft sm" data-phdel="${k}">${L.phDel}</button>`:''}</div>
       <div class="field">${L.fKind}${kindChips(l.kind,'data-lkind')}</div>
       <div class="two"><div class="field"><label for="ln-n${k}">${L.rvNewName}</label><input id="ln-n${k}" data-f="name" value="${esc(l.name)}" placeholder="${L.fNamePh}"></div><div class="field"><label for="ln-np${k}">${L.fNamePt}</label><input id="ln-np${k}" data-f="namePt" value="${esc(l.namePt)}" placeholder="${L.fNamePtPh}"></div></div>
       <div class="two"><div class="field"><label for="ln-c${k}">${L.fCost}</label><input id="ln-c${k}" data-f="cost" type="number" step="0.01" min="0" inputmode="decimal" value="${esc(l.cost)}"></div>
@@ -668,7 +690,7 @@ function lineMatchHtml(l,k){const L=t();
   if(!l.pick){const nm=l.name||l.namePt;return `<span class="hint">${nm?esc(L.lnNoCodeName(nm)):L.lnNoCode}</span>`}
   const ms=codeMatches(l.code), it=items.find(i=>i.id===l.pick);if(!it)return '';
   const j=calc(it);
-  const found=`<b>${esc(lbl(it))}</b><span class="ref">${esc(mLabel(it.month||month))} · ${L.stock} ${j.stock}${L.pcs}</span>`;
+  const found=`${safeImg(it.photo)?`<img class="lthumb" src="${safeImg(it.photo)}" alt="">`:''}<b>${esc(lbl(it))}</b><span class="ref">${esc(mLabel(it.month||month))} · ${L.stock} ${j.stock}${L.pcs}</span>`;
   return ms.length>1?`<div class="found">${found}</div><div class="field"><label for="ln-m${k}">${L.lnMonth}</label><select id="ln-m${k}" data-f="pick">${ms.map(m=>`<option value="${m.id}" ${m.id===l.pick?'selected':''}>${esc(mLabel(m.month||month))} · ${L.stock} ${calc(m).stock}${L.pcs}</option>`).join('')}</select></div>`:`<div class="found">${found}</div>`;
 }
 function lineHtml(l,k){const L=t();return `<div class="rline ${l.type}" data-k="${k}">
@@ -706,8 +728,10 @@ function wireLines(){const box=$('#rv-lines');
     if(el.dataset.f==='qty')l.qty=el.value===''?'':Math.max(0,Math.floor(+el.value||0));
     if(el.dataset.f==='name')l.name=el.value;if(el.dataset.f==='namePt')l.namePt=el.value;if(el.dataset.f==='cost')l.cost=el.value;if(el.dataset.f==='price')l.price=el.value;if(el.dataset.f==='priceV')l.priceV=el.value;
     validate()});
-  box.addEventListener('change',e=>{const el=e.target.closest('[data-f="pick"]');if(!el)return;const k=+el.closest('.rline').dataset.k;rc.lines[k].pick=el.value;redrawLine(k)});
-  box.addEventListener('click',e=>{const d=e.target.closest('[data-del]');if(d){rc.lines.splice(+d.dataset.del,1);drawLines();return}
+  box.addEventListener('change',async e=>{const ph=e.target.closest('input[data-photo]');if(ph){const k=+ph.dataset.photo,f=ph.files&&ph.files[0];if(f){try{rc.lines[k].photo=await makeThumb(f)}catch(_){toast(t().phErr)}redrawLine(k)}return}
+    const el=e.target.closest('[data-f="pick"]');if(!el)return;const k=+el.closest('.rline').dataset.k;rc.lines[k].pick=el.value;redrawLine(k)});
+  box.addEventListener('click',e=>{const pd=e.target.closest('[data-phdel]');if(pd){const k=+pd.dataset.phdel;rc.lines[k].photo='';redrawLine(k);return}
+    const d=e.target.closest('[data-del]');if(d){rc.lines.splice(+d.dataset.del,1);drawLines();return}
     const kb=e.target.closest('[data-lkind]');if(kb){const k=+kb.closest('.rline').dataset.k,l=rc.lines[k];l.kind=l.kind===kb.dataset.lkind?'':kb.dataset.lkind;redrawLine(k);return}
     const cb=e.target.closest('[data-c]');if(cb){const k=+cb.closest('.rline').dataset.k;rc.lines[k].ch=cb.dataset.c;redrawLine(k);return}
     const b=e.target.closest('[data-t]');if(!b)return;const k=+b.closest('.rline').dataset.k;rc.lines[k].type=b.dataset.t;redrawLine(k)});
@@ -717,7 +741,7 @@ async function applyInput(){const L=t();$('#rv-apply').disabled=true;
   const now=new Date().toISOString(), today=now.slice(0,10), patches={}, logLines=[];
   try{
     for(const l of rc.lines){const qn=+l.qty||0;if(isBlank(l))continue;
-      if(l.pick==='new'){const data={ref:l.code.trim(),name:l.name.trim(),namePt:l.namePt.trim(),kind:l.kind||'',cost:+l.cost||0,price:+l.price||0,priceV:+l.priceV||0,made:qn,sold:0,soldV:0,madeDate:today,month:today.slice(0,7),updatedAt:now};
+      if(l.pick==='new'){const data={photo:safeImg(l.photo),ref:l.code.trim(),name:l.name.trim(),namePt:l.namePt.trim(),kind:l.kind||'',cost:+l.cost||0,price:+l.price||0,priceV:+l.priceV||0,made:qn,sold:0,soldV:0,madeDate:today,month:today.slice(0,7),updatedAt:now};
         const id=await saveItem(null,data);if(!id)throw new Error('save');logLines.push({id,code:data.ref,name:dn(data),type:'in',qty:qn,created:true});continue}
       const it=items.find(i=>i.id===l.pick);if(!it)continue;
       const p=patches[it.id]||(patches[it.id]={made:+it.made||0,sold:+it.sold||0,soldV:+it.soldV||0});
@@ -743,6 +767,7 @@ async function undoMove(m){const L=t();
 
 document.addEventListener('click',e=>{const tr=e.target.closest('tr[data-edit]');if(tr){const it=items.find(i=>i.id===tr.dataset.edit);if(it)itemForm(it);return}
   const b=e.target.closest('button');if(!b)return;
+  if(b.dataset.view){const it=items.find(i=>i.id===b.dataset.view);if(it)photoView(it.photo);return}
   if(b.id==='viewBtn'){view=view==='table'?'cards':'table';try{localStorage.setItem('view',view)}catch(e){}render();return}
   if(b.dataset.lang){lang=b.dataset.lang;try{localStorage.setItem('lang',lang)}catch(e){}closeSheet();render()}
   if(b.dataset.f&&b.classList.contains('bin')||b.dataset.f==='all'&&!b.closest('.sheet')){filter=filter===b.dataset.f?'all':b.dataset.f;q='';$('#q').value='';render()}
