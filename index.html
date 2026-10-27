@@ -88,6 +88,10 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .phrow{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
 .pthumb{width:56px;height:56px;object-fit:cover;border-radius:8px}
 .pthumb.big{width:96px;height:96px}
+.btn.sl{background:var(--sale-soft);color:var(--sale)}
+.decl{display:flex;gap:8px;align-items:flex-start;font-size:12.5px;color:var(--muted);line-height:1.45}
+.decl input{width:auto;margin-top:2px}
+.linkbtn{border:0;background:none;color:var(--accent);font-weight:600;padding:0}
 .sh{font-size:14px;margin:6px 0 0;color:var(--ink)}
 .kinds{display:flex;flex-wrap:wrap;gap:6px}
 .kinds button{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:6px 11px;font-size:13px}
@@ -272,7 +276,12 @@ ko:{h1:'재고 정리판',sub:'상품의 입고·판매·재고·수익을 한�
  inEmpty:'코드를 넣거나 사진·말로 읽어오세요. 새 코드를 넣으면 새 상품으로 등록돼요.',inReadDone:n=>`${n}줄을 읽었어요. 아래에서 확인하고 반영하세요.`,
  lnCode:'코드',lnNewTag:'새 상품',lnNew:'처음 보는 코드예요. 종류를 고르면 새 상품으로 등록되고 수량은 입고로 들어가요.',lnNoCode:'코드를 넣어주세요.',lnNoCodeName:n=>`"${n}" · 코드를 넣어주세요.`,lnMonth:'어느 달 상품인가요?',lnRemove:'지우기',eNewName:'새 상품 이름을 넣어주세요.',
  rcTitle:'영수증·말로 수량 입력',rcKind:'무엇을 입력하나요?',kAuto:'알아서',kSale:'판매·출고',kIn:'입고',
- rcCam:'사진 찍기',phTitle:'상품 사진',phCam:'사진 찍기',phGal:'사진 고르기',phDel:'사진 지우기',phErr:'사진을 넣지 못했어요. 다른 사진으로 해보세요.',rcAiOff:'사진 AI 읽기가 아직 켜져 있지 않아요. Firebase에서 AI Logic을 켜면 돼요. 지금은 말이나 글로 "2611 20 판매"처럼 넣어주세요.',rcCamHint:'카메라가 안 열리면 "사진 고르기"를 누르고 카메라를 고르세요. 찍어둔 영수증 사진을 골라도 돼요.',rcGal:'사진 고르기',rcMic:'말하기',rcMicStop:'그만 말하기',
+ rcCam:'사진 찍기',slBtn:'StockLink에 올리기',slAgain:'StockLink에 다시 올리기',slTitle:'StockLink 사우두 게시판에 올리기',slLoginHint:'StockLink 앱에서 가입한 이메일과 비밀번호로 로그인하세요. 한 번 로그인하면 다음부터는 바로 올릴 수 있어요.',slEmail:'이메일',slPw:'비밀번호',slLogin:'StockLink 로그인',
+ slNoComp:'이 계정에 등록된 회사가 없어요. StockLink 앱에서 회사(CNPJ)를 먼저 등록하세요.',slComp:'어느 회사로 올릴까요?',slCompOne:n=>`<b>${n}</b> 이름으로 올라가요.`,slPhoto:'상품 사진이 같이 올라가요.',slNoPhoto:'상품 사진이 없어요. 수정에서 사진을 넣으면 같이 올라가요.',
+ slTitleL:'제목',slCat:'종류',slPrice:'사우두 가격 (R$)',slQty:'올릴 수량',slPriceType:'가격 방식',slPeca:'1개당 가격',slLote:'전체 묶음 가격',slDesc:'설명 (선택)',
+ slDecl:'이 재고를 실제로 보유하고 있으며, 상품은 정품이고 합법적으로 들여온 것이며, 사진·가격·정보가 사실임을 확인합니다. 이 게시물과 거래의 책임은 저에게 있습니다.',
+ slGo:'StockLink에 올리기',slSending:'올리는 중…',slDone:'StockLink 게시판에 올렸어요. 손님은 왓츠앱으로 바로 연락해요.',slAs:e=>`StockLink 계정: ${e}`,slLogout:'StockLink 로그아웃',slOut:'StockLink에서 로그아웃했어요',slAlready:d=>`${d}에 이미 올렸어요. 다시 올리면 새 게시물이 하나 더 생겨요.`,
+ slETitle:'제목을 2글자 이상 넣어주세요.',slEPrice:'가격을 넣어주세요.',slEQty:'수량을 1 이상 넣어주세요.',slEDecl:'확인란에 체크해 주세요.',slESub:'올릴 수 없어요. StockLink 무료 기간이나 구독이 끝났거나 회사가 정지됐어요. StockLink 앱에서 확인해 주세요.',slELogin:'이메일이나 비밀번호가 맞지 않아요. 이메일 확인을 아직 안 했다면 메일함을 확인하세요.',slEFail:'StockLink에 연결하지 못했어요. 인터넷을 확인하고 다시 해보세요.',phTitle:'상품 사진',phCam:'사진 찍기',phGal:'사진 고르기',phDel:'사진 지우기',phErr:'사진을 넣지 못했어요. 다른 사진으로 해보세요.',rcAiOff:'사진 AI 읽기가 아직 켜져 있지 않아요. Firebase에서 AI Logic을 켜면 돼요. 지금은 말이나 글로 "2611 20 판매"처럼 넣어주세요.',rcCamHint:'카메라가 안 열리면 "사진 고르기"를 누르고 카메라를 고르세요. 찍어둔 영수증 사진을 골라도 돼요.',rcGal:'사진 고르기',rcMic:'말하기',rcMicStop:'그만 말하기',
  rcTextL:'또는 글로 적기',get rcTextPh(){return `예: 2611 20${U()} 팔렸어, 2598 입고 300${U()}`},
  rcMicHint:'여기서는 마이크를 바로 쓸 수 없어요. 아래 글 칸을 누르고 키보드의 마이크 버튼을 눌러 말하세요.',
  rcListening:'듣고 있어요… 한 번에 한 줄씩 짧게 말하세요. 예: "2611 스무 장 판매". 더 넣으려면 다시 누르세요.',
@@ -319,7 +328,12 @@ pt:{h1:'Controle de Estoque',sub:'Entrada, vendas, estoque e lucro dos produtos'
  inEmpty:'Digite um código ou leia uma foto/voz. Código novo vira produto novo.',inReadDone:n=>`${n} linha(s) lida(s). Confira abaixo e lance.`,
  lnCode:'Código',lnNewTag:'Produto novo',lnNew:'Código novo. Escolha o tipo para cadastrar; a quantidade entra como entrada.',lnNoCode:'Informe o código.',lnNoCodeName:n=>`"${n}" · informe o código.`,lnMonth:'De qual mês é o produto?',lnRemove:'Remover',eNewName:'Informe o nome do produto novo.',
  rcTitle:'Lançar por nota, foto ou voz',rcKind:'O que você vai lançar?',kAuto:'Detectar',kSale:'Venda · saída',kIn:'Entrada',
- rcCam:'Tirar foto',phTitle:'Foto do produto',phCam:'Tirar foto',phGal:'Escolher foto',phDel:'Remover foto',phErr:'Não foi possível usar essa foto. Tente outra.',rcAiOff:'A leitura de fotos por IA ainda não está ativada (falta ligar o AI Logic no Firebase). Por enquanto fale ou escreva "2611 20 venda".',rcCamHint:'Se a câmera não abrir, toque em "Escolher foto" e escolha a câmera, ou escolha uma foto já tirada.',rcGal:'Escolher foto',rcMic:'Falar',rcMicStop:'Parar',
+ rcCam:'Tirar foto',slBtn:'Publicar no StockLink',slAgain:'Publicar de novo no StockLink',slTitle:'Publicar no mural de saldão StockLink',slLoginHint:'Entre com o e-mail e a senha da sua conta StockLink. Depois do primeiro acesso, é só publicar.',slEmail:'E-mail',slPw:'Senha',slLogin:'Entrar no StockLink',
+ slNoComp:'Esta conta não tem empresa cadastrada. Cadastre a empresa (CNPJ) no app StockLink primeiro.',slComp:'Publicar por qual empresa?',slCompOne:n=>`Será publicado como <b>${n}</b>.`,slPhoto:'A foto do produto vai junto.',slNoPhoto:'Produto sem foto. Adicione em Editar para ir junto.',
+ slTitleL:'Título',slCat:'Categoria',slPrice:'Preço do saldão (R$)',slQty:'Quantidade',slPriceType:'Tipo de preço',slPeca:'Por peça',slLote:'Lote inteiro',slDesc:'Descrição (opcional)',
+ slDecl:'Declaro que tenho este estoque, que os produtos são originais e de origem legal e que as fotos, preços e informações são verdadeiros. Sou responsável por este anúncio e pela negociação.',
+ slGo:'Publicar no StockLink',slSending:'Publicando…',slDone:'Publicado no StockLink. Os compradores falam com você pelo WhatsApp.',slAs:e=>`Conta StockLink: ${e}`,slLogout:'Sair do StockLink',slOut:'Você saiu do StockLink',slAlready:d=>`Já publicado em ${d}. Publicar de novo cria outro anúncio.`,
+ slETitle:'O título precisa de pelo menos 2 letras.',slEPrice:'Informe o preço.',slEQty:'Informe pelo menos 1.',slEDecl:'Marque a declaração.',slESub:'Não foi possível publicar: o período grátis ou a assinatura do StockLink acabou, ou a empresa está suspensa. Confira no app StockLink.',slELogin:'E-mail ou senha incorretos. Se ainda não confirmou o e-mail, veja sua caixa de entrada.',slEFail:'Não foi possível conectar ao StockLink. Verifique a internet e tente de novo.',phTitle:'Foto do produto',phCam:'Tirar foto',phGal:'Escolher foto',phDel:'Remover foto',phErr:'Não foi possível usar essa foto. Tente outra.',rcAiOff:'A leitura de fotos por IA ainda não está ativada (falta ligar o AI Logic no Firebase). Por enquanto fale ou escreva "2611 20 venda".',rcCamHint:'Se a câmera não abrir, toque em "Escolher foto" e escolha a câmera, ou escolha uma foto já tirada.',rcGal:'Escolher foto',rcMic:'Falar',rcMicStop:'Parar',
  rcTextL:'Ou escreva',get rcTextPh(){return `Ex.: vendi 20 ${U()} do 2611, entrada de 300 ${U()} do 2598`},
  rcMicHint:'Aqui o microfone não pode ser usado direto. Toque no campo de texto abaixo e use o microfone do teclado.',
  rcListening:'Ouvindo… fale uma linha curta por vez. Ex.: "2611 vinte peças vendidas". Para mais, toque de novo.',
@@ -372,6 +386,83 @@ async function makeThumb(file){const bmp=await createImageBitmap(file);let side=
   bmp.close&&bmp.close();return url}
 const safeImg=u=>typeof u==='string'&&u.startsWith('data:image/')?u:'';
 function photoView(src){if(!safeImg(src))return;const L=t();openSheet(`${head(L.phTitle)}<img src="${safeImg(src)}" alt="" style="width:100%;border-radius:12px">`)}
+
+// ---------- StockLink: post a saldão item to the StockLink board ----------
+const SL={url:'https://vpezmkfdqbvhqfbwpfpr.supabase.co',key:'sb_publishable_jgjaVuVENGeLmrqePBkY0Q_J3vtJoXz',lib:'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.0',client:null};
+const SL_CATS=['vestidos','blusas','calcas','saias','shorts','conjuntos','macacoes','casacos','praia','infantil','masculino','outros'];
+const SL_CAT_KO={vestidos:'원피스',blusas:'블라우스·상의',calcas:'바지',saias:'치마',shorts:'반바지',conjuntos:'세트',macacoes:'점프수트',casacos:'아우터',praia:'수영복',infantil:'아동복',masculino:'남성복',outros:'기타'};
+const SL_CAT_PT={vestidos:'Vestidos',blusas:'Blusas',calcas:'Calças',saias:'Saias',shorts:'Shorts',conjuntos:'Conjuntos',macacoes:'Macacões',casacos:'Casacos',praia:'Moda praia',infantil:'Infantil',masculino:'Masculino',outros:'Outros'};
+const SL_FROM_KIND={vestido:'vestidos',blusa:'blusas',cropped:'blusas',calca:'calcas',saia:'saias',short:'shorts',conjunto:'conjuntos',macacao:'macacoes',jaqueta:'casacos'};
+const slEnabled=()=>!window.__preview;
+function slLoad(){if(SL.client)return Promise.resolve(SL.client);
+  return new Promise((res,rej)=>{const go=()=>{try{SL.client=window.supabase.createClient(SL.url,SL.key,{auth:{persistSession:true,storageKey:'stocklink-auth'}});res(SL.client)}catch(e){rej(e)}};
+    if(window.supabase&&window.supabase.createClient)return go();
+    const sc=document.createElement('script');sc.src=SL.lib;sc.onload=go;sc.onerror=()=>rej(new Error('load'));document.head.appendChild(sc)})}
+function slErr(e){const L=t(),m=String((e&&(e.message||e.code))||'');
+  if(/DECLARACAO/i.test(m))return L.slEDecl;
+  if(/row-level|42501|permission|security policy/i.test(m))return L.slESub;
+  if(/Invalid login|invalid_credentials|Email not confirmed/i.test(m))return L.slELogin;
+  return L.slEFail}
+async function slForm(it){const L=t();
+  openSheet(`${head(L.slTitle)}<div id="sl-body" class="busy"><span class="spin"></span><span>${L.loading}</span></div>`);
+  let db;try{db=await slLoad()}catch(e){$('#sl-body').outerHTML=`<p class="err">${L.slEFail}</p>`;return}
+  const {data:{session}}=await db.auth.getSession();
+  if(!session)return slLogin(it,db);
+  return slPost(it,db,session.user);
+}
+function slLogin(it,db){const L=t();
+  $('#sl-body').outerHTML=`<div id="sl-body" style="display:flex;flex-direction:column;gap:10px">
+    <p class="hint">${L.slLoginHint}</p>
+    <div class="field"><label for="sl-email">${L.slEmail}</label><input id="sl-email" type="email" autocomplete="email" autocapitalize="off"></div>
+    <div class="field"><label for="sl-pw">${L.slPw}</label><input id="sl-pw" type="password" autocomplete="current-password"></div>
+    <p class="err" id="sl-err" hidden></p>
+    <button class="btn full" type="button" id="sl-login">${L.slLogin}</button></div>`;
+  $('#sl-login').onclick=async()=>{const err=$('#sl-err');err.hidden=true;$('#sl-login').disabled=true;
+    try{const {data,error}=await db.auth.signInWithPassword({email:$('#sl-email').value.trim(),password:$('#sl-pw').value});if(error)throw error;
+      $('#sl-body').outerHTML=`<div id="sl-body"></div>`;slPost(it,db,data.user)}
+    catch(e){err.textContent=slErr(e);err.hidden=false;$('#sl-login').disabled=false}};
+}
+async function slPost(it,db,user){const L=t(),j=calc(it);
+  let comps=[];
+  try{const {data,error}=await db.from('empresa_usuarios').select('empresa_id,empresas(id,nome,teste_ate,assinatura_ate,suspensa)').eq('usuario_id',user.id);if(error)throw error;
+    comps=(data||[]).map(r=>r.empresas).filter(Boolean)}catch(e){$('#sl-body').outerHTML=`<p class="err" id="sl-body">${slErr(e)}</p>`;return}
+  if(!comps.length){$('#sl-body').outerHTML=`<div id="sl-body"><p class="err">${L.slNoComp}</p><button class="btn soft full" type="button" id="sl-out">${L.slLogout}</button></div>`;
+    $('#sl-out').onclick=async()=>{await db.auth.signOut();closeSheet()};return}
+  const price=j.price?Math.round(j.price*(1-rules.saleOff/100)*100)/100:'';
+  // buyers on StockLink read Portuguese: prefer the Portuguese name or type
+  const ptName=it.namePt||((KINDS_LIST().find(x=>x[0]===it.kind)||[])[2])||it.name||'';
+  const title=[it.ref,ptName].filter(Boolean).join(' ').slice(0,120)||it.ref;
+  const cat=SL_FROM_KIND[it.kind]||'outros', CL=lang==='pt'?SL_CAT_PT:SL_CAT_KO;
+  $('#sl-body').outerHTML=`<div id="sl-body" style="display:flex;flex-direction:column;gap:10px">
+    ${it.slId?`<div class="advice c-re">${L.slAlready(new Date(it.slAt).toLocaleDateString(lang==='ko'?'ko-KR':'pt-BR'))}</div>`:''}
+    ${comps.length>1?`<div class="field"><label for="sl-comp">${L.slComp}</label><select id="sl-comp">${comps.map(c=>`<option value="${c.id}">${esc(c.nome)}</option>`).join('')}</select></div>`:`<p class="hint">${L.slCompOne(esc(comps[0].nome))}</p>`}
+    ${safeImg(it.photo)?`<div class="phrow"><img class="pthumb big" src="${safeImg(it.photo)}" alt=""><span class="hint">${L.slPhoto}</span></div>`:`<p class="hint">${L.slNoPhoto}</p>`}
+    <div class="field"><label for="sl-title">${L.slTitleL}</label><input id="sl-title" maxlength="120" value="${esc(title)}"></div>
+    <div class="field"><label for="sl-cat">${L.slCat}</label><select id="sl-cat">${SL_CATS.map(c=>`<option value="${c}" ${c===cat?'selected':''}>${CL[c]}</option>`).join('')}</select></div>
+    <div class="two"><div class="field"><label for="sl-price">${L.slPrice}</label><input id="sl-price" type="number" step="0.01" min="0" inputmode="decimal" value="${price}"></div>
+    <div class="field"><label for="sl-qty">${L.slQty}</label><input id="sl-qty" type="number" min="0" inputmode="numeric" value="${j.stock}"></div></div>
+    <div class="field">${L.slPriceType}<div class="seg two-way" role="group" id="sl-tipo"><button type="button" data-tp="peca" aria-pressed="true">${L.slPeca}</button><button type="button" data-tp="lote" aria-pressed="false">${L.slLote}</button></div></div>
+    <div class="field"><label for="sl-desc">${L.slDesc}</label><textarea id="sl-desc" maxlength="2000"></textarea></div>
+    <label class="decl"><input type="checkbox" id="sl-decl"> <span>${L.slDecl}</span></label>
+    <p class="err" id="sl-err" hidden></p>
+    <button class="btn full" type="button" id="sl-go">${L.slGo}</button>
+    <p class="hint">${L.slAs(esc(user.email||''))} <button class="linkbtn" type="button" id="sl-out">${L.slLogout}</button></p></div>`;
+  let tipo='peca';$('#sl-tipo').onclick=e=>{const b=e.target.closest('[data-tp]');if(!b)return;tipo=b.dataset.tp;document.querySelectorAll('#sl-tipo button').forEach(x=>x.setAttribute('aria-pressed',x===b))};
+  $('#sl-out').onclick=async()=>{await db.auth.signOut();closeSheet();toast(L.slOut)};
+  $('#sl-go').onclick=async()=>{const err=$('#sl-err');err.hidden=true;
+    const titulo=$('#sl-title').value.trim(),preco=+$('#sl-price').value,qtd=Math.floor(+$('#sl-qty').value||0),empresa=comps.length>1?$('#sl-comp').value:comps[0].id;
+    const bad=m=>{err.textContent=m;err.hidden=false};
+    if(titulo.length<2)return bad(L.slETitle); if(!(preco>=0)||$('#sl-price').value==='')return bad(L.slEPrice); if(qtd<1)return bad(L.slEQty); if(!$('#sl-decl').checked)return bad(L.slEDecl);
+    $('#sl-go').disabled=true;$('#sl-go').textContent=L.slSending;
+    try{let fotos=[];
+      if(safeImg(it.photo)){const blob=await (await fetch(it.photo)).blob();const path=`${empresa}/${Date.now()}-${Math.random().toString(36).slice(2,8)}.jpg`;
+        const up=await db.storage.from('anuncios').upload(path,blob,{contentType:'image/jpeg',upsert:false});if(up.error)throw up.error;fotos=[path]}
+      const {data,error}=await db.from('anuncios').insert({empresa_id:empresa,titulo,categoria:$('#sl-cat').value,preco:Math.round(preco*100)/100,tipo_preco:tipo,quantidade:qtd,descricao:$('#sl-desc').value.trim()||null,fotos,declarado_em:new Date().toISOString()}).select('id').single();
+      if(error)throw error;
+      try{await patchItem(it.id,{slId:data.id,slAt:new Date().toISOString(),slQty:qtd})}catch(_){}
+      closeSheet();toast(L.slDone)}
+    catch(e){bad(slErr(e));$('#sl-go').disabled=false;$('#sl-go').textContent=L.slGo}};
+}
 function card(i){const L=t(),j=i.j;return `<div class="card ${CLS[j.cat]}">
     <div class="row">${safeImg(i.photo)?`<button type="button" class="cthumb" data-view="${i.id}" aria-label="${L.phTitle}"><img src="${safeImg(i.photo)}" alt=""></button>`:''}<div class="name" style="flex:1"><span class="code big">${esc(i.ref||L.noCode)}</span>${dn(i)?`<span class="pname">${esc(dn(i))}</span>`:''}<div class="ref">${j.days===999?L.noDate:L.day(j.days)}${q?' · '+esc(mLabel(i.month||month)):''}</div></div><span class="pill">${L.cats[j.cat][0]}</span></div>
     <div class="nums"><div>${L.made}<b>${j.made}</b></div><div>${L.sold}<b>${j.sold}</b>${j.soldV?`<span class="ref">${L.retailN(j.soldV)}</span>`:''}</div><div>${L.stock}<b>${j.stock}</b></div></div>
@@ -379,7 +470,7 @@ function card(i){const L=t(),j=i.j;return `<div class="card ${CLS[j.cat]}">
     <div class="ref">${L.rate} <b style="color:var(--ink)">${j.rate.toFixed(0)}%</b> · ${L.costL} ${j.cost?brl(j.cost):'—'} · ${L.priceL} ${j.price?brl(j.price):'—'} · ${L.priceVL} ${j.priceV?brl(j.priceV):'—'}</div>
     <div class="nums money2"><div>${L.itemSales}<b>${brl(j.sales)}</b></div><div>${L.itemProfit}<b style="${j.profit<0?'color:var(--retail)':''}">${j.profit===null?'—':brl(j.profit)}</b></div></div>
     <div class="advice">${advice(j)}</div>
-    <div class="acts"><button class="btn" type="button" data-in="${i.id}">${L.cardIn}</button><button class="btn soft" type="button" data-edit="${i.id}">${L.edit}</button></div>
+    <div class="acts"><button class="btn" type="button" data-in="${i.id}">${L.cardIn}</button><button class="btn soft" type="button" data-edit="${i.id}">${L.edit}</button>${slEnabled()&&(j.cat==='sale'||j.cat==='retail'||i.slId)?`<button class="btn sl" type="button" data-sl="${i.id}">${i.slId?L.slAgain:L.slBtn}</button>`:''}</div>
   </div>`}
 
 function table(rows){const L=t();const T2=f=>rows.reduce((a,i)=>a+f(i.j),0);
@@ -478,6 +569,7 @@ function itemForm(it,preset){const L=t();
   <div class="two"><div></div><div class="field"><label for="f-soldv">${L.fSoldV}</label><input id="f-soldv" type="number" min="0" inputmode="numeric" value="${esc(v.soldV||0)}"></div></div>
   <p class="hint">${L.fDateHint}</p><p class="err" id="f-err" hidden></p>
   <button class="btn full" type="button" id="f-save">${L.save}</button>
+  ${it&&slEnabled()?`<button class="btn sl full" type="button" data-sl="${it.id}">${it.slId?L.slAgain:L.slBtn}</button>`:''}
   ${it?`<div id="delZone"><button class="btn danger full" type="button" id="f-del">${L.del}</button></div>`:''}`);
   let fphoto=v.photo||'';
   const drawPh=()=>{$('#f-ph').innerHTML=`${safeImg(fphoto)?`<img class="pthumb big" src="${safeImg(fphoto)}" alt="">`:''}<label class="btn soft sm" for="f-pc">${L.phCam}</label><input class="vh" type="file" accept="image/*" capture="environment" id="f-pc"><label class="btn soft sm" for="f-pg">${L.phGal}</label><input class="vh" type="file" accept="image/*" id="f-pg">${fphoto?`<button type="button" class="btn soft sm" id="f-phdel">${L.phDel}</button>`:''}`;
@@ -767,6 +859,7 @@ async function undoMove(m){const L=t();
 
 document.addEventListener('click',e=>{const tr=e.target.closest('tr[data-edit]');if(tr){const it=items.find(i=>i.id===tr.dataset.edit);if(it)itemForm(it);return}
   const b=e.target.closest('button');if(!b)return;
+  if(b.dataset.sl){const it=items.find(i=>i.id===b.dataset.sl);if(it)slForm(it);return}
   if(b.dataset.view){const it=items.find(i=>i.id===b.dataset.view);if(it)photoView(it.photo);return}
   if(b.id==='viewBtn'){view=view==='table'?'cards':'table';try{localStorage.setItem('view',view)}catch(e){}render();return}
   if(b.dataset.lang){lang=b.dataset.lang;try{localStorage.setItem('lang',lang)}catch(e){}closeSheet();render()}
