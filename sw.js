@@ -1,5 +1,5 @@
 // 앱 화면을 휴대폰에 저장해서 인터넷이 없어도 열리게 합니다. (데이터 저장은 Firebase가 따로 처리)
-const CACHE = "jaego-v16";
+const CACHE = "jaego-v17";
 const SHELL = ['./', 'index.html', 'manifest.webmanifest', 'firebase-config.js', 'icons/icon-192.png', 'icons/icon-512.png'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting())); });
 self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim())); });
