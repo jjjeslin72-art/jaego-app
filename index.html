@@ -55,12 +55,12 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .mgrid b{display:block;font-size:16px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
 .money .note{font-size:11.5px;opacity:.85;margin:0}
 .neg{color:#ffd0dc}
-.bins{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-.bin{border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:11px 12px;text-align:left;color:var(--ink);display:flex;flex-direction:column;gap:2px;border-left:5px solid var(--c)}
+.bins{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.bin{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:7px 8px;text-align:left;color:var(--ink);display:flex;flex-direction:column;gap:2px;border-left:5px solid var(--c)}
 .bin[aria-pressed="true"]{background:var(--cs);border-color:var(--c)}
-.bin .n{font-family:var(--display);font-size:28px;line-height:1;color:var(--c);font-variant-numeric:tabular-nums}
-.bin .t{font-weight:700;font-size:14px}
-.bin .d{font-size:11.5px;color:var(--muted)}
+.bin .n{font-family:var(--display);font-size:22px;line-height:1;color:var(--c);font-variant-numeric:tabular-nums}
+.bin .t{font-weight:700;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bin .d{display:none}
 .c-re{--c:var(--re);--cs:var(--re-soft)} .c-watch{--c:var(--watch);--cs:var(--watch-soft)}
 .c-sale{--c:var(--sale);--cs:var(--sale-soft)} .c-retail{--c:var(--retail);--cs:var(--retail-soft)} .c-early{--c:var(--early);--cs:var(--early-soft)}
 .sum{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
@@ -70,7 +70,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .search svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:var(--muted)}
 .list{display:flex;flex-direction:column;gap:10px}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:13px;display:flex;flex-direction:column;gap:8px}
-.row{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
 .name{font-weight:700;font-size:15.5px;min-width:0}
 .code.big{font-size:17px;padding:2px 9px;margin-right:8px;vertical-align:0}
 .pname{font-weight:500;font-size:14px}
@@ -96,6 +96,32 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .decl{display:flex;gap:8px;align-items:flex-start;font-size:12.5px;color:var(--muted);line-height:1.45}
 .decl input{width:auto;margin-top:2px}
 .linkbtn{border:0;background:none;color:var(--accent);font-weight:600;padding:0}
+.moneyd{border-radius:14px;background:var(--accent);color:var(--surface)}
+.moneyd>summary{list-style:none;cursor:pointer;padding:11px 14px;display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;font-size:13px}
+.moneyd>summary::-webkit-details-marker{display:none}
+.moneyd>summary b{font-size:15px;font-variant-numeric:tabular-nums}
+.moneyd>summary .more{margin-left:auto;font-size:12px;opacity:.85}
+.moneyd[open]>summary .more{opacity:.6}
+.moneyd .money{padding-top:0;background:none}
+.negt{color:#ffd0dc}
+.histd>summary{cursor:pointer;font-family:var(--display);font-size:19px;padding:4px 0}
+.histd .hist{margin-top:8px}
+.vseg{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--surface)}
+.vseg button{border:0;background:none;color:var(--muted);padding:6px 10px;font-size:12.5px;font-weight:600}
+.vseg button[aria-pressed="true"]{background:var(--accent);color:var(--surface)}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+@media (min-width:520px){.grid3{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.tile{border:1px solid var(--line);border-top:4px solid var(--c);background:var(--surface);border-radius:12px;overflow:hidden;padding:0;text-align:left;color:var(--ink);display:flex;flex-direction:column;min-width:0}
+.tile:active{transform:scale(.98)}
+.tph{position:relative;display:grid;place-items:center;aspect-ratio:4/3;max-width:100%;background:var(--cs)}
+.tph img{width:100%;height:100%;object-fit:cover;display:block}
+.tcode{font-family:var(--display);font-size:22px;color:var(--c)}
+.tcat{position:absolute;left:4px;top:4px;font-size:10.5px;font-weight:700;background:var(--surface);color:var(--c);border-radius:999px;padding:1px 7px}
+.tinfo{display:flex;flex-direction:column;padding:5px 7px 7px;gap:1px;min-width:0}
+.tref{font-weight:700;font-size:13px;font-variant-numeric:tabular-nums}
+.tnm{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:14px}
+.tst{font-size:11px;color:var(--muted)}
+.tst b{color:var(--ink);font-size:13px}
 .sh{font-size:14px;margin:6px 0 0;color:var(--ink)}
 .kinds{display:flex;flex-wrap:wrap;gap:6px}
 .kinds button{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:6px 11px;font-size:13px}
@@ -196,14 +222,13 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
       <select class="month" id="month" aria-label="month"></select>
     </div>
   </div>
-  <div class="money" id="money"></div>
+  <details class="moneyd" id="moneyd"><summary id="moneySum"></summary><div class="money" id="money"></div></details>
   <div class="bins" id="bins"></div>
   <div class="sum" id="sum"></div>
   <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="q" type="search" autocomplete="off"></div>
-  <div class="row"><h2 id="listTitle"></h2><span class="acts"><button class="btn soft" type="button" id="viewBtn"></button><button class="btn soft" type="button" id="rulesBtn"></button></span></div>
+  <div class="row"><h2 id="listTitle"></h2><span class="acts"><span class="vseg" role="group" id="vseg"><button type="button" data-vm="grid"></button><button type="button" data-vm="cards"></button><button type="button" data-vm="table"></button></span><button class="btn soft sm" type="button" id="rulesBtn"></button></span></div>
   <div class="list" id="list"></div>
-  <div class="row" id="histHead"><h2 id="histTitle"></h2></div>
-  <div class="hist" id="hist"></div>
+  <details class="histd"><summary id="histTitle"></summary><div class="hist" id="hist"></div></details>
   <div class="status" id="status"></div>
   <div class="who"><span id="whoName"></span><span><button class="linkbtn" type="button" id="setupBtn"></button> · <button class="linkbtn" type="button" id="logoutBtn"></button></span></div>
 </div>
@@ -280,7 +305,7 @@ ko:{h1:'재고 정리판',sub:'상품의 입고·판매·재고·수익을 한�
  inEmpty:'코드를 넣거나 사진·말로 읽어오세요. 새 코드를 넣으면 새 상품으로 등록돼요.',inReadDone:n=>`${n}줄을 읽었어요. 아래에서 확인하고 반영하세요.`,
  lnCode:'코드',lnNewTag:'새 상품',lnNew:'처음 보는 코드예요. 종류를 고르면 새 상품으로 등록되고 수량은 입고로 들어가요.',lnNoCode:'코드를 넣어주세요.',lnNoCodeName:n=>`"${n}" · 코드를 넣어주세요.`,lnMonth:'어느 달 상품인가요?',lnRemove:'지우기',eNewName:'새 상품 이름을 넣어주세요.',
  rcTitle:'영수증·말로 수량 입력',rcKind:'무엇을 입력하나요?',kAuto:'알아서',kSale:'판매·출고',kIn:'입고',
- rcCam:'사진 찍기',qeTitle:'가격·수량 고치기',qeHint:'숫자를 누르면 가격·수량을 바로 고칠 수 있어요',qeQty:'수량',qePrice:'가격',qeStock:'지금 남은 재고 (직접 세서 맞추기)',qeStockHint:'입고·판매를 고치면 재고가 따라 바뀌어요. 창고에서 세어본 숫자가 다르면 재고 칸에 그 숫자를 직접 넣으세요.',slBtn:'StockLink에 올리기',slAgain:'StockLink에 다시 올리기',slTitle:'StockLink 사우두 게시판에 올리기',slLoginHint:'StockLink 앱에서 가입한 이메일과 비밀번호로 로그인하세요. 한 번 로그인하면 다음부터는 바로 올릴 수 있어요.',slEmail:'이메일',slPw:'비밀번호',slLogin:'StockLink 로그인',
+ rcCam:'사진 찍기',vm:{grid:'칸',cards:'카드',table:'표'},moreMoney:'자세히 ▾',qeTitle:'가격·수량 고치기',qeHint:'숫자를 누르면 가격·수량을 바로 고칠 수 있어요',qeQty:'수량',qePrice:'가격',qeStock:'지금 남은 재고 (직접 세서 맞추기)',qeStockHint:'입고·판매를 고치면 재고가 따라 바뀌어요. 창고에서 세어본 숫자가 다르면 재고 칸에 그 숫자를 직접 넣으세요.',slBtn:'StockLink에 올리기',slAgain:'StockLink에 다시 올리기',slTitle:'StockLink 사우두 게시판에 올리기',slLoginHint:'StockLink 앱에서 가입한 이메일과 비밀번호로 로그인하세요. 한 번 로그인하면 다음부터는 바로 올릴 수 있어요.',slEmail:'이메일',slPw:'비밀번호',slLogin:'StockLink 로그인',
  slNoComp:'이 계정에 등록된 회사가 없어요. StockLink 앱에서 회사(CNPJ)를 먼저 등록하세요.',slComp:'어느 회사로 올릴까요?',slCompOne:n=>`<b>${n}</b> 이름으로 올라가요.`,slPhoto:'상품 사진이 같이 올라가요.',slNoPhoto:'상품 사진이 없어요. 수정에서 사진을 넣으면 같이 올라가요.',
  slTitleL:'제목',slCat:'종류',slPrice:'사우두 가격 (R$)',slQty:'올릴 수량',slPriceType:'가격 방식',slPeca:'1개당 가격',slLote:'전체 묶음 가격',slDesc:'설명 (선택)',
  slDecl:'이 재고를 실제로 보유하고 있으며, 상품은 정품이고 합법적으로 들여온 것이며, 사진·가격·정보가 사실임을 확인합니다. 이 게시물과 거래의 책임은 저에게 있습니다.',
@@ -332,7 +357,7 @@ pt:{h1:'Controle de Estoque',sub:'Entrada, vendas, estoque e lucro dos produtos'
  inEmpty:'Digite um código ou leia uma foto/voz. Código novo vira produto novo.',inReadDone:n=>`${n} linha(s) lida(s). Confira abaixo e lance.`,
  lnCode:'Código',lnNewTag:'Produto novo',lnNew:'Código novo. Escolha o tipo para cadastrar; a quantidade entra como entrada.',lnNoCode:'Informe o código.',lnNoCodeName:n=>`"${n}" · informe o código.`,lnMonth:'De qual mês é o produto?',lnRemove:'Remover',eNewName:'Informe o nome do produto novo.',
  rcTitle:'Lançar por nota, foto ou voz',rcKind:'O que você vai lançar?',kAuto:'Detectar',kSale:'Venda · saída',kIn:'Entrada',
- rcCam:'Tirar foto',qeTitle:'Editar preços e quantidades',qeHint:'Toque nos números para editar preços e quantidades',qeQty:'Quantidades',qePrice:'Preços',qeStock:'Estoque atual (contagem real)',qeStockHint:'Mudando entrada ou vendas, o estoque acompanha. Se a contagem física for diferente, digite o número real no estoque.',slBtn:'Publicar no StockLink',slAgain:'Publicar de novo no StockLink',slTitle:'Publicar no mural de saldão StockLink',slLoginHint:'Entre com o e-mail e a senha da sua conta StockLink. Depois do primeiro acesso, é só publicar.',slEmail:'E-mail',slPw:'Senha',slLogin:'Entrar no StockLink',
+ rcCam:'Tirar foto',vm:{grid:'Grade',cards:'Cartões',table:'Tabela'},moreMoney:'Detalhes ▾',qeTitle:'Editar preços e quantidades',qeHint:'Toque nos números para editar preços e quantidades',qeQty:'Quantidades',qePrice:'Preços',qeStock:'Estoque atual (contagem real)',qeStockHint:'Mudando entrada ou vendas, o estoque acompanha. Se a contagem física for diferente, digite o número real no estoque.',slBtn:'Publicar no StockLink',slAgain:'Publicar de novo no StockLink',slTitle:'Publicar no mural de saldão StockLink',slLoginHint:'Entre com o e-mail e a senha da sua conta StockLink. Depois do primeiro acesso, é só publicar.',slEmail:'E-mail',slPw:'Senha',slLogin:'Entrar no StockLink',
  slNoComp:'Esta conta não tem empresa cadastrada. Cadastre a empresa (CNPJ) no app StockLink primeiro.',slComp:'Publicar por qual empresa?',slCompOne:n=>`Será publicado como <b>${n}</b>.`,slPhoto:'A foto do produto vai junto.',slNoPhoto:'Produto sem foto. Adicione em Editar para ir junto.',
  slTitleL:'Título',slCat:'Categoria',slPrice:'Preço do saldão (R$)',slQty:'Quantidade',slPriceType:'Tipo de preço',slPeca:'Por peça',slLote:'Lote inteiro',slDesc:'Descrição (opcional)',
  slDecl:'Declaro que tenho este estoque, que os produtos são originais e de origem legal e que as fotos, preços e informações são verdadeiros. Sou responsável por este anúncio e pela negociação.',
@@ -358,7 +383,7 @@ let lang='ko'; try{lang=localStorage.getItem('lang')||'ko'}catch(e){}
 const t=()=>T[lang];
 
 const DEF={minDays:20,reRate:70,lowRate:40,retailMax:30,saleOff:30,bizType:'clothes',unit:'',unitPt:'',kinds:[]};
-let view='cards';try{view=localStorage.getItem('view')||'cards'}catch(e){}
+let view='grid';try{view=localStorage.getItem('view2')||'grid'}catch(e){}
 let rules={...DEF}, items=[], moves=[], db=null, ai=null, aiOpts={images:null}, filter='all', q='', loaded=false, dbState='wait', unsub=[];
 let month=new Date().toISOString().slice(0,7);
 const CLS={re:'c-re',watch:'c-watch',sale:'c-sale',retail:'c-retail',early:'c-early'};
@@ -501,6 +526,9 @@ function card(i){const L=t(),j=i.j;return `<div class="card ${CLS[j.cat]}">
     <div class="acts"><button class="btn" type="button" data-in="${i.id}">${L.cardIn}</button><button class="btn soft" type="button" data-edit="${i.id}">${L.edit}</button>${slEnabled()&&(j.cat==='sale'||j.cat==='retail'||i.slId)?`<button class="btn sl" type="button" data-sl="${i.id}">${i.slId?L.slAgain:L.slBtn}</button>`:''}</div>
   </div>`}
 
+function grid(rows){const L=t();return `<div class="grid3">${rows.map(i=>{const j=i.j,ph=safeImg(i.photo);return `<button type="button" class="tile ${CLS[j.cat]}" data-open="${i.id}">
+    <span class="tph">${ph?`<img src="${ph}" alt="">`:`<span class="tcode">${esc(i.ref||'—')}</span>`}<span class="tcat">${L.cats[j.cat][0]}</span></span>
+    <span class="tinfo">${ph?`<span class="tref">${esc(i.ref||'—')}</span>`:''}<span class="tnm">${esc(dn(i))}</span><span class="tst"><b>${num(j.stock)}</b> ${L.stock} · ${j.rate.toFixed(0)}%</span></span></button>`}).join('')}</div>`}
 function table(rows){const L=t();const T2=f=>rows.reduce((a,i)=>a+f(i.j),0);
   return `<p class="hint">${L.tblHint}</p><div class="tablewrap"><table class="tbl"><thead><tr><th class="l code-c">${L.thCode}</th><th class="l">${L.thName}</th><th>${L.made}</th><th>${L.sold}</th><th>${L.stock}</th><th>${L.rate}</th><th class="l">${L.thCat}</th><th>${L.itemSales}</th><th>${L.itemProfit}</th></tr></thead><tbody>
   ${rows.map(i=>{const j=i.j;return `<tr data-edit="${i.id}" class="${CLS[j.cat]}"><td class="l code-c">${safeImg(i.photo)?`<img class="tthumb" src="${safeImg(i.photo)}" alt="">`:''}${esc(i.ref||'—')}</td><td class="l">${esc(dn(i)||'—')}</td><td>${num(j.made)}</td><td>${num(j.sold)}</td><td>${num(j.stock)}</td><td>${j.rate.toFixed(0)}%</td><td class="l"><span class="dot"></span>${L.cats[j.cat][0]}</td><td>${brl(j.sales)}</td><td style="${j.profit<0?'color:var(--retail)':''}">${j.profit===null?'—':brl(j.profit)}</td></tr>`}).join('')}
@@ -508,7 +536,7 @@ function table(rows){const L=t();const T2=f=>rows.reduce((a,i)=>a+f(i.j),0);
 function render(){
   const L=t(); document.documentElement.lang=lang==='ko'?'ko':'pt-BR';
   document.querySelectorAll('[data-lang]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.lang===lang));
-  $('#h1').textContent=L.h1; $('#sub').textContent=L.sub; $('#rulesBtn').textContent=L.rulesBtn; $('#viewBtn').textContent=view==='table'?L.viewCards:L.viewTable; $('#rcBtnTxt').textContent=L.inBtn;
+  $('#h1').textContent=L.h1; $('#sub').textContent=L.sub; $('#rulesBtn').textContent=L.rulesBtn; document.querySelectorAll('[data-vm]').forEach(b=>{b.textContent=L.vm[b.dataset.vm];b.setAttribute('aria-pressed',b.dataset.vm===view)}); $('#rcBtnTxt').textContent=L.inBtn;
   $('#q').placeholder=L.qPh; $('#q').setAttribute('aria-label',L.qPh); $('#histTitle').textContent=L.hTitle;
   $('#status').className='status'+(dbState==='ok'||dbState==='wait'?'':' warn'); $('#status').textContent={ok:L.stOk,off:L.stOff,no:L.stNo,err:L.stErr}[dbState]||'';
   if(window.App&&App.onRender)App.onRender(L);
@@ -518,6 +546,7 @@ function render(){
   const sales=S(j=>j.sales), withCost=mine.filter(i=>i.j.cost), profit=withCost.reduce((a,i)=>a+i.j.profit,0);
   const prodCost=S(j=>j.prodCost), stockVal=S(j=>j.stock*j.cost), salesWC=withCost.reduce((a,i)=>a+i.j.sales,0);
   const cash=salesWC-prodCost, margin=salesWC?profit/salesWC*100:0;
+  $('#moneySum').innerHTML=`<span>${L.sales} <b>${brl(sales)}</b></span><span>${L.profit} <b class="${profit<0?'negt':''}">${brl(profit)}</b></span><span class="more">${L.moreMoney}</span>`;
   $('#money').innerHTML=`<div><div class="lbl">${L.sales} · ${mLabel(month)}</div><div class="big">${brl(sales)}</div><div class="lbl">${L.salesNote}</div></div>
    <div class="mgrid">
     <div><span class="lbl">${L.profit}</span><b class="${profit<0?'neg':''}">${brl(profit)}</b><span class="lbl">${L.margin} ${margin.toFixed(0)}%</span></div>
@@ -535,12 +564,12 @@ function render(){
   if(q){const nq=norm(q);
     const found=items.filter(i=>norm(i.ref).includes(nq)||norm(i.name).includes(nq)||norm(i.namePt).includes(nq)).sort(byRecent).map(i=>({...i,j:calc(i)}));
     $('#listTitle').textContent=L.searchRes(found.length);
-    $('#list').innerHTML=found.length?(view==='table'?table(found):found.map(card).join('')):`<div class="empty">${L.noFound}</div>`;return}
+    $('#list').innerHTML=found.length?(view==='table'?table(found):view==='grid'?grid(found):found.map(card).join('')):`<div class="empty">${L.noFound}</div>`;return}
   $('#listTitle').innerHTML=esc(filter==='all'?L.all:L.catList(L.cats[filter][0]))+(filter!=='all'?` <button type="button" class="btn soft sm" data-f="all" style="vertical-align:middle">${L.showAll}</button>`:'');
   if(!mine.length){$('#list').innerHTML=`<div class="empty">${L.emptyMonth(mLabel(month))}${!items.length?`<br><br><button class="btn soft sm" type="button" id="bizPick">${L.bizPick}</button>`:''}</div>`;return}
   const order={re:0,sale:1,retail:2,watch:3,early:4};
   const shown=mine.filter(i=>filter==='all'||i.j.cat===filter).sort((a,b)=>order[a.j.cat]-order[b.j.cat]||b.j.rate-a.j.rate);
-  $('#list').innerHTML=shown.length?(view==='table'?table(shown):shown.map(card).join('')):`<div class="empty">${L.emptyCat}</div>`;
+  $('#list').innerHTML=shown.length?(view==='table'?table(shown):view==='grid'?grid(shown):shown.map(card).join('')):`<div class="empty">${L.emptyCat}</div>`;
 }
 function renderHist(){const L=t();
   if(!moves.length){$('#hist').innerHTML=`<div class="hint">${L.hEmpty}</div>`;return}
@@ -890,7 +919,8 @@ document.addEventListener('click',e=>{const tr=e.target.closest('tr[data-edit]')
   if(b.dataset.qe){const it=items.find(i=>i.id===b.dataset.qe);if(it)quickEdit(it);return}
   if(b.dataset.sl){const it=items.find(i=>i.id===b.dataset.sl);if(it)slForm(it);return}
   if(b.dataset.view){const it=items.find(i=>i.id===b.dataset.view);if(it)photoView(it.photo);return}
-  if(b.id==='viewBtn'){view=view==='table'?'cards':'table';try{localStorage.setItem('view',view)}catch(e){}render();return}
+  if(b.dataset.vm){view=b.dataset.vm;try{localStorage.setItem('view2',view)}catch(e){}render();return}
+  if(b.dataset.open){const it=items.find(i=>i.id===b.dataset.open);if(it)openSheet(`${head(esc(lbl(it)))}${card({...it,j:calc(it)})}`);return}
   if(b.dataset.lang){lang=b.dataset.lang;try{localStorage.setItem('lang',lang)}catch(e){}closeSheet();render()}
   if(b.dataset.f&&b.classList.contains('bin')||b.dataset.f==='all'&&!b.closest('.sheet')){filter=filter===b.dataset.f?'all':b.dataset.f;q='';$('#q').value='';render()}
   if(b.dataset.in){const it=items.find(i=>i.id===b.dataset.in);if(it)inputForm({code:it.ref||'',pick:it.id,type:'sale'})}
