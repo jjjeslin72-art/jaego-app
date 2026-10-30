@@ -122,6 +122,24 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .tnm{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:14px}
 .tst{font-size:11px;color:var(--muted)}
 .tst b{color:var(--ink);font-size:13px}
+.cthumb.add{display:grid;place-items:center;border:1.5px dashed var(--accent);background:var(--accent-soft);color:var(--accent);font-size:12px;font-weight:700;cursor:pointer;text-align:center;line-height:1.2}
+.szrow{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.sz{font-size:12px;border:1px solid var(--line);border-radius:7px;padding:2px 7px;color:var(--muted);font-variant-numeric:tabular-nums;background:var(--surface)}
+.sz b{color:var(--ink)}
+.sz.zero{background:var(--retail-soft);border-color:transparent;color:var(--retail)}
+.sz.zero b{color:var(--retail)}
+.sz.un{border-style:dashed}
+.tsz{display:flex;flex-wrap:wrap;gap:3px;margin-top:2px}
+.tsz i{font-style:normal;font-size:10.5px;background:var(--bg);border-radius:4px;padding:0 4px;font-variant-numeric:tabular-nums}
+.tsz i.z{background:var(--retail-soft);color:var(--retail)}
+.sztbl{display:grid;grid-template-columns:auto 1fr 1fr auto;gap:6px 8px;align-items:center;font-size:12.5px;color:var(--muted)}
+.sztbl b{color:var(--ink);font-size:14px}
+.sztbl input{padding:7px 8px}
+.szst{min-width:36px;text-align:right;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
+.szline>summary{cursor:pointer;font-size:12.5px;color:var(--accent);font-weight:600}
+.szin{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:6px;margin-top:6px}
+.szin label{display:flex;flex-direction:column;gap:2px;font-size:12px;color:var(--muted);font-weight:700}
+.szin input{padding:7px 6px}
 .sh{font-size:14px;margin:6px 0 0;color:var(--ink)}
 .kinds{display:flex;flex-wrap:wrap;gap:6px}
 .kinds button{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:6px 11px;font-size:13px}
@@ -305,7 +323,7 @@ ko:{h1:'재고 정리판',sub:'상품의 입고·판매·재고·수익을 한�
  inEmpty:'코드를 넣거나 사진·말로 읽어오세요. 새 코드를 넣으면 새 상품으로 등록돼요.',inReadDone:n=>`${n}줄을 읽었어요. 아래에서 확인하고 반영하세요.`,
  lnCode:'코드',lnNewTag:'새 상품',lnNew:'처음 보는 코드예요. 종류를 고르면 새 상품으로 등록되고 수량은 입고로 들어가요.',lnNoCode:'코드를 넣어주세요.',lnNoCodeName:n=>`"${n}" · 코드를 넣어주세요.`,lnMonth:'어느 달 상품인가요?',lnRemove:'지우기',eNewName:'새 상품 이름을 넣어주세요.',
  rcTitle:'영수증·말로 수량 입력',rcKind:'무엇을 입력하나요?',kAuto:'알아서',kSale:'판매·출고',kIn:'입고',
- rcCam:'사진 찍기',vm:{grid:'칸',cards:'카드',table:'표'},moreMoney:'자세히 ▾',qeTitle:'가격·수량 고치기',qeHint:'숫자를 누르면 가격·수량을 바로 고칠 수 있어요',qeQty:'수량',qePrice:'가격',qeStock:'지금 남은 재고 (직접 세서 맞추기)',qeStockHint:'입고·판매를 고치면 재고가 따라 바뀌어요. 창고에서 세어본 숫자가 다르면 재고 칸에 그 숫자를 직접 넣으세요.',slBtn:'StockLink에 올리기',slAgain:'StockLink에 다시 올리기',slTitle:'StockLink 사우두 게시판에 올리기',slLoginHint:'StockLink 앱에서 가입한 이메일과 비밀번호로 로그인하세요. 한 번 로그인하면 다음부터는 바로 올릴 수 있어요.',slEmail:'이메일',slPw:'비밀번호',slLogin:'StockLink 로그인',
+ rcCam:'사진 찍기',phAddShort:'+ 사진',szTitle:'사이즈별 수량',szUn:'사이즈 미지정',szUnHint:n=>`사이즈를 안 정한 재고가 ${n}${U()} 있어요.`,bySize:'사이즈별로 넣기',sizesL:'사이즈 (쉼표로 나누기)',sizesHint:'예: P, M, G, GG 또는 36, 38, 40, 42. 사이즈를 안 쓰면 "없음"이라고 쓰세요.',none:'없음',vm:{grid:'칸',cards:'카드',table:'표'},moreMoney:'자세히 ▾',qeTitle:'가격·수량 고치기',qeHint:'숫자를 누르면 가격·수량을 바로 고칠 수 있어요',qeQty:'수량',qePrice:'가격',qeStock:'지금 남은 재고 (직접 세서 맞추기)',qeStockHint:'입고·판매를 고치면 재고가 따라 바뀌어요. 창고에서 세어본 숫자가 다르면 재고 칸에 그 숫자를 직접 넣으세요.',slBtn:'StockLink에 올리기',slAgain:'StockLink에 다시 올리기',slTitle:'StockLink 사우두 게시판에 올리기',slLoginHint:'StockLink 앱에서 가입한 이메일과 비밀번호로 로그인하세요. 한 번 로그인하면 다음부터는 바로 올릴 수 있어요.',slEmail:'이메일',slPw:'비밀번호',slLogin:'StockLink 로그인',
  slNoComp:'이 계정에 등록된 회사가 없어요. StockLink 앱에서 회사(CNPJ)를 먼저 등록하세요.',slComp:'어느 회사로 올릴까요?',slCompOne:n=>`<b>${n}</b> 이름으로 올라가요.`,slPhoto:'상품 사진이 같이 올라가요.',slNoPhoto:'상품 사진이 없어요. 수정에서 사진을 넣으면 같이 올라가요.',
  slTitleL:'제목',slCat:'종류',slPrice:'사우두 가격 (R$)',slQty:'올릴 수량',slPriceType:'가격 방식',slPeca:'1개당 가격',slLote:'전체 묶음 가격',slDesc:'설명 (선택)',
  slDecl:'이 재고를 실제로 보유하고 있으며, 상품은 정품이고 합법적으로 들여온 것이며, 사진·가격·정보가 사실임을 확인합니다. 이 게시물과 거래의 책임은 저에게 있습니다.',
@@ -357,7 +375,7 @@ pt:{h1:'Controle de Estoque',sub:'Entrada, vendas, estoque e lucro dos produtos'
  inEmpty:'Digite um código ou leia uma foto/voz. Código novo vira produto novo.',inReadDone:n=>`${n} linha(s) lida(s). Confira abaixo e lance.`,
  lnCode:'Código',lnNewTag:'Produto novo',lnNew:'Código novo. Escolha o tipo para cadastrar; a quantidade entra como entrada.',lnNoCode:'Informe o código.',lnNoCodeName:n=>`"${n}" · informe o código.`,lnMonth:'De qual mês é o produto?',lnRemove:'Remover',eNewName:'Informe o nome do produto novo.',
  rcTitle:'Lançar por nota, foto ou voz',rcKind:'O que você vai lançar?',kAuto:'Detectar',kSale:'Venda · saída',kIn:'Entrada',
- rcCam:'Tirar foto',vm:{grid:'Grade',cards:'Cartões',table:'Tabela'},moreMoney:'Detalhes ▾',qeTitle:'Editar preços e quantidades',qeHint:'Toque nos números para editar preços e quantidades',qeQty:'Quantidades',qePrice:'Preços',qeStock:'Estoque atual (contagem real)',qeStockHint:'Mudando entrada ou vendas, o estoque acompanha. Se a contagem física for diferente, digite o número real no estoque.',slBtn:'Publicar no StockLink',slAgain:'Publicar de novo no StockLink',slTitle:'Publicar no mural de saldão StockLink',slLoginHint:'Entre com o e-mail e a senha da sua conta StockLink. Depois do primeiro acesso, é só publicar.',slEmail:'E-mail',slPw:'Senha',slLogin:'Entrar no StockLink',
+ rcCam:'Tirar foto',phAddShort:'+ Foto',szTitle:'Quantidade por tamanho',szUn:'Sem tamanho',szUnHint:n=>`Há ${n} ${U()} em estoque sem tamanho definido.`,bySize:'Lançar por tamanho',sizesL:'Tamanhos (separe por vírgula)',sizesHint:'Ex.: P, M, G, GG ou 36, 38, 40, 42. Para não usar tamanhos, escreva "nenhum".',none:'nenhum',vm:{grid:'Grade',cards:'Cartões',table:'Tabela'},moreMoney:'Detalhes ▾',qeTitle:'Editar preços e quantidades',qeHint:'Toque nos números para editar preços e quantidades',qeQty:'Quantidades',qePrice:'Preços',qeStock:'Estoque atual (contagem real)',qeStockHint:'Mudando entrada ou vendas, o estoque acompanha. Se a contagem física for diferente, digite o número real no estoque.',slBtn:'Publicar no StockLink',slAgain:'Publicar de novo no StockLink',slTitle:'Publicar no mural de saldão StockLink',slLoginHint:'Entre com o e-mail e a senha da sua conta StockLink. Depois do primeiro acesso, é só publicar.',slEmail:'E-mail',slPw:'Senha',slLogin:'Entrar no StockLink',
  slNoComp:'Esta conta não tem empresa cadastrada. Cadastre a empresa (CNPJ) no app StockLink primeiro.',slComp:'Publicar por qual empresa?',slCompOne:n=>`Será publicado como <b>${n}</b>.`,slPhoto:'A foto do produto vai junto.',slNoPhoto:'Produto sem foto. Adicione em Editar para ir junto.',
  slTitleL:'Título',slCat:'Categoria',slPrice:'Preço do saldão (R$)',slQty:'Quantidade',slPriceType:'Tipo de preço',slPeca:'Por peça',slLote:'Lote inteiro',slDesc:'Descrição (opcional)',
  slDecl:'Declaro que tenho este estoque, que os produtos são originais e de origem legal e que as fotos, preços e informações são verdadeiros. Sou responsável por este anúncio e pela negociação.',
@@ -382,19 +400,26 @@ for(const lg of ['ko','pt']){const base=T[lg].cats;Object.defineProperty(T[lg],'
 let lang='ko'; try{lang=localStorage.getItem('lang')||'ko'}catch(e){}
 const t=()=>T[lang];
 
-const DEF={minDays:20,reRate:70,lowRate:40,retailMax:30,saleOff:30,bizType:'clothes',unit:'',unitPt:'',kinds:[]};
+const DEF={minDays:20,reRate:70,lowRate:40,retailMax:30,saleOff:30,bizType:'clothes',unit:'',unitPt:'',kinds:[],sizes:[],noSizes:false};
 let view='grid';try{view=localStorage.getItem('view2')||'grid'}catch(e){}
 let rules={...DEF}, items=[], moves=[], db=null, ai=null, aiOpts={images:null}, filter='all', q='', loaded=false, dbState='wait', unsub=[];
 let month=new Date().toISOString().slice(0,7);
 const CLS={re:'c-re',watch:'c-watch',sale:'c-sale',retail:'c-retail',early:'c-early'};
 
 function daysSince(d){if(!d)return 999;return Math.max(0,Math.floor((Date.now()-new Date(d+'T12:00:00').getTime())/864e5))}
+// sizes: each product can keep 입고/판매 per size in it.sz = {P:{m,s}, M:{m,s}, ...}
+const SZ=()=>{if(typeof rules==='undefined')return ['P','M','G','GG'];if(rules.noSizes)return [];const c=Array.isArray(rules.sizes)?rules.sizes.filter(Boolean):[];return c.length?c:(bt()==='clothes'?['P','M','G','GG']:[])};
+const szKeys=it=>{const ks=[...SZ()];for(const k of Object.keys((it&&it.sz)||{}))if(!ks.includes(k))ks.push(k);return ks};
+const szSum=(o,f)=>Object.values(o||{}).reduce((a,v)=>a+Math.max(0,+(f?(v||{})[f]:v)||0),0);
+function addSz(base,delta,field,sign){const out=JSON.parse(JSON.stringify(base||{}));for(const [k,n] of Object.entries(delta||{})){const q=Math.max(0,Math.floor(+n||0));if(!q)continue;out[k]=out[k]||{m:0,s:0};out[k][field]=Math.max(0,(+out[k][field]||0)+sign*q)}return out}
 function calc(it){
   const made=+it.made||0, sold=Math.min(+it.sold||0,made), adj=Math.round(+it.adj||0), stock=Math.max(0,made-sold+adj), rate=made?sold/made*100:0, days=daysSince(it.madeDate);
   const price=+it.price||0, priceV=+it.priceV||0, cost=+it.cost||0, soldV=Math.min(+it.soldV||0,sold), soldA=sold-soldV;
   let cat; if(!made)cat='early'; else if(rate>=rules.reRate)cat='re'; else if(days<rules.minDays)cat='early'; else if(rate>=rules.lowRate)cat='watch'; else cat=stock>rules.retailMax?'sale':'retail';
   const sales=soldA*price+soldV*(priceV||price);
-  return {made,sold,soldV,soldA,stock,rate,days,cat,price,priceV,cost,perDay:sold/Math.max(days,1),sales,profit:cost?sales-sold*cost:null,prodCost:made*cost};
+  const sz=it.sz||{},szList=szKeys(it).map(k=>{const v=sz[k]||{};const m=+v.m||0,s=+v.s||0;return {k,m,s,st:Math.max(0,m-s)}}),szM=szSum(sz,'m'),szS=szSum(sz,'s');
+  const hasSz=szM>0||szS>0,szUn=Math.max(0,(made-sold)-(szM-szS));
+  return {made,sold,soldV,soldA,stock,rate,days,cat,price,priceV,cost,perDay:sold/Math.max(days,1),sales,profit:cost?sales-sold*cost:null,prodCost:made*cost,szList,hasSz,szUn};
 }
 function advice(j){const L=t();
   if(!j.made)return L.adWait;
@@ -425,6 +450,9 @@ function quickEdit(it){const L=t(),j=calc(it);
   <div class="two"><div class="field"><label for="qe-soldv">${L.fSoldV}</label><input id="qe-soldv" type="number" min="0" inputmode="numeric" value="${j.soldV}"></div>
   <div class="field"><label for="qe-stock">${L.qeStock}</label><input id="qe-stock" type="number" min="0" inputmode="numeric" value="${j.stock}"></div></div>
   <p class="hint">${L.qeStockHint}</p>
+  ${szKeys(it).length?`<h3 class="sh">${L.szTitle}</h3><div class="sztbl"><span></span><span>${L.made}</span><span>${L.sold}</span><span>${L.stock}</span>
+    ${j.szList.map(x=>`<b>${esc(x.k)}</b><input type="number" min="0" inputmode="numeric" data-szm="${esc(x.k)}" value="${x.m||''}"><input type="number" min="0" inputmode="numeric" data-szs="${esc(x.k)}" value="${x.s||''}"><span class="szst" data-szst="${esc(x.k)}">${x.st}</span>`).join('')}</div>
+    <p class="hint" id="qe-szun"></p>`:''}
   <h3 class="sh">${L.qePrice}</h3>
   <div class="two"><div class="field"><label for="qe-cost">${L.fCost}</label><input id="qe-cost" type="number" step="0.01" min="0" inputmode="decimal" value="${j.cost||''}"></div>
   <div class="field"><label for="qe-price">${L.fPrice}</label><input id="qe-price" type="number" step="0.01" min="0" inputmode="decimal" value="${j.price||''}"></div></div>
@@ -432,12 +460,18 @@ function quickEdit(it){const L=t(),j=calc(it);
   <p class="err" id="qe-err" hidden></p>
   <button class="btn full" type="button" id="qe-save">${L.save}</button>`);
   // changing 입고/판매 moves the stock along; typing the stock yourself keeps your number
+  const readSz=()=>{const o={};document.querySelectorAll('.sztbl [data-szm]').forEach(inp=>{const k=inp.dataset.szm,sv=document.querySelector(`.sztbl [data-szs="${CSS.escape(k)}"]`);const m=Math.max(0,Math.floor(+inp.value||0)),so=Math.max(0,Math.floor(+(sv&&sv.value)||0));if(m||so)o[k]={m,s:so}});return o};
+  const szSync=()=>{const o=readSz();document.querySelectorAll('[data-szst]').forEach(el=>{const v=o[el.dataset.szst]||{m:0,s:0};el.textContent=Math.max(0,v.m-v.s)});
+    const M=szSum(o,'m'),S=szSum(o,'s');if(M>(+$('#qe-made').value||0))$('#qe-made').value=M;if(S>(+$('#qe-sold').value||0))$('#qe-sold').value=S;sync&&sync();
+    const un=Math.max(0,((+$('#qe-made').value||0)-(+$('#qe-sold').value||0))-(M-S));if($('#qe-szun'))$('#qe-szun').textContent=un?L.szUnHint(un):''};
+  document.querySelectorAll('.sztbl input').forEach(x=>x.addEventListener('input',()=>szSync()));
   let stockTouched=false;const sync=()=>{if(stockTouched)return;const m=Math.max(0,Math.floor(+$('#qe-made').value||0)),so=Math.max(0,Math.floor(+$('#qe-sold').value||0));$('#qe-stock').value=Math.max(0,m-so+Math.round(+it.adj||0))};
+  setTimeout(()=>{if($('#qe-szun'))szSync()},0);
   $('#qe-made').oninput=sync;$('#qe-sold').oninput=sync;$('#qe-stock').oninput=()=>{stockTouched=true};
   $('#qe-save').onclick=async()=>{const n=id=>Math.max(0,Math.floor(+$(id).value||0)),m=id=>Math.max(0,+$(id).value||0),err=$('#qe-err');
     const made=n('#qe-made'),sold=n('#qe-sold'),soldV=n('#qe-soldv'),stock=n('#qe-stock');
     if(sold>made){err.textContent=L.eSold;err.hidden=false;return} if(soldV>sold){err.textContent=L.eSoldV;err.hidden=false;return}
-    const patch={made,sold,soldV,adj:stock-(made-sold),cost:m('#qe-cost'),price:m('#qe-price'),priceV:m('#qe-pricev'),updatedAt:new Date().toISOString()};
+    const patch={sz:readSz(),made,sold,soldV,adj:stock-(made-sold),cost:m('#qe-cost'),price:m('#qe-price'),priceV:m('#qe-pricev'),updatedAt:new Date().toISOString()};
     try{await patchItem(it.id,patch);closeSheet();toast(L.tSaved)}catch(e){toast(L.tSaveErr)}};
 }
 // ---------- StockLink: post a saldão item to the StockLink board ----------
@@ -517,8 +551,8 @@ async function slPost(it,db,user){const L=t(),j=calc(it);
     catch(e){bad(slErr(e));$('#sl-go').disabled=false;$('#sl-go').textContent=L.slGo}};
 }
 function card(i){const L=t(),j=i.j;return `<div class="card ${CLS[j.cat]}">
-    <div class="row">${safeImg(i.photo)?`<button type="button" class="cthumb" data-view="${i.id}" aria-label="${L.phTitle}"><img src="${safeImg(i.photo)}" alt=""></button>`:''}<div class="name" style="flex:1"><span class="code big">${esc(i.ref||L.noCode)}</span>${dn(i)?`<span class="pname">${esc(dn(i))}</span>`:''}<div class="ref">${j.days===999?L.noDate:L.day(j.days)}${q?' · '+esc(mLabel(i.month||month)):''}</div></div><span class="pill">${L.cats[j.cat][0]}</span></div>
-    <button type="button" class="qe" data-qe="${i.id}" aria-label="${L.qeTitle}"><div class="nums"><div>${L.made}<b>${j.made}</b></div><div>${L.sold}<b>${j.sold}</b>${j.soldV?`<span class="ref">${L.retailN(j.soldV)}</span>`:''}</div><div>${L.stock}<b>${j.stock}</b></div></div>
+    <div class="row">${safeImg(i.photo)?`<button type="button" class="cthumb" data-view="${i.id}" aria-label="${L.phTitle}"><img src="${safeImg(i.photo)}" alt=""></button>`:`<label class="cthumb add" for="cph-${i.id}">${L.phAddShort}</label><input class="vh" type="file" accept="image/*" id="cph-${i.id}" data-cph="${i.id}">`}<div class="name" style="flex:1"><span class="code big">${esc(i.ref||L.noCode)}</span>${dn(i)?`<span class="pname">${esc(dn(i))}</span>`:''}<div class="ref">${j.days===999?L.noDate:L.day(j.days)}${q?' · '+esc(mLabel(i.month||month)):''}</div></div><span class="pill">${L.cats[j.cat][0]}</span></div>
+    <button type="button" class="qe" data-qe="${i.id}" aria-label="${L.qeTitle}"><div class="nums"><div>${L.made}<b>${j.made}</b></div><div>${L.sold}<b>${j.sold}</b>${j.soldV?`<span class="ref">${L.retailN(j.soldV)}</span>`:''}</div><div>${L.stock}<b>${j.stock}</b></div></div>${j.hasSz?szChips(j):''}
     <div class="bar" role="img" aria-label="${L.rate} ${j.rate.toFixed(0)}%"><i style="width:${j.rate.toFixed(1)}%"></i></div>
     <div class="ref">${L.rate} <b style="color:var(--ink)">${j.rate.toFixed(0)}%</b> · ${L.costL} ${j.cost?brl(j.cost):'—'} · ${L.priceL} ${j.price?brl(j.price):'—'} · ${L.priceVL} ${j.priceV?brl(j.priceV):'—'}</div><span class="qehint">${L.qeHint}</span></button>
     <div class="nums money2"><div>${L.itemSales}<b>${brl(j.sales)}</b></div><div>${L.itemProfit}<b style="${j.profit<0?'color:var(--retail)':''}">${j.profit===null?'—':brl(j.profit)}</b></div></div>
@@ -526,9 +560,10 @@ function card(i){const L=t(),j=i.j;return `<div class="card ${CLS[j.cat]}">
     <div class="acts"><button class="btn" type="button" data-in="${i.id}">${L.cardIn}</button><button class="btn soft" type="button" data-edit="${i.id}">${L.edit}</button>${slEnabled()&&(j.cat==='sale'||j.cat==='retail'||i.slId)?`<button class="btn sl" type="button" data-sl="${i.id}">${i.slId?L.slAgain:L.slBtn}</button>`:''}</div>
   </div>`}
 
+function szChips(j){const L=t();return `<div class="szrow">${j.szList.map(x=>`<span class="sz ${x.st?'':'zero'}">${esc(x.k)} <b>${x.st}</b></span>`).join('')}${j.szUn>0?`<span class="sz un">${L.szUn} <b>${j.szUn}</b></span>`:''}</div>`}
 function grid(rows){const L=t();return `<div class="grid3">${rows.map(i=>{const j=i.j,ph=safeImg(i.photo);return `<button type="button" class="tile ${CLS[j.cat]}" data-open="${i.id}">
     <span class="tph">${ph?`<img src="${ph}" alt="">`:`<span class="tcode">${esc(i.ref||'—')}</span>`}<span class="tcat">${L.cats[j.cat][0]}</span></span>
-    <span class="tinfo">${ph?`<span class="tref">${esc(i.ref||'—')}</span>`:''}<span class="tnm">${esc(dn(i))}</span><span class="tst"><b>${num(j.stock)}</b> ${L.stock} · ${j.rate.toFixed(0)}%</span></span></button>`}).join('')}</div>`}
+    <span class="tinfo">${ph?`<span class="tref">${esc(i.ref||'—')}</span>`:''}<span class="tnm">${esc(dn(i))}</span><span class="tst"><b>${num(j.stock)}</b> ${L.stock} · ${j.rate.toFixed(0)}%</span>${j.hasSz?`<span class="tsz">${j.szList.map(x=>`<i class="${x.st?'':'z'}">${esc(x.k)}${x.st}</i>`).join('')}</span>`:''}</span></button>`}).join('')}</div>`}
 function table(rows){const L=t();const T2=f=>rows.reduce((a,i)=>a+f(i.j),0);
   return `<p class="hint">${L.tblHint}</p><div class="tablewrap"><table class="tbl"><thead><tr><th class="l code-c">${L.thCode}</th><th class="l">${L.thName}</th><th>${L.made}</th><th>${L.sold}</th><th>${L.stock}</th><th>${L.rate}</th><th class="l">${L.thCat}</th><th>${L.itemSales}</th><th>${L.itemProfit}</th></tr></thead><tbody>
   ${rows.map(i=>{const j=i.j;return `<tr data-edit="${i.id}" class="${CLS[j.cat]}"><td class="l code-c">${safeImg(i.photo)?`<img class="tthumb" src="${safeImg(i.photo)}" alt="">`:''}${esc(i.ref||'—')}</td><td class="l">${esc(dn(i)||'—')}</td><td>${num(j.made)}</td><td>${num(j.sold)}</td><td>${num(j.stock)}</td><td>${j.rate.toFixed(0)}%</td><td class="l"><span class="dot"></span>${L.cats[j.cat][0]}</td><td>${brl(j.sales)}</td><td style="${j.profit<0?'color:var(--retail)':''}">${j.profit===null?'—':brl(j.profit)}</td></tr>`}).join('')}
@@ -656,6 +691,8 @@ function rulesForm(){const L=t();
   <div class="field"><label for="r-biz">${L.bizL}</label><select id="r-biz">${Object.entries(BIZ).map(([k,b])=>`<option value="${k}" ${bt()===k?'selected':''}>${lang==='pt'?b.pt:b.ko}</option>`).join('')}</select></div>
   <div class="two"><div class="field"><label for="r-unit">${L.unitL}</label><input id="r-unit" value="${esc(rules.unit||'')}" placeholder="${esc(B().unit[0])}"></div>
   <div class="field"><label for="r-unitpt">${L.unitPtL}</label><input id="r-unitpt" value="${esc(rules.unitPt||'')}" placeholder="${esc(B().unit[1])}"></div></div>
+  <div class="field"><label for="r-sizes">${L.sizesL}</label><input id="r-sizes" value="${esc(rules.noSizes?L.none:(Array.isArray(rules.sizes)?rules.sizes.join(', '):''))}" placeholder="${bt()==='clothes'?'P, M, G, GG':L.none}"></div>
+  <p class="hint">${L.sizesHint}</p>
   <div class="field"><label for="r-kinds">${L.kindsL}</label><input id="r-kinds" value="${esc(custom)}" placeholder="${esc(B().kinds.map(x=>lang==='pt'?x[2]:x[1]).join(', '))}"></div>
   <p class="hint">${L.kindsHint}</p>
   <h3 class="sh">${L.rulesH}</h3>
@@ -668,12 +705,13 @@ function rulesForm(){const L=t();
   <button class="btn full" type="button" id="r-save">${L.rSave}</button><button class="btn soft full" type="button" id="r-reset">${L.rReset}</button>`);
   $('#r-biz').onchange=e=>{const b=BIZ[e.target.value];$('#r-unit').placeholder=b.unit[0];$('#r-unitpt').placeholder=b.unit[1];$('#r-kinds').placeholder=b.kinds.map(x=>lang==='pt'?x[2]:x[1]).join(', ')};
   $('#r-save').onclick=async()=>{const n=(id,d)=>{const x=+$(id).value;return Number.isFinite(x)&&x>=0?x:d};
+    const szRaw=$('#r-sizes').value.trim(),noSizes=/^(없음|nenhum|-|0)$/i.test(szRaw),sizes=noSizes?[]:szRaw.split(/[,\n/]/).map(x=>x.trim().toUpperCase()).filter(Boolean).slice(0,20);
     const kinds=$('#r-kinds').value.split(/[,\n]/).map(x=>x.trim()).filter(Boolean).slice(0,30);
     const r={reRate:n('#r-re',DEF.reRate),lowRate:n('#r-low',DEF.lowRate),retailMax:n('#r-retail',DEF.retailMax),minDays:n('#r-days',DEF.minDays),saleOff:n('#r-off',DEF.saleOff),
-      bizType:$('#r-biz').value,unit:$('#r-unit').value.trim().slice(0,8),unitPt:$('#r-unitpt').value.trim().slice(0,8),kinds};
+      bizType:$('#r-biz').value,unit:$('#r-unit').value.trim().slice(0,8),unitPt:$('#r-unitpt').value.trim().slice(0,8),kinds,sizes,noSizes};
     if(r.lowRate>=r.reRate){toast(L.rErr);return}
     rules=r;if(db){db.doc('config/rules').set(r).catch(()=>toast(L.tSaveErr))}closeSheet();render();toast(L.tRules)};
-  $('#r-reset').onclick=async()=>{rules={...DEF,bizType:rules.bizType,unit:rules.unit,unitPt:rules.unitPt,kinds:rules.kinds};if(db){db.doc('config/rules').set(rules).catch(()=>{})}closeSheet();render();toast(L.tReset)};
+  $('#r-reset').onclick=async()=>{rules={...DEF,bizType:rules.bizType,unit:rules.unit,unitPt:rules.unitPt,kinds:rules.kinds,sizes:rules.sizes,noSizes:rules.noSizes};if(db){db.doc('config/rules').set(rules).catch(()=>{})}closeSheet();render();toast(L.tReset)};
 }
 
 // ---------- one input screen: code entry, photo, voice, text, new product ----------
@@ -768,6 +806,7 @@ Rules:
 - Do not invent lines. Skip totals, prices, taxes, payment and customer details.
 - "kind": the product type if the record says it, one of ${KINDS_LIST().map(x=>x[0]).join(', ')}; null if not said.
 - "channel": "varejo" for retail or single-piece sales (varejo, avulso, unidade, 소매, 낱장); otherwise "atacado".
+- "sizes": quantity per size when sizes are listed, using these size names: ${SZ().join(', ')||'none'}; {} if not listed. "qty" is still the total.
 - "read": a short quote of what you read for that line.
 
 Return ONLY a JSON object, no other text:
@@ -783,9 +822,13 @@ function matchItem(l){
 }
 // Reads short spoken/typed lines without AI: "2611 20장 판매", "2598 입고 300", "vendi 20 do 2611"
 const KNUM={'한':1,'하나':1,'두':2,'둘':2,'세':3,'셋':3,'네':4,'넷':4,'다섯':5,'여섯':6,'일곱':7,'여덟':8,'아홉':9,'열':10,'스무':20,'스물':20,'서른':30,'마흔':40,'쉰':50,'예순':60,'일흔':70,'여든':80,'아흔':90,'백':100};
+function parseSizes(seg){const ks=SZ();if(!ks.length)return {sz:{},rest:seg};const alt=ks.map(k=>k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).sort((a,b)=>b.length-a.length).join('|');
+  const re=new RegExp(`(^|[\\s,;/])(${alt})\\s*[:=x×-]?\\s*(\\d+)(?=\\s|,|;|/|$|장|개|pç)`,'gi');const sz={};let rest=seg;
+  rest=rest.replace(re,(m0,pre,k,n)=>{const key=ks.find(x=>x.toLowerCase()===k.toLowerCase())||k;sz[key]=(sz[key]||0)+(+n);return pre+' '});return {sz,rest}}
 function localParse(text,kind){
   const lines=[];
   for(let seg of String(text).split(/\n|,|;|그리고|\be\b|\band\b/i)){seg=seg.trim();if(!seg)continue;
+    const ps=parseSizes(seg);const szFound=szSum(ps.sz)?ps.sz:null;if(szFound)seg=ps.rest;
     const low=seg.toLowerCase();
     let type=/판매|팔|출고|나감|나갔|vend|saída|saida|venda/.test(low)?'sale':/입고|들어|생산|entrada|chegou|recebi|produ/.test(low)?'in':null;
     // qty: number right before a unit, else Korean count words before a unit
@@ -799,7 +842,8 @@ function localParse(text,kind){
     if(qty===null){const nums=(seg.match(/\d+/g)||[]).filter(n=>n!==String(code).replace(/\D/g,''));if(nums.length)qty=+nums[nums.length-1]}
     if(!code&&!qty)continue;
     const ch=/소매|낱장|한\s*장씩|varejo|avuls|unidade/.test(low)?'varejo':null;
-    lines.push({code,name:null,kind:findKind(low)||null,channel:ch,qty:qty||0,type:type||(kind!=='auto'?kind:null),read:seg})}
+    if(szFound)qty=szSum(szFound);
+    lines.push({code,name:null,sizes:szFound||{},kind:findKind(low)||null,channel:ch,qty:qty||0,type:type||(kind!=='auto'?kind:null),read:seg})}
   return {lines,note:''};
 }
 async function readReceipt(){const L=t(), err=$('#rc-err');err.hidden=true;stopMic();
@@ -816,7 +860,8 @@ async function readReceipt(){const L=t(), err=$('#rc-err');err.hidden=true;stopM
     const got=(Array.isArray(out?.lines)?out.lines:[]).map(l=>{const m=matchItem(l);
       const type=l.type==='sale'||l.type==='in'?l.type:(rc.kind==='auto'?'sale':rc.kind);
       const code=m?(m.ref||''):String(l.code??'').trim();
-      const line=newLine({code,pick:m?m.id:(code?'new':''),name:!m&&hasHangul(l.name)?String(l.name).trim():'',namePt:!m&&l.name&&!hasHangul(l.name)?String(l.name).trim():'',kind:!m?(KINDS_LIST().some(x=>x[0]===l.kind)?l.kind:findKind(l.name)):'',ch:l.channel==='varejo'?'V':'A',qty:Math.max(0,Math.round(+l.qty||0)),type,read:String(l.read??'')});
+      const lsz={};for(const [k,n] of Object.entries(l.sizes||{})){const key=SZ().find(x=>x.toLowerCase()===String(k).toLowerCase())||String(k).toUpperCase();if(+n>0)lsz[key]=Math.floor(+n)}
+      const line=newLine({sz:lsz,code,pick:m?m.id:(code?'new':''),name:!m&&hasHangul(l.name)?String(l.name).trim():'',namePt:!m&&l.name&&!hasHangul(l.name)?String(l.name).trim():'',kind:!m?(KINDS_LIST().some(x=>x[0]===l.kind)?l.kind:findKind(l.name)):'',ch:l.channel==='varejo'?'V':'A',qty:Math.max(0,Math.round(+l.qty||0)),type,read:String(l.read??'')});
       return line});
     rc.lines=rc.lines.filter(l=>!isBlank(l)).concat(got);
     rc.note=String(out?.note||'');rc.source=rc.photos.length?'photo':(rc.source||'text');
@@ -848,6 +893,7 @@ function lineHtml(l,k){const L=t();return `<div class="rline ${l.type}" data-k="
     <div class="m">${lineMatchHtml(l,k)}</div>
     <div class="qtyrow"><div class="seg two-way" role="group"><button type="button" data-t="sale" aria-pressed="${l.type==='sale'}">${L.rvSale}</button><button type="button" data-t="in" aria-pressed="${l.type==='in'}">${L.rvIn}</button></div>
       <input type="number" min="0" inputmode="numeric" data-f="qty" aria-label="${L.rvQty}" placeholder="${L.rvQty}" value="${esc(l.qty)}"></div>
+    ${SZ().length||(l.sz&&Object.keys(l.sz).length)?`<details class="szline" ${l.sz&&szSum(l.sz)?'open':''}><summary>${L.bySize}</summary><div class="szin">${[...new Set([...SZ(),...Object.keys(l.sz||{})])].map(k=>`<label>${esc(k)}<input type="number" min="0" inputmode="numeric" data-szk="${esc(k)}" value="${(l.sz&&l.sz[k])||''}"></label>`).join('')}</div></details>`:''}
     <div class="chrow"><span>${L.chL}</span><div class="seg two-way" role="group"><button type="button" data-c="A" aria-pressed="${l.ch!=='V'}">${L.chA}</button><button type="button" data-c="V" aria-pressed="${l.ch==='V'}">${L.chV}</button></div></div>
     ${l.read?`<div class="read">${L.rvRead}: “${esc(l.read)}”</div>`:''}
     <p class="err" data-e hidden></p></div>`}
@@ -877,6 +923,10 @@ function wireLines(){const box=$('#rv-lines');
     if(el.dataset.f==='qty')l.qty=el.value===''?'':Math.max(0,Math.floor(+el.value||0));
     if(el.dataset.f==='name')l.name=el.value;if(el.dataset.f==='namePt')l.namePt=el.value;if(el.dataset.f==='cost')l.cost=el.value;if(el.dataset.f==='price')l.price=el.value;if(el.dataset.f==='priceV')l.priceV=el.value;
     validate()});
+  box.addEventListener('input',e=>{const el=e.target.closest('[data-szk]');if(!el)return;const row=el.closest('.rline'),k=+row.dataset.k,l=rc.lines[k];
+    l.sz=l.sz||{};const n=Math.max(0,Math.floor(+el.value||0));if(n)l.sz[el.dataset.szk]=n;else delete l.sz[el.dataset.szk];
+    const sum=szSum(l.sz);if(sum){l.qty=sum;row.querySelector('[data-f="qty"]').value=sum}
+    validate()});
   box.addEventListener('change',async e=>{const ph=e.target.closest('input[data-photo]');if(ph){const k=+ph.dataset.photo,f=ph.files&&ph.files[0];if(f){try{rc.lines[k].photo=await makeThumb(f)}catch(_){toast(t().phErr)}redrawLine(k)}return}
     const el=e.target.closest('[data-f="pick"]');if(!el)return;const k=+el.closest('.rline').dataset.k;rc.lines[k].pick=el.value;redrawLine(k)});
   box.addEventListener('click',e=>{const pd=e.target.closest('[data-phdel]');if(pd){const k=+pd.dataset.phdel;rc.lines[k].photo='';redrawLine(k);return}
@@ -890,12 +940,13 @@ async function applyInput(){const L=t();$('#rv-apply').disabled=true;
   const now=new Date().toISOString(), today=now.slice(0,10), patches={}, logLines=[];
   try{
     for(const l of rc.lines){const qn=+l.qty||0;if(isBlank(l))continue;
-      if(l.pick==='new'){const data={photo:safeImg(l.photo),ref:l.code.trim(),name:l.name.trim(),namePt:l.namePt.trim(),kind:l.kind||'',cost:+l.cost||0,price:+l.price||0,priceV:+l.priceV||0,made:qn,sold:0,soldV:0,madeDate:today,month:today.slice(0,7),updatedAt:now};
-        const id=await saveItem(null,data);if(!id)throw new Error('save');logLines.push({id,code:data.ref,name:dn(data),type:'in',qty:qn,created:true});continue}
+      if(l.pick==='new'){const data={sz:szSum(l.sz)?addSz({},l.sz,'m',1):{},photo:safeImg(l.photo),ref:l.code.trim(),name:l.name.trim(),namePt:l.namePt.trim(),kind:l.kind||'',cost:+l.cost||0,price:+l.price||0,priceV:+l.priceV||0,made:qn,sold:0,soldV:0,madeDate:today,month:today.slice(0,7),updatedAt:now};
+        const id=await saveItem(null,data);if(!id)throw new Error('save');logLines.push({id,code:data.ref,name:dn(data),type:'in',qty:qn,created:true,sz:l.sz||{}});continue}
       const it=items.find(i=>i.id===l.pick);if(!it)continue;
-      const p=patches[it.id]||(patches[it.id]={made:+it.made||0,sold:+it.sold||0,soldV:+it.soldV||0});
+      const p=patches[it.id]||(patches[it.id]={made:+it.made||0,sold:+it.sold||0,soldV:+it.soldV||0,sz:JSON.parse(JSON.stringify(it.sz||{}))});
       if(l.type==='in')p.made+=qn;else{p.sold+=qn;if(l.ch==='V')p.soldV+=qn}
-      logLines.push({id:it.id,code:it.ref||'',name:dn(it),type:l.type,qty:qn,ch:l.type==='sale'?(l.ch==='V'?'V':'A'):''});
+      if(szSum(l.sz))p.sz=addSz(p.sz,l.sz,l.type==='in'?'m':'s',1);
+      logLines.push({id:it.id,sz:l.sz||{},code:it.ref||'',name:dn(it),type:l.type,qty:qn,ch:l.type==='sale'?(l.ch==='V'?'V':'A'):''});
     }
     for(const [id,p] of Object.entries(patches))await patchItem(id,{...p,updatedAt:now});
     await addMove({at:now,source:rc.source||'manual',lines:logLines,undone:false});
@@ -907,13 +958,17 @@ async function undoMove(m){const L=t();
   try{const patches={};
     for(const l of m.lines||[]){const it=items.find(i=>i.id===l.id);if(!it)continue;
       if(l.created){if(db)await db.collection('styles').doc(l.id).delete();else items=items.filter(x=>x.id!==l.id);delete patches[l.id];continue}
-      const p=patches[l.id]||(patches[l.id]={made:+it.made||0,sold:+it.sold||0,soldV:+it.soldV||0});
+      const p=patches[l.id]||(patches[l.id]={made:+it.made||0,sold:+it.sold||0,soldV:+it.soldV||0,sz:JSON.parse(JSON.stringify(it.sz||{}))});
+      if(szSum(l.sz))p.sz=addSz(p.sz,l.sz,l.type==='in'?'m':'s',-1);
       if(l.type==='in')p.made=Math.max(0,p.made-l.qty);else{p.sold=Math.max(0,p.sold-l.qty);if(l.ch==='V')p.soldV=Math.max(0,p.soldV-l.qty)}}
     for(const [id,p] of Object.entries(patches)){if(p.sold>p.made)p.sold=p.made;if(p.soldV>p.sold)p.soldV=p.sold;await patchItem(id,{...p,updatedAt:new Date().toISOString()})}
     if(db)await db.collection('moves').doc(m.id).update({undone:true});else{m.undone=true}
     render();toast(L.tUndone)}catch(e){toast(L.tSaveErr)}
 }
 
+document.addEventListener('change',async e=>{const el=e.target.closest&&e.target.closest('input[data-cph]');if(!el)return;const f=el.files&&el.files[0];if(!f)return;
+  try{const ph=await makeThumb(f);await patchItem(el.dataset.cph,{photo:ph,updatedAt:new Date().toISOString()});const it=items.find(i=>i.id===el.dataset.cph);
+    if(it&&document.querySelector('.sheet .card'))openSheet(`${head(esc(lbl(it)))}${card({...it,j:calc(it)})}`);toast(t().tSaved)}catch(_){toast(t().phErr)}});
 document.addEventListener('click',e=>{const tr=e.target.closest('tr[data-edit]');if(tr){const it=items.find(i=>i.id===tr.dataset.edit);if(it)itemForm(it);return}
   const b=e.target.closest('button');if(!b)return;
   if(b.dataset.qe){const it=items.find(i=>i.id===b.dataset.qe);if(it)quickEdit(it);return}
