@@ -4,7 +4,7 @@ on:
     paths: ['android/**', '.github/workflows/android.yml']
   workflow_dispatch:
 permissions:
-  contents: read
+  contents: write
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -25,5 +25,10 @@ jobs:
           BT=$(ls -d $ANDROID_HOME/build-tools/* | sort -V | tail -1)
           cp $BT/lib/apksigner.jar out/ && cp $BT/zipalign out/ && ldd $BT/zipalign > out/zipalign-ldd.txt || true
           echo "${{ github.run_number }}" > out/version.txt
-      - uses: actions/upload-artifact@v4
-        with: { name: android-unsigned, path: out/ }
+      - name: Put the files on the android-build branch
+        run: |
+          cd out
+          git init -q -b android-build
+          git -c user.name=github-actions -c user.email=actions@github.com add -A
+          git -c user.name=github-actions -c user.email=actions@github.com commit -q -m "build ${{ github.run_number }}"
+          git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" android-build
