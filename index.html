@@ -94,6 +94,29 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .qehint{display:block;font-size:11.5px;color:var(--accent);font-weight:600;margin-top:4px}
 .btn.sl{background:var(--sale-soft);color:var(--sale)}
 .btn.wa{background:#1fa855;color:#fff}
+.tools{display:flex;flex-wrap:wrap;gap:6px}
+.tool{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:7px 12px;font:inherit;font-size:13px;font-weight:600;white-space:nowrap}
+.tool b{font-variant-numeric:tabular-nums}.tool.over{border-color:var(--retail);color:var(--retail)}
+.resz{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700;color:var(--re)}
+.sz.plus{background:var(--re-soft);color:var(--re);border-color:var(--re)}
+.dsum{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.dsum div{background:var(--accent-soft);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:2px}
+.dsum .lbl{font-size:12px;color:var(--muted)}.dsum b{font-family:var(--display);font-size:22px;font-variant-numeric:tabular-nums}
+.dsum .over{background:var(--retail-soft);color:var(--retail)}
+.dlist{display:flex;flex-direction:column;gap:6px}
+.drow{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-left:5px solid var(--sale);background:var(--surface);color:var(--ink);border-radius:10px;padding:10px 12px;text-align:left;font:inherit}
+.drow.over{border-left-color:var(--retail)}.drow .w{flex:1;display:flex;flex-direction:column;min-width:0}.drow .amt{font-variant-numeric:tabular-nums}.drow.over .amt{color:var(--retail)}
+.lbn{width:76px;flex:none;text-align:center}
+.scanbox{position:relative;border-radius:14px;overflow:hidden;background:#000;aspect-ratio:4/3}
+.scanbox video{width:100%;height:100%;object-fit:cover;display:block}
+.scanframe{position:absolute;inset:18%;border:3px solid rgba(255,255,255,.85);border-radius:14px;pointer-events:none}
+#printArea{display:none}
+body.staff #moneyd,body.staff .money2,body.staff .costinfo,body.staff #rulesBtn,body.staff button[data-edit],body.staff .own{display:none!important}
+@media print{body>*:not(#printArea){display:none!important}body{background:#fff!important;padding:0!important}
+ #printArea{display:grid!important;grid-template-columns:repeat(4,1fr);gap:3mm}
+ .plabel{border:1px dashed #999;padding:2.5mm;display:flex;flex-direction:column;align-items:center;gap:1mm;break-inside:avoid;color:#000;font-family:Arial,sans-serif;text-align:center}
+ .plabel img{width:26mm;height:26mm;image-rendering:pixelated}.plabel b{font-size:15pt;line-height:1}.plabel span{font-size:8pt}
+ @page{margin:8mm}}
 .decl{display:flex;gap:8px;align-items:flex-start;font-size:12.5px;color:var(--muted);line-height:1.45}
 .decl input{width:auto;margin-top:2px}
 .linkbtn{border:0;background:none;color:var(--accent);font-weight:600;padding:0}
@@ -244,6 +267,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
   <details class="moneyd" id="moneyd"><summary id="moneySum"></summary><div class="money" id="money"></div></details>
   <div class="bins" id="bins"></div>
   <div class="sum" id="sum"></div>
+  <div class="tools" id="tools"></div>
   <div class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="q" type="search" autocomplete="off"></div>
   <div class="row"><h2 id="listTitle"></h2><span class="acts"><span class="vseg" role="group" id="vseg"><button type="button" data-vm="grid"></button><button type="button" data-vm="cards"></button><button type="button" data-vm="table"></button></span><button class="btn soft sm" type="button" id="rulesBtn"></button></span></div>
   <div class="list" id="list"></div>
@@ -293,7 +317,7 @@ const lbl=i=>i?[i.ref,dn(i)].filter(Boolean).join(' · '):'';
 const hasHangul=s=>/[\uac00-\ud7a3]/.test(String(s||''));
 
 const T={
-ko:{trendBtn:'📤 트렌드 레이더로 판매 순위 보내기',trendNone:'보낼 판매 기록이 아직 없어요',trendCopied:'복사했어요. 트렌드 레이더 앱의 공유로 붙여 넣어 주세요',h1:'재고 정리판',sub:'상품의 입고·판매·재고·수익을 한눈에',monthL:(y,m)=>`${y}년 ${m}월 입고`,
+ko:{h1:'재고 정리판',sub:'상품의 입고·판매·재고·수익을 한눈에',monthL:(y,m)=>`${y}년 ${m}월 입고`,
  sales:'이번 달 매출',salesNote:'도매 판매 × 도매가 + 소매 판매 × 소매가',profit:'판매 이익',profitNote:'판매한 상품에서 남은 돈 (판매 금액 − 원가)',
  prodCost:'생산비 총액',cash:'현금 수익',cashNote:'매출 − 생산비 (안 팔린 재고까지 뺀 금액)',stockVal:'남은 재고 가치',margin:'이익률',
  noCost:'원가가 없는 상품은 수익 계산에서 빠져요.',
@@ -346,7 +370,7 @@ ko:{trendBtn:'📤 트렌드 레이더로 판매 순위 보내기',trendNone:'�
  tApplied:(a,b)=>`판매 ${a}${U()} · 입고 ${b}${U()} 반영했어요`,
  hTitle:'최근 입력 기록',hEmpty:'입력하기로 넣은 내용이 여기에 기록돼요. 잘못 넣었으면 되돌릴 수 있어요.',
  hSum:(s,i)=>[s?`판매 ${s}${U()}`:'',i?`입고 ${i}${U()}`:''].filter(Boolean).join(' · '),hSrc:{photo:'사진',voice:'말',text:'글',manual:'직접'},hUndo:'되돌리기',hUndoQ:'정말 되돌릴까요?',hUndone:'되돌림',tUndone:'되돌렸어요'},
-pt:{trendBtn:'📤 Enviar ranking de vendas ao Trend Radar',trendNone:'Ainda não há vendas para enviar',trendCopied:'Copiado. Cole no app Trend Radar',h1:'Controle de Estoque',sub:'Entrada, vendas, estoque e lucro dos produtos',monthL:(y,m)=>`Entrada ${String(m).padStart(2,'0')}/${y}`,
+pt:{h1:'Controle de Estoque',sub:'Entrada, vendas, estoque e lucro dos produtos',monthL:(y,m)=>`Entrada ${String(m).padStart(2,'0')}/${y}`,
  sales:'Faturamento do mês',salesNote:'vendas atacado × preço atacado + vendas varejo × preço varejo',profit:'Lucro das vendas',profitNote:'o que sobrou dos produtos vendidos (vendas − custo)',
  prodCost:'Custo total de produção',cash:'Resultado em caixa',cashNote:'faturamento − custo de produção (inclui o estoque parado)',stockVal:'Valor do estoque',margin:'Margem',
  noCost:'Produtos sem custo ficam fora do cálculo de lucro.',
@@ -403,6 +427,32 @@ pt:{trendBtn:'📤 Enviar ranking de vendas ao Trend Radar',trendNone:'Ainda nã
 for(const lg of ['ko','pt']){const base=T[lg].cats;Object.defineProperty(T[lg],'cats',{get(){return {...base,re:B().re[lg==='ko'?0:1].slice(0,2)}}})}
 let lang='ko'; try{lang=localStorage.getItem('lang')||'ko'}catch(e){}
 const t=()=>T[lang];
+Object.assign(T.ko,{
+ trendBtn:'📤 트렌드 레이더로 판매 순위 보내기',trendNone:'보낼 판매 기록이 아직 없어요',trendCopied:'복사했어요. 트렌드 레이더 앱의 공유로 붙여 넣어 주세요',
+ tools:{debt:'외상 장부',scan:'QR 스캔',label:'QR 라벨',xls:'엑셀',team:'직원'},
+ reSz:'사이즈별로 더 만들 수량',reOrder:n=>`재생산 주문서 보내기 (${n}개)`,reOrderHead:'재생산 주문',reTotal:'합계',
+ dPay:'돈 받기',dNow:'바로 받음',dLater:'외상',dCust:'손님(거래처) 이름',dCustPh:'예: Loja Maria',dAmt:'외상 금액 (R$)',dDue:'받을 날',dPhone:'손님 왓츠앱 번호 (선택)',dNote:'메모 (선택)',
+ dTitle:'외상 장부',dTotal:'받을 돈 전체',dOver:'날짜 지난 돈',dEmpty:'외상이 없어요. 판매를 입력할 때 "외상"을 고르면 여기에 모여요.',dAdd:'+ 외상 직접 적기',dRecv:'입금 받기',dRecvAmt:'받은 금액 (R$)',dRecvOk:'입금 처리했어요',
+ dRemind:'왓츠앱으로 알리기',dLeft:'남은 돈',dDueOn:d=>`받을 날 ${d}`,dOverdue:'날짜 지남',dDone:'다 받음',dSaved:'외상을 적었어요',dEName:'손님 이름을 넣어 주세요',dEAmt:'금액을 넣어 주세요',dDel:'지우기',dDelQ:'정말?',dHistory:'기록',dSaleOf:'판매',dManual:'직접 적음',dSave:'저장',
+ tmTitle:'직원 같이 쓰기',tmHint:'직원의 Gmail 주소를 넣으세요. 직원은 같은 앱 주소에서 그 Gmail로 로그인해 판매·입고만 입력해요. 원가·이익·매출·외상 장부는 직원에게 보이지 않아요.',tmEmail:'직원 Gmail',tmAdd:'직원 추가',tmSend:'안내 보내기',tmNone:'아직 직원이 없어요',tmRemove:'빼기',tmBad:'Gmail 주소를 확인해 주세요',tmAdded:'직원을 추가했어요. 안내를 보내 주세요.',tmErr:'저장하지 못했어요. Firebase 규칙을 새로 넣었는지 확인해 주세요.',tmPreview:'직원 기능은 앱 주소(구글 로그인)에서 쓸 수 있어요.',staffBadge:n=>`${n||'가게'} 직원으로 사용 중 · 판매·입고 입력`,
+ xBusy:'엑셀 파일 만드는 중…',xDone:'엑셀 파일을 받았어요',xErr:'엑셀 파일을 만들지 못했어요. 인터넷을 확인해 주세요.',
+ xH:{p:['코드','상품','입고','판매','소매 판매','재고','판매율(%)','분류','원가','도매가','소매가','매출','이익'],s:['코드','사이즈','입고','판매','재고'],d:['손님','전화','날짜','금액','받은 돈','남은 돈','받을 날','메모']},xS:['상품','사이즈','외상'],
+ lbTitle:'QR 라벨 인쇄',lbHint:'옷에 붙일 라벨을 뽑아요. 나중에 "QR 스캔"으로 라벨을 찍으면 바로 판매로 들어가요.',lbAll1:'모두 1장씩',lbAll0:'모두 0',lbPrint:'인쇄하기',lbNone:'뽑을 장수를 넣어 주세요',lbEmpty:'이번 달 코드가 있는 상품이 없어요',lbErr:'라벨을 만들지 못했어요. 인터넷을 확인해 주세요.',
+ scTitle:'QR 스캔',scHint:'라벨의 QR을 카메라에 비추세요. 한 번 찍을 때마다 1장씩 올라가요. 같은 상품을 또 찍을 땐 카메라를 잠깐 뗐다가 다시 비추세요.',scNoCam:'카메라를 열지 못했어요. 카메라 사용을 허락해 주세요.',scSale:'판매로 넣기',scIn:'입고로 넣기',scEmpty:'아직 찍은 게 없어요',scGot:c=>`${c} 찍었어요`,scUnknown:'등록 안 된 코드 (입고로 들어가요)'
+});
+Object.assign(T.pt,{
+ trendBtn:'📤 Enviar ranking de vendas ao Trend Radar',trendNone:'Ainda não há vendas para enviar',trendCopied:'Copiado. Cole no app Trend Radar',
+ tools:{debt:'Fiado',scan:'Ler QR',label:'Etiquetas QR',xls:'Excel',team:'Equipe'},
+ reSz:'Quanto produzir por tamanho',reOrder:n=>`Enviar pedido de produção (${n})`,reOrderHead:'Pedido de produção',reTotal:'Total',
+ dPay:'Pagamento',dNow:'Pago na hora',dLater:'Fiado',dCust:'Nome do cliente',dCustPh:'Ex.: Loja Maria',dAmt:'Valor fiado (R$)',dDue:'Vencimento',dPhone:'WhatsApp do cliente (opcional)',dNote:'Obs. (opcional)',
+ dTitle:'Fiado',dTotal:'Total a receber',dOver:'Vencido',dEmpty:'Nada no fiado. Ao lançar uma venda, escolha "Fiado" e ela aparece aqui.',dAdd:'+ Anotar fiado',dRecv:'Receber pagamento',dRecvAmt:'Valor recebido (R$)',dRecvOk:'Pagamento registrado',
+ dRemind:'Lembrar pelo WhatsApp',dLeft:'Falta',dDueOn:d=>`Vence ${d}`,dOverdue:'Vencido',dDone:'Pago',dSaved:'Fiado anotado',dEName:'Coloque o nome do cliente',dEAmt:'Coloque o valor',dDel:'Apagar',dDelQ:'Certeza?',dHistory:'Histórico',dSaleOf:'Venda',dManual:'Anotado à mão',dSave:'Salvar',
+ tmTitle:'Usar com funcionários',tmHint:'Coloque o Gmail do funcionário. Ele abre o mesmo endereço do app, entra com esse Gmail e só lança vendas e entradas. Custo, lucro, faturamento e fiado não aparecem para ele.',tmEmail:'Gmail do funcionário',tmAdd:'Adicionar',tmSend:'Enviar instruções',tmNone:'Nenhum funcionário ainda',tmRemove:'Remover',tmBad:'Confira o endereço do Gmail',tmAdded:'Funcionário adicionado. Envie as instruções.',tmErr:'Não foi possível salvar. Confira se as novas regras do Firebase foram publicadas.',tmPreview:'A função de equipe funciona no endereço do app (login Google).',staffBadge:n=>`Funcionário de ${n||'loja'} · lançar vendas e entradas`,
+ xBusy:'Gerando o Excel…',xDone:'Arquivo Excel baixado',xErr:'Não foi possível gerar o Excel. Verifique a internet.',
+ xH:{p:['Código','Produto','Entrada','Vendido','Vendido varejo','Estoque','Venda (%)','Situação','Custo','Atacado','Varejo','Faturamento','Lucro'],s:['Código','Tamanho','Entrada','Vendido','Estoque'],d:['Cliente','Telefone','Data','Valor','Recebido','Falta','Vencimento','Obs.']},xS:['Produtos','Tamanhos','Fiado'],
+ lbTitle:'Imprimir etiquetas QR',lbHint:'Imprima etiquetas para as peças. Depois, em "Ler QR", é só apontar a câmera para lançar a venda.',lbAll1:'Todas 1',lbAll0:'Todas 0',lbPrint:'Imprimir',lbNone:'Coloque quantas etiquetas imprimir',lbEmpty:'Nenhum produto com código neste mês',lbErr:'Não foi possível gerar as etiquetas. Verifique a internet.',
+ scTitle:'Ler QR',scHint:'Aponte a câmera para o QR da etiqueta. Cada leitura soma 1 peça. Para ler o mesmo produto de novo, afaste a câmera e aponte outra vez.',scNoCam:'Não foi possível abrir a câmera. Permita o uso da câmera.',scSale:'Lançar como venda',scIn:'Lançar como entrada',scEmpty:'Nada lido ainda',scGot:c=>`${c} lido`,scUnknown:'Código não cadastrado (entra como entrada)'
+});
 
 const DEF={minDays:20,reRate:70,lowRate:40,retailMax:30,saleOff:30,bizType:'clothes',unit:'',unitPt:'',kinds:[],sizes:[],noSizes:false};
 let view='grid';try{view=localStorage.getItem('view2')||'grid'}catch(e){}
@@ -460,7 +510,7 @@ function quickEdit(it){const L=t(),j=calc(it);
     ${j.szList.map(x=>`<b>${esc(szLabel(x.k))}</b><input type="number" min="0" inputmode="numeric" data-szm="${esc(x.k)}" value="${x.m||''}"><input type="number" min="0" inputmode="numeric" data-szs="${esc(x.k)}" value="${x.s||''}"><span class="szst" data-szst="${esc(x.k)}">${x.st}</span>`).join('')}</div>
     <p class="hint" id="qe-szun"></p>`:''}
   <h3 class="sh">${L.qePrice}</h3>
-  <div class="two"><div class="field"><label for="qe-cost">${L.fCost}</label><input id="qe-cost" type="number" step="0.01" min="0" inputmode="decimal" value="${j.cost||''}"></div>
+  <div class="two"><div class="field costinfo"><label for="qe-cost">${L.fCost}</label><input id="qe-cost" type="number" step="0.01" min="0" inputmode="decimal" value="${j.cost||''}"></div>
   <div class="field"><label for="qe-price">${L.fPrice}</label><input id="qe-price" type="number" step="0.01" min="0" inputmode="decimal" value="${j.price||''}"></div></div>
   <div class="two"><div class="field"><label for="qe-pricev">${L.fPriceV}</label><input id="qe-pricev" type="number" step="0.01" min="0" inputmode="decimal" value="${j.priceV||''}"></div><div></div></div>
   <p class="err" id="qe-err" hidden></p>
@@ -583,9 +633,9 @@ function card(i){const L=t(),j=i.j;return `<div class="card ${CLS[j.cat]}">
     <div class="row">${safeImg(i.photo)?`<button type="button" class="cthumb" data-view="${i.id}" aria-label="${L.phTitle}"><img src="${safeImg(i.photo)}" alt=""></button>`:`<label class="cthumb add" for="cph-${i.id}">${L.phAddShort}</label><input class="vh" type="file" accept="image/*" id="cph-${i.id}" data-cph="${i.id}">`}<div class="name" style="flex:1"><span class="code big">${esc(i.ref||L.noCode)}</span>${dn(i)?`<span class="pname">${esc(dn(i))}</span>`:''}<div class="ref">${j.days===999?L.noDate:L.day(j.days)}${q?' · '+esc(mLabel(i.month||month)):''}</div></div><span class="pill">${L.cats[j.cat][0]}</span></div>
     <button type="button" class="qe" data-qe="${i.id}" aria-label="${L.qeTitle}"><div class="nums"><div>${L.made}<b>${j.made}</b></div><div>${L.sold}<b>${j.sold}</b>${j.soldV?`<span class="ref">${L.retailN(j.soldV)}</span>`:''}</div><div>${L.stock}<b>${j.stock}</b></div></div>${j.hasSz?szChips(j):''}
     <div class="bar" role="img" aria-label="${L.rate} ${j.rate.toFixed(0)}%"><i style="width:${j.rate.toFixed(1)}%"></i></div>
-    <div class="ref">${L.rate} <b style="color:var(--ink)">${j.rate.toFixed(0)}%</b> · ${L.costL} ${j.cost?brl(j.cost):'—'} · ${L.priceL} ${j.price?brl(j.price):'—'} · ${L.priceVL} ${j.priceV?brl(j.priceV):'—'}</div><span class="qehint">${L.qeHint}</span></button>
+    <div class="ref">${L.rate} <b style="color:var(--ink)">${j.rate.toFixed(0)}%</b> <span class="costinfo">· ${L.costL} ${j.cost?brl(j.cost):'—'}</span> · ${L.priceL} ${j.price?brl(j.price):'—'} · ${L.priceVL} ${j.priceV?brl(j.priceV):'—'}</div><span class="qehint">${L.qeHint}</span></button>
     <div class="nums money2"><div>${L.itemSales}<b>${brl(j.sales)}</b></div><div>${L.itemProfit}<b style="${j.profit<0?'color:var(--retail)':''}">${j.profit===null?'—':brl(j.profit)}</b></div></div>
-    <div class="advice">${advice(j)}</div>
+    <div class="advice">${advice(j)}${reSzHtml(j)}</div>
     <div class="acts"><button class="btn" type="button" data-in="${i.id}">${L.cardIn}</button><button class="btn soft" type="button" data-edit="${i.id}">${L.edit}</button>${slEnabled()&&(j.cat==='sale'||j.cat==='retail'||i.slId)?`<button class="btn sl" type="button" data-sl="${i.id}">${i.slId?L.slAgain:L.slBtn}</button>`:''}</div>
     ${j.cat==='sale'||j.cat==='retail'||i.slId?`<button class="btn wa full" type="button" data-wa="${i.id}">💬 ${L.waBtn}</button>`:''}
   </div>`}
@@ -595,9 +645,9 @@ function grid(rows){const L=t();return `<div class="grid3">${rows.map(i=>{const 
     <span class="tph">${ph?`<img src="${ph}" alt="">`:`<span class="tcode">${esc(i.ref||'—')}</span>`}<span class="tcat">${L.cats[j.cat][0]}</span></span>
     <span class="tinfo">${ph?`<span class="tref">${esc(i.ref||'—')}</span>`:''}<span class="tnm">${esc(dn(i))}</span><span class="tst"><b>${num(j.stock)}</b> ${L.stock} · ${j.rate.toFixed(0)}%</span>${j.hasSz?`<span class="tsz">${j.szList.map(x=>`<i class="${x.st?'':'z'}">${esc(x.k)}${x.st}</i>`).join('')}</span>`:''}</span></button>`}).join('')}</div>`}
 function table(rows){const L=t();const T2=f=>rows.reduce((a,i)=>a+f(i.j),0);
-  return `<p class="hint">${L.tblHint}</p><div class="tablewrap"><table class="tbl"><thead><tr><th class="l code-c">${L.thCode}</th><th class="l">${L.thName}</th><th>${L.made}</th><th>${L.sold}</th><th>${L.stock}</th><th>${L.rate}</th><th class="l">${L.thCat}</th><th>${L.itemSales}</th><th>${L.itemProfit}</th></tr></thead><tbody>
-  ${rows.map(i=>{const j=i.j;return `<tr data-edit="${i.id}" class="${CLS[j.cat]}"><td class="l code-c">${safeImg(i.photo)?`<img class="tthumb" src="${safeImg(i.photo)}" alt="">`:''}${esc(i.ref||'—')}</td><td class="l">${esc(dn(i)||'—')}</td><td>${num(j.made)}</td><td>${num(j.sold)}</td><td>${num(j.stock)}</td><td>${j.rate.toFixed(0)}%</td><td class="l"><span class="dot"></span>${L.cats[j.cat][0]}</td><td>${brl(j.sales)}</td><td style="${j.profit<0?'color:var(--retail)':''}">${j.profit===null?'—':brl(j.profit)}</td></tr>`}).join('')}
-  </tbody><tfoot><tr><td class="l code-c">${L.total}</td><td class="l">${rows.length}</td><td>${num(T2(j=>j.made))}</td><td>${num(T2(j=>j.sold))}</td><td>${num(T2(j=>j.stock))}</td><td></td><td></td><td>${brl(T2(j=>j.sales))}</td><td>${brl(rows.reduce((a,i)=>a+(i.j.profit||0),0))}</td></tr></tfoot></table></div>`}
+  return `<p class="hint">${L.tblHint}</p><div class="tablewrap"><table class="tbl"><thead><tr><th class="l code-c">${L.thCode}</th><th class="l">${L.thName}</th><th>${L.made}</th><th>${L.sold}</th><th>${L.stock}</th><th>${L.rate}</th><th class="l">${L.thCat}</th><th class="own">${L.itemSales}</th><th class="own">${L.itemProfit}</th></tr></thead><tbody>
+  ${rows.map(i=>{const j=i.j;return `<tr data-edit="${i.id}" class="${CLS[j.cat]}"><td class="l code-c">${safeImg(i.photo)?`<img class="tthumb" src="${safeImg(i.photo)}" alt="">`:''}${esc(i.ref||'—')}</td><td class="l">${esc(dn(i)||'—')}</td><td>${num(j.made)}</td><td>${num(j.sold)}</td><td>${num(j.stock)}</td><td>${j.rate.toFixed(0)}%</td><td class="l"><span class="dot"></span>${L.cats[j.cat][0]}</td><td class="own">${brl(j.sales)}</td><td class="own" style="${j.profit<0?'color:var(--retail)':''}">${j.profit===null?'—':brl(j.profit)}</td></tr>`}).join('')}
+  </tbody><tfoot><tr><td class="l code-c">${L.total}</td><td class="l">${rows.length}</td><td>${num(T2(j=>j.made))}</td><td>${num(T2(j=>j.sold))}</td><td>${num(T2(j=>j.stock))}</td><td></td><td></td><td class="own">${brl(T2(j=>j.sales))}</td><td class="own">${brl(rows.reduce((a,i)=>a+(i.j.profit||0),0))}</td></tr></tfoot></table></div>`}
 function render(){
   const L=t(); document.documentElement.lang=lang==='ko'?'ko':'pt-BR';
   document.querySelectorAll('[data-lang]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.lang===lang));
@@ -624,6 +674,10 @@ function render(){
   $('#bins').innerHTML=['re','sale','retail','watch'].map(k=>`<button type="button" class="bin ${CLS[k]}" data-f="${k}" aria-pressed="${filter===k&&!q}"><span class="n">${count(k)}</span><span class="t">${L.cats[k][0]}</span><span class="d">${L.cats[k][1]}</span></button>`).join('');
   const tm=S(j=>j.made), ts=S(j=>j.sold);
   $('#sum').innerHTML=`<span>${L.styles} <b>${mine.length}</b></span><span>${L.made} <b>${num(tm)} ${L.pcs}</b></span><span>${L.sold} <b>${num(ts)} ${L.pcs}</b></span><span>${L.stock} <b>${num(S(j=>j.stock))} ${L.pcs}</b></span>${count('early')?`<span>${L.cats.early[0]} <b>${count('early')}</b></span>`:''}`;
+  document.body.classList.toggle('staff',isStaff());if(isStaff())$('#sub').textContent=L.staffBadge(ownerName);
+  {const gs=custGroups(),dT=gs.reduce((a,x)=>a+x.left,0),dO=gs.some(x=>x.over);
+   $('#tools').innerHTML=[!isStaff()&&['debt',`💰 ${L.tools.debt}${dT?` <b>${brl(dT)}</b>`:''}`,dO?'over':''],['scan','📷 '+L.tools.scan],['label','🏷️ '+L.tools.label],!isStaff()&&['xls','📊 '+L.tools.xls],!isStaff()&&['team','👥 '+L.tools.team]].filter(Boolean).map(([k,x,c])=>`<button type="button" class="tool ${c||''}" data-tool="${k}">${x}</button>`).join('')}
+  $('#trendBtn').textContent=L.trendBtn;
   renderHist();
   if(!loaded){$('#listTitle').textContent=L.all;$('#list').innerHTML=`<div class="empty">${L.loading}</div>`;return}
   if(q){const nq=norm(q);
@@ -634,8 +688,8 @@ function render(){
   if(!mine.length){$('#list').innerHTML=`<div class="empty">${L.emptyMonth(mLabel(month))}${!items.length?`<br><br><button class="btn soft sm" type="button" id="bizPick">${L.bizPick}</button>`:''}</div>`;return}
   const order={re:0,sale:1,retail:2,watch:3,early:4};
   const shown=mine.filter(i=>filter==='all'||i.j.cat===filter).sort((a,b)=>order[a.j.cat]-order[b.j.cat]||b.j.rate-a.j.rate);
-  const waN=(filter==='sale'||filter==='retail')?shown.filter(i=>i.j.stock>0).length:0;
-  $('#list').innerHTML=(waN?`<button type="button" class="btn wa full" data-waall="${filter}" style="margin-bottom:10px">💬 ${L.waAll(waN)}</button>`:'')+(shown.length?(view==='table'?table(shown):view==='grid'?grid(shown):shown.map(card).join('')):`<div class="empty">${L.emptyCat}</div>`);
+  const waN=(filter==='sale'||filter==='retail')?shown.filter(i=>i.j.stock>0).length:0, reN=filter==='re'?shown.length:0;
+  $('#list').innerHTML=(waN?`<button type="button" class="btn wa full" data-waall="${filter}" style="margin-bottom:10px">💬 ${L.waAll(waN)}</button>`:'')+(reN?`<button type="button" class="btn wa full" data-reorder="1" style="margin-bottom:10px">🧵 ${L.reOrder(reN)}</button>`:'')+(shown.length?(view==='table'?table(shown):view==='grid'?grid(shown):shown.map(card).join('')):`<div class="empty">${L.emptyCat}</div>`);
 }
 function renderHist(){const L=t();
   if(!moves.length){$('#hist').innerHTML=`<div class="hint">${L.hEmpty}</div>`;return}
@@ -648,7 +702,7 @@ function renderHist(){const L=t();
 
 function openSheet(html){$('#sheetRoot').innerHTML=`<div class="sheet-wrap" id="sw"><div class="sheet" role="dialog" aria-modal="true">${html}</div></div>`;
   $('#sw').addEventListener('click',e=>{if(e.target.id==='sw'||e.target.closest('[data-close]'))closeSheet()})}
-function closeSheet(){stopMic();$('#sheetRoot').innerHTML=''}
+function closeSheet(){stopMic();stopScan();$('#sheetRoot').innerHTML=''}
 function toast(x){const el=$('#toast');el.textContent=x;el.hidden=false;clearTimeout(toast.h);toast.h=setTimeout(()=>el.hidden=true,2600)}
 const head=title=>`<div class="row"><h2>${title}</h2><button class="btn soft" type="button" data-close>${t().close}</button></div>`;
 
@@ -667,8 +721,8 @@ async function removeItem(id){
   items=items.filter(x=>x.id!==id);render();
 }
 async function addMove(m){
-  if(db){const ref=db.collection('moves').doc();await ref.set(m);return}
-  moves.unshift({...m,id:'mv'+Date.now()});renderHist();
+  if(db){const ref=db.collection('moves').doc();await ref.set(m);return ref.id}
+  const id='mv'+Date.now();moves.unshift({...m,id});renderHist();return id
 }
 
 // ---------- product form ----------
@@ -758,8 +812,8 @@ function rematch(l){const ms=codeMatches(l.code);
   if(ms.length){if(!ms.some(m=>m.id===l.pick))l.pick=ms[0].id}else l.pick=l.code.trim()?'new':'';
   if(l.pick==='new')l.type='in'}
 
-function inputForm(preset){const L=t();
-  rc={photos:[],text:'',kind:'auto',source:null,note:'',lines:[newLine(preset)]};
+function inputForm(preset,more){const L=t();stopScan();
+  rc={photos:[],text:'',kind:'auto',source:null,note:'',lines:[newLine(preset),...(more||[]).map(x=>newLine(x))]};
   const imgOk=!ai||!!aiOpts.images;
   openSheet(`${head(L.inTitle)}
   <div class="field">${L.rcKind}<div class="seg" role="group" id="rc-kind">${[['auto',L.kAuto],['sale',L.kSale],['in',L.kIn]].map(([k,x])=>`<button type="button" data-k="${k}" aria-pressed="${rc.kind===k}">${x}</button>`).join('')}</div></div>
@@ -784,7 +838,9 @@ function inputForm(preset){const L=t();
   <div id="rv-note"></div>
   <div id="rv-lines" style="display:flex;flex-direction:column;gap:10px"></div>
   <button class="btn soft full" type="button" id="ln-add">${L.inAdd}</button>
+  ${debtBoxHtml()}
   <button class="btn full" type="button" id="rv-apply"></button>`);
+  wireDebtBox();
   const drawThumbs=()=>{$('#rc-thumbs').innerHTML=rc.photos.map((p,k)=>`<div class="thumb"><img src="${p.url}" alt=""><button type="button" data-rm="${k}" aria-label="x">×</button></div>`).join('')};
   $('#rc-thumbs').onclick=e=>{const b=e.target.closest('[data-rm]');if(!b)return;const k=+b.dataset.rm;URL.revokeObjectURL(rc.photos[k].url);rc.photos.splice(k,1);drawThumbs()};
   $('#rc-kind').onclick=e=>{const b=e.target.closest('[data-k]');if(!b)return;rc.kind=b.dataset.k;document.querySelectorAll('#rc-kind button').forEach(x=>x.setAttribute('aria-pressed',x===b))};
@@ -948,7 +1004,7 @@ function validate(){const L=t(),errs=[],eff={};
   rc.lines.forEach((l,k)=>{if(!errs[k]&&l.type==='sale'&&eff[l.pick]&&eff[l.pick].sold>eff[l.pick].made){const it=items.find(i=>i.id===l.pick);errs[k]=L.rvEOver(lbl(it),Math.max(0,(+it.made||0)-(+it.sold||0)))}});
   document.querySelectorAll('#rv-lines .rline').forEach(el=>{const k=+el.dataset.k,p=el.querySelector('[data-e]');p.textContent=errs[k]||'';p.hidden=!errs[k]});
   const n=rc.lines.filter(l=>!isBlank(l)).length;
-  $('#rv-apply').textContent=L.rvApply(n);$('#rv-apply').disabled=!n||errs.some(Boolean);}
+  $('#rv-apply').textContent=L.rvApply(n);$('#rv-apply').disabled=!n||errs.some(Boolean);debtSync();}
 function wireLines(){const box=$('#rv-lines');
   box.addEventListener('input',e=>{const el=e.target.closest('[data-f]');if(!el)return;const k=+el.closest('.rline').dataset.k,l=rc.lines[k];
     if(el.dataset.f==='code'){l.code=el.value;rematch(l);redrawLine(k);return}
@@ -968,7 +1024,10 @@ function wireLines(){const box=$('#rv-lines');
     const b=e.target.closest('[data-t]');if(!b)return;const k=+b.closest('.rline').dataset.k;rc.lines[k].type=b.dataset.t;redrawLine(k)});
   $('#rv-apply').onclick=()=>applyInput();
 }
-async function applyInput(){const L=t();$('#rv-apply').disabled=true;
+async function applyInput(){const L=t();
+  const hasSale=$('#rv-debt')&&!$('#rv-debt').hidden, cust=hasSale?$('#d-cust').value.trim():'', later=hasSale&&rc.debt&&rc.debt.mode==='later', dAmt=later?Math.round((+$('#d-amt').value||0)*100)/100:0;
+  if(later&&!cust){toast(L.dEName);$('#d-cust').focus();return} if(later&&!(dAmt>0)){toast(L.dEAmt);$('#d-amt').focus();return}
+  $('#rv-apply').disabled=true;
   const now=new Date().toISOString(), today=now.slice(0,10), patches={}, logLines=[];
   try{
     for(const l of rc.lines){const qn=+l.qty||0;if(isBlank(l))continue;
@@ -981,7 +1040,8 @@ async function applyInput(){const L=t();$('#rv-apply').disabled=true;
       logLines.push({id:it.id,sz:l.sz||{},code:it.ref||'',name:dn(it),type:l.type,qty:qn,ch:l.type==='sale'?(l.ch==='V'?'V':'A'):''});
     }
     for(const [id,p] of Object.entries(patches))await patchItem(id,{...p,updatedAt:now});
-    await addMove({at:now,source:rc.source||'manual',lines:logLines,undone:false});
+    const mvId=await addMove({at:now,source:rc.source||'manual',lines:logLines,undone:false,...(cust?{cust}:{})});
+    if(later){try{await saveDebt({cust,phone:$('#d-ph').value.trim(),amt:dAmt,paid:0,due:$('#d-due').value||'',at:now,src:'sale',moveId:mvId||'',lines:logLines.filter(l=>l.type==='sale').map(l=>`${l.code||l.name}×${l.qty}`).join(', ').slice(0,200)})}catch(_){toast(L.tSaveErr)}}
     const s=logLines.filter(l=>l.type==='sale').reduce((a,l)=>a+l.qty,0),i=logLines.filter(l=>l.type==='in').reduce((a,l)=>a+l.qty,0);
     rc.photos.forEach(p=>URL.revokeObjectURL(p.url));rc=null;closeSheet();toast(L.tApplied(s,i));
   }catch(e){toast(L.tSaveErr);$('#rv-apply').disabled=false}
@@ -994,6 +1054,7 @@ async function undoMove(m){const L=t();
       if(szSum(l.sz))p.sz=addSz(p.sz,l.sz,l.type==='in'?'m':'s',-1);
       if(l.type==='in')p.made=Math.max(0,p.made-l.qty);else{p.sold=Math.max(0,p.sold-l.qty);if(l.ch==='V')p.soldV=Math.max(0,p.soldV-l.qty)}}
     for(const [id,p] of Object.entries(patches)){if(p.sold>p.made)p.sold=p.made;if(p.soldV>p.sold)p.soldV=p.sold;await patchItem(id,{...p,updatedAt:new Date().toISOString()})}
+    for(const d of debts.filter(x=>x.moveId&&x.moveId===m.id&&!(+x.paid>0)))await delDebt(d.id);
     if(db)await db.collection('moves').doc(m.id).update({undone:true});else{m.undone=true}
     render();toast(L.tUndone)}catch(e){toast(L.tSaveErr)}
 }
@@ -1006,6 +1067,9 @@ document.addEventListener('click',e=>{const tr=e.target.closest('tr[data-edit]')
   if(b.dataset.qe){const it=items.find(i=>i.id===b.dataset.qe);if(it)quickEdit(it);return}
   if(b.dataset.sl){const it=items.find(i=>i.id===b.dataset.sl);if(it)slForm(it);return}
   if(b.dataset.wa){waShare([items.find(i=>i.id===b.dataset.wa)]);return}
+  if(b.dataset.tool){({debt:debtBook,scan:scanForm,label:labelForm,xls:exportXls,team:teamForm})[b.dataset.tool]();return}
+  if(b.dataset.dcust){custView(b.dataset.dcust);return}
+  if(b.dataset.reorder){shareText(reOrderText(items.filter(i=>i.month===month&&calc(i).cat==='re')));return}
   if(b.dataset.waall){const k=b.dataset.waall;waShare(items.filter(i=>i.month===month&&calc(i).cat===k).filter(i=>calc(i).stock>0));return}
   if(b.dataset.view){const it=items.find(i=>i.id===b.dataset.view);if(it)photoView(it.photo);return}
   if(b.dataset.vm){view=b.dataset.vm;try{localStorage.setItem('view2',view)}catch(e){}render();return}
@@ -1016,19 +1080,213 @@ document.addEventListener('click',e=>{const tr=e.target.closest('tr[data-edit]')
   if(b.dataset.edit)itemForm(items.find(i=>i.id===b.dataset.edit));
   if(b.dataset.undo){if(b.dataset.armed){const m=moves.find(x=>x.id===b.dataset.undo);if(m)undoMove(m)}else{b.dataset.armed='1';b.textContent=t().hUndoQ;b.classList.replace('soft','danger');setTimeout(()=>{if(b.isConnected){delete b.dataset.armed;b.textContent=t().hUndo;b.classList.replace('danger','soft')}},4000)}}
   if(b.id==='rcBtn')inputForm();
+  if(b.id==='trendBtn')trendShare();
   if(b.id==='rulesBtn'||b.id==='bizPick')rulesForm();
 });
 $('#month').addEventListener('change',e=>{month=e.target.value;filter='all';render()});
 let qt;$('#q').addEventListener('input',e=>{clearTimeout(qt);qt=setTimeout(()=>{q=e.target.value.trim();render()},150)});
 
+// ---------- more tools: size re-order, 외상(fiado) book, staff, Excel, QR labels, QR scan ----------
+let debts=[], role='owner', ownerName='', team=[], scan=null;
+const isStaff=()=>role==='staff';
+const LIB={xlsx:'lib/xlsx.full.min.js',qr:'lib/qrcode.js',jsqr:'lib/jsQR.js'};
+const libP={};
+function loadLib(k,test){if(test())return Promise.resolve();
+  return libP[k]||(libP[k]=new Promise((res,rej)=>{const s=document.createElement('script');s.src=LIB[k];s.onload=()=>test()?res():rej(new Error(k));s.onerror=()=>{delete libP[k];rej(new Error(k))};document.head.appendChild(s)}))}
+const todayStr=()=>{const d=new Date();return new Date(d.getTime()-d.getTimezoneOffset()*6e4).toISOString().slice(0,10)};
+const addDays=n=>{const d=new Date();d.setDate(d.getDate()+n);return new Date(d.getTime()-d.getTimezoneOffset()*6e4).toISOString().slice(0,10)};
+const fmtD=(d,lg)=>d?new Date(String(d).slice(0,10)+'T12:00:00').toLocaleDateString((lg||lang)==='ko'?'ko-KR':'pt-BR',{day:'2-digit',month:'2-digit'}):'';
+async function shareText(text){const L=t();
+  if(navigator.share){try{await navigator.share({text});return}catch(e){if(e&&e.name==='AbortError')return}}
+  try{await navigator.clipboard.writeText(text)}catch(_){}
+  if(!window.__preview){try{window.open('https://wa.me/?text='+encodeURIComponent(text),'_blank')}catch(_){}}
+  toast(L.waCopied)}
+
+// --- 1. how many to make again, per size ---
+const reQty=j=>{const need=Math.max(0,Math.round(j.perDay*30-j.stock));return Math.max(need,Math.round(j.made*0.5/6)*6)};
+function reSizes(j){if(j.cat!=='re'||!j.hasSz)return [];
+  const ss=j.szList.reduce((a,x)=>a+x.s,0);if(!ss)return [];
+  const target=reQty(j)+j.szList.reduce((a,x)=>a+x.st,0);
+  return j.szList.map(x=>({k:x.k,n:Math.max(0,Math.round(target*x.s/ss)-x.st)})).filter(x=>x.n>0)}
+function reSzHtml(j){const L=t(),r=reSizes(j);if(!r.length)return '';
+  return `<div class="resz"><span>${L.reSz}</span><div class="szrow">${r.map(x=>`<span class="sz plus">${esc(szLabel(x.k))} <b>+${x.n}</b></span>`).join('')}<span class="sz">${L.reTotal} <b>${r.reduce((a,x)=>a+x.n,0)}</b></span></div></div>`}
+function reOrderText(list){const L=t();
+  return `🧵 *${L.reOrderHead}* · ${new Date().toLocaleDateString(lang==='ko'?'ko-KR':'pt-BR')}\n\n`+list.map(i=>{const j=calc(i),r=reSizes(j),tot=r.length?r.reduce((a,x)=>a+x.n,0):reQty(j);
+    return `• *${i.ref||'—'}* ${dn(i)}\n   ${r.length?r.map(x=>`${szLabel(x.k)} ${x.n}`).join(' · ')+` = ${tot}${U()}`:`${tot}${U()}`}`}).join('\n')}
+
+// --- 2. 외상 / fiado ---
+const dLeft=d=>Math.max(0,Math.round(((+d.amt||0)-(+d.paid||0))*100)/100);
+async function saveDebt(data){if(db){const ref=db.collection('debts').doc();await ref.set(data);return ref.id}
+  const id='d'+Date.now()+Math.random().toString(36).slice(2,5);debts.push({...data,id});render();return id}
+async function patchDebt(id,p){if(db){await db.collection('debts').doc(id).update(p);return}const k=debts.findIndex(x=>x.id===id);if(k>=0)debts[k]={...debts[k],...p};render()}
+async function delDebt(id){if(db){await db.collection('debts').doc(id).delete();return}debts=debts.filter(x=>x.id!==id);render()}
+function custGroups(){const g={},td=todayStr();
+  for(const d of debts){const left=dLeft(d);if(left<=0)continue;const k=norm(d.cust)||'?';const x=g[k]||(g[k]={name:d.cust||'?',left:0,over:0,due:''});
+    x.left+=left;if(d.due&&d.due<td)x.over+=left;if(d.due&&(!x.due||d.due<x.due))x.due=d.due}
+  return Object.values(g).sort((a,b)=>b.over-a.over||String(a.due||'9').localeCompare(String(b.due||'9')))}
+const custNames=()=>[...new Map(debts.filter(d=>d.cust).map(d=>[norm(d.cust),d.cust])).values()];
+const custPhone=name=>{const k=norm(name);const d=debts.filter(x=>norm(x.cust)===k&&x.phone).sort((a,b)=>String(b.at).localeCompare(String(a.at)))[0];return d?d.phone:''};
+const custList=()=>`<datalist id="custs">${custNames().map(n=>`<option value="${esc(n)}">`).join('')}</datalist>`;
+function debtBook(){const L=t();if(isStaff())return;const gs=custGroups(),tot=gs.reduce((a,x)=>a+x.left,0),over=gs.reduce((a,x)=>a+x.over,0);
+  openSheet(`${head(L.dTitle)}
+  <div class="dsum"><div><span class="lbl">${L.dTotal}</span><b>${brl(tot)}</b></div><div class="${over?'over':''}"><span class="lbl">${L.dOver}</span><b>${brl(over)}</b></div></div>
+  <div class="dlist">${gs.length?gs.map(x=>`<button type="button" class="drow ${x.over?'over':''}" data-dcust="${esc(x.name)}"><span class="w"><b>${esc(x.name)}</b><span class="ref">${x.over?L.dOverdue+' · ':''}${x.due?L.dDueOn(fmtD(x.due)):''}</span></span><b class="amt">${brl(x.left)}</b></button>`).join(''):`<div class="empty">${L.dEmpty}</div>`}</div>
+  <button class="btn soft full" type="button" id="d-add">${L.dAdd}</button>`);
+  $('#d-add').onclick=()=>debtForm()}
+function debtForm(name){const L=t();
+  openSheet(`${head(L.dAdd.replace(/^\+\s*/,''))}${custList()}
+  <div class="field"><label for="df-cust">${L.dCust}</label><input id="df-cust" list="custs" autocomplete="off" placeholder="${L.dCustPh}" value="${esc(name||'')}"></div>
+  <div class="two"><div class="field"><label for="df-amt">${L.dAmt}</label><input id="df-amt" type="number" step="0.01" min="0" inputmode="decimal"></div>
+  <div class="field"><label for="df-due">${L.dDue}</label><input id="df-due" type="date" value="${addDays(30)}"></div></div>
+  <div class="field"><label for="df-ph">${L.dPhone}</label><input id="df-ph" type="tel" inputmode="tel" placeholder="11 99999-9999" value="${esc(name?custPhone(name):'')}"></div>
+  <div class="field"><label for="df-note">${L.dNote}</label><input id="df-note" maxlength="120"></div>
+  <p class="err" id="df-err" hidden></p><button class="btn full" type="button" id="df-save">${L.dSave}</button>`);
+  $('#df-cust').onchange=()=>{if(!$('#df-ph').value)$('#df-ph').value=custPhone($('#df-cust').value)};
+  $('#df-save').onclick=async()=>{const err=$('#df-err'),bad=m=>{err.textContent=m;err.hidden=false};
+    const cust=$('#df-cust').value.trim(),amt=Math.round((+$('#df-amt').value||0)*100)/100;if(!cust)return bad(L.dEName);if(!(amt>0))return bad(L.dEAmt);
+    $('#df-save').disabled=true;
+    try{await saveDebt({cust,phone:$('#df-ph').value.trim(),amt,paid:0,due:$('#df-due').value||'',at:new Date().toISOString(),src:'manual',note:$('#df-note').value.trim()});toast(L.dSaved);custView(cust)}
+    catch(e){toast(L.tSaveErr);$('#df-save').disabled=false}}}
+function remindText(name,left,due){
+  return `Olá ${name}, tudo bem? 😊\nPassando para lembrar do valor em aberto de *${brl(left)}*${due?` (vencimento ${fmtD(due,'pt')})`:''}.\nQualquer dúvida estou à disposição. Obrigada! 🙏`}
+function custView(name){const L=t(),k=norm(name);
+  const list=debts.filter(d=>norm(d.cust)===k).sort((a,b)=>String(b.at).localeCompare(String(a.at)));
+  const left=Math.round(list.reduce((a,d)=>a+dLeft(d),0)*100)/100, phone=custPhone(name), td=todayStr();
+  const nextDue=list.filter(d=>dLeft(d)>0&&d.due).map(d=>d.due).sort()[0]||'';
+  openSheet(`${head(esc(name))}
+  <div class="advice ${left?(nextDue&&nextDue<td?'c-retail':'c-sale'):'c-re'}">${L.dLeft} <b>${brl(left)}</b>${nextDue?' · '+L.dDueOn(fmtD(nextDue)):''}${nextDue&&nextDue<td?' · <b>'+L.dOverdue+'</b>':''}</div>
+  ${left?`<div class="field"><label for="d-recv">${L.dRecvAmt}</label><input id="d-recv" type="number" step="0.01" min="0" inputmode="decimal" value="${left.toFixed(2)}"></div>
+  <button class="btn full" type="button" id="d-recvb">${L.dRecv}</button>
+  <button class="btn wa full" type="button" id="d-wa">💬 ${L.dRemind}</button>`:''}
+  <h3 class="sh">${L.dHistory}</h3>
+  <div class="dlist">${list.map(d=>`<div class="hrow"><div class="w"><b>${brl(+d.amt||0)}${dLeft(d)>0?` · ${L.dLeft} ${brl(dLeft(d))}`:` · ${L.dDone}`}</b><span class="ref">${fmtD(d.at)} · ${esc(d.lines||d.note||(d.src==='manual'?L.dManual:L.dSaleOf))}${d.due&&dLeft(d)>0?' · '+L.dDueOn(fmtD(d.due)):''}</span></div><button class="btn soft sm" type="button" data-ddel="${d.id}">${L.dDel}</button></div>`).join('')}</div>
+  <button class="btn soft full" type="button" id="d-add2">${L.dAdd}</button>`);
+  $('#d-add2').onclick=()=>debtForm(name);
+  document.querySelector('.sheet .dlist').onclick=async e=>{const b=e.target.closest('[data-ddel]');if(!b)return;
+    if(!b.dataset.armed){b.dataset.armed='1';b.textContent=L.dDelQ;b.classList.replace('soft','danger');return}
+    try{await delDebt(b.dataset.ddel);custView(name)}catch(_){toast(L.tSaveErr)}};
+  if(!left)return;
+  $('#d-recvb').onclick=async()=>{let rest=Math.round((+$('#d-recv').value||0)*100)/100;if(!(rest>0))return;$('#d-recvb').disabled=true;const now=new Date().toISOString();
+    try{for(const d of list.slice().reverse()){const l=dLeft(d);if(l<=0||rest<=0)continue;const take=Math.min(l,rest);rest=Math.round((rest-take)*100)/100;
+        await patchDebt(d.id,{paid:Math.round(((+d.paid||0)+take)*100)/100,pays:[...(d.pays||[]),{at:now,amt:take}]})}
+      toast(L.dRecvOk);custView(name)}catch(_){toast(L.tSaveErr);$('#d-recvb').disabled=false}};
+  $('#d-wa').onclick=()=>{const txt=remindText(name,left,nextDue);let ph=String(phone).replace(/\D/g,'');if(ph&&ph.length<=11)ph='55'+ph;
+    if(ph&&!window.__preview){try{window.open(`https://wa.me/${ph}?text=${encodeURIComponent(txt)}`,'_blank');return}catch(_){}}shareText(txt)}}
+// the 외상 box inside the input sheet
+function debtBoxHtml(){const L=t();return `<div class="cap" id="rv-debt" hidden>${custList()}
+  <div class="caph">${L.dPay}</div>
+  <div class="seg two-way" role="group" id="d-mode"><button type="button" data-dm="now" aria-pressed="true">${L.dNow}</button><button type="button" data-dm="later" aria-pressed="false">${L.dLater}</button></div>
+  <div class="field"><label for="d-cust">${L.dCust}</label><input id="d-cust" list="custs" autocomplete="off" placeholder="${L.dCustPh}"></div>
+  <div id="d-later" hidden style="display:flex;flex-direction:column;gap:10px">
+   <div class="two"><div class="field"><label for="d-amt">${L.dAmt}</label><input id="d-amt" type="number" step="0.01" min="0" inputmode="decimal"></div>
+   <div class="field"><label for="d-due">${L.dDue}</label><input id="d-due" type="date" value="${addDays(30)}"></div></div>
+   <div class="field"><label for="d-ph">${L.dPhone}</label><input id="d-ph" type="tel" inputmode="tel" placeholder="11 99999-9999"></div></div></div>`}
+function wireDebtBox(){rc.debt={mode:'now',touched:false};
+  $('#d-mode').onclick=e=>{const b=e.target.closest('[data-dm]');if(!b)return;rc.debt.mode=b.dataset.dm;document.querySelectorAll('#d-mode button').forEach(x=>x.setAttribute('aria-pressed',x===b));$('#d-later').hidden=rc.debt.mode!=='later';debtSync()};
+  $('#d-amt').oninput=()=>{rc.debt.touched=true};
+  $('#d-cust').onchange=()=>{if(!$('#d-ph').value)$('#d-ph').value=custPhone($('#d-cust').value)}}
+function saleTotal(){let s=0;for(const l of rc.lines){if(l.type!=='sale'||!(+l.qty>0))continue;const it=items.find(i=>i.id===l.pick);if(!it)continue;const j=calc(it);s+=(+l.qty)*(l.ch==='V'?(j.priceV||j.price):j.price)}return Math.round(s*100)/100}
+function debtSync(){if(!rc||!rc.debt||!$('#rv-debt'))return;const any=rc.lines.some(l=>l.type==='sale'&&+l.qty>0&&l.pick&&l.pick!=='new');
+  $('#rv-debt').hidden=!any;if(!rc.debt.touched){const s=saleTotal();$('#d-amt').value=s?s.toFixed(2):''}}
+
+// --- 3. staff ---
+function teamForm(){const L=t();if(isStaff())return;
+  if(!(window.App&&App.team)){openSheet(`${head(L.tmTitle)}<p class="hint">${L.tmHint}</p><div class="advice c-sale">${L.tmPreview}</div>`);return}
+  openSheet(`${head(L.tmTitle)}<p class="hint">${L.tmHint}</p><div id="tm-list" class="dlist"></div>
+  <div class="field"><label for="tm-email">${L.tmEmail}</label><input id="tm-email" type="email" autocapitalize="off" autocomplete="off" placeholder="nome@gmail.com"></div>
+  <p class="err" id="tm-err" hidden></p><button class="btn full" type="button" id="tm-add">${L.tmAdd}</button>`);
+  drawTeam();
+  $('#tm-add').onclick=async()=>{const err=$('#tm-err');err.hidden=true;const em=$('#tm-email').value.trim().toLowerCase();
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)){err.textContent=L.tmBad;err.hidden=false;return}
+    $('#tm-add').disabled=true;try{await App.team.add(em);$('#tm-email').value='';if(!team.includes(em))team.push(em);drawTeam();toast(L.tmAdded)}catch(e){err.textContent=L.tmErr;err.hidden=false}$('#tm-add').disabled=false};
+  $('#tm-list').onclick=async e=>{const s=e.target.closest('[data-tmsend]');if(s)return shareText(teamMsg(s.dataset.tmsend));
+    const r=e.target.closest('[data-tmrm]');if(!r)return;if(!r.dataset.armed){r.dataset.armed='1';r.textContent=L.dDelQ;r.classList.replace('soft','danger');return}
+    try{await App.team.remove(r.dataset.tmrm);team=team.filter(x=>x!==r.dataset.tmrm);drawTeam()}catch(_){toast(L.tmErr)}}}
+function drawTeam(){const L=t(),el=$('#tm-list');if(!el)return;
+  el.innerHTML=team.length?team.map(em=>`<div class="hrow"><div class="w"><b>${esc(em)}</b></div><button class="btn wa sm" type="button" data-tmsend="${esc(em)}">💬 ${L.tmSend}</button><button class="btn soft sm" type="button" data-tmrm="${esc(em)}">${L.tmRemove}</button></div>`).join(''):`<p class="hint">${L.tmNone}</p>`}
+function teamMsg(email){const url=location.href.split('#')[0].split('?')[0];
+  return `Olá! 👋\nPara lançar vendas e entradas no nosso controle de estoque:\n1. Abra ${url}\n2. Toque em "Entrar com Google" e use este Gmail: ${email}\nPronto! Obrigada 🙏`}
+
+// --- 4. Excel ---
+async function exportXls(){const L=t();if(isStaff())return;toast(L.xBusy);
+  try{await loadLib('xlsx',()=>window.XLSX);const X=window.XLSX,H=L.xH,r2=n=>Math.round(n*100)/100;
+    const mine=items.filter(i=>i.month===month).map(i=>({i,j:calc(i)}));
+    const P=mine.map(({i,j})=>[i.ref||'',dn(i),j.made,j.sold,j.soldV,j.stock,Math.round(j.rate),L.cats[j.cat][0],j.cost||'',j.price||'',j.priceV||'',r2(j.sales),j.profit===null?'':r2(j.profit)]);
+    const S=[];mine.forEach(({i,j})=>j.szList.filter(x=>x.m||x.s).forEach(x=>S.push([i.ref||'',szLabel(x.k),x.m,x.s,x.st])));
+    const D=debts.slice().sort((a,b)=>String(a.at).localeCompare(String(b.at))).map(d=>[d.cust||'',d.phone||'',String(d.at||'').slice(0,10),+d.amt||0,+d.paid||0,dLeft(d),d.due||'',d.lines||d.note||'']);
+    const wb=X.utils.book_new(),add=(rows,h,n)=>{const ws=X.utils.aoa_to_sheet([h,...rows]);ws['!cols']=h.map((_,k)=>({wch:k===1?24:12}));X.utils.book_append_sheet(wb,ws,n)};
+    add(P,H.p,L.xS[0]);if(S.length)add(S,H.s,L.xS[1]);if(D.length)add(D,H.d,L.xS[2]);
+    X.writeFile(wb,`estoque-${month}.xlsx`);toast(L.xDone)}catch(e){toast(L.xErr)}}
+
+// --- 5. QR labels and QR scan ---
+function labelForm(){const L=t();const list=items.filter(i=>i.month===month&&String(i.ref||'').trim()).sort((a,b)=>String(a.ref).localeCompare(String(b.ref),undefined,{numeric:true}));
+  if(!list.length){openSheet(`${head(L.lbTitle)}<div class="empty">${L.lbEmpty}</div>`);return}
+  openSheet(`${head(L.lbTitle)}<p class="hint">${L.lbHint}</p>
+  <div class="row" style="justify-content:flex-start;gap:6px"><button class="btn soft sm" type="button" data-lball="1">${L.lbAll1}</button><button class="btn soft sm" type="button" data-lball="0">${L.lbAll0}</button></div>
+  <div class="dlist">${list.map(i=>`<label class="hrow"><span class="w"><b><span class="code">${esc(i.ref)}</span> ${esc(dn(i))}</b></span><input class="lbn" type="number" min="0" max="500" inputmode="numeric" data-lbn="${i.id}" value="1"></label>`).join('')}</div>
+  <p class="err" id="lb-err" hidden></p><button class="btn full" type="button" id="lb-print">🖨️ ${L.lbPrint}</button>`);
+  document.querySelectorAll('[data-lball]').forEach(b=>b.onclick=()=>document.querySelectorAll('[data-lbn]').forEach(x=>x.value=b.dataset.lball));
+  $('#lb-print').onclick=async()=>{const err=$('#lb-err');err.hidden=true;
+    const want=[...document.querySelectorAll('[data-lbn]')].map(x=>[items.find(i=>i.id===x.dataset.lbn),Math.min(500,Math.max(0,Math.floor(+x.value||0)))]).filter(([i,n])=>i&&n);
+    if(!want.length){err.textContent=L.lbNone;err.hidden=false;return}
+    try{await loadLib('qr',()=>window.qrcode)}catch(_){err.textContent=L.lbErr;err.hidden=false;return}
+    const qr=s=>{const q=window.qrcode(0,'M');q.addData(String(s));q.make();return q.createDataURL(6,0)};
+    let html='';for(const [i,n] of want){const img=qr(String(i.ref).trim()),nm=i.namePt||((KINDS_LIST().find(x=>x[0]===i.kind)||[])[2])||'';
+      const one=`<div class="plabel"><img src="${img}" alt=""><b>${esc(String(i.ref).trim())}</b>${nm?`<span>${esc(nm)}</span>`:''}</div>`;html+=one.repeat(n)}
+    let pa=$('#printArea');if(!pa){pa=document.createElement('div');pa.id='printArea';document.body.appendChild(pa)}pa.innerHTML=html;
+    setTimeout(()=>{try{window.print()}catch(_){}},150)}}
+function stopScan(){if(scan){scan.on=false;try{scan.stream&&scan.stream.getTracks().forEach(x=>x.stop())}catch(e){}scan=null}}
+async function scanForm(){const L=t();stopScan();
+  openSheet(`${head(L.scTitle)}<p class="hint">${L.scHint}</p><div class="scanbox"><video id="sc-v" playsinline muted autoplay></video><span class="scanframe"></span></div>
+  <p class="err" id="sc-err" hidden></p><div id="sc-list" class="dlist"></div>
+  <div class="two"><button class="btn full" type="button" id="sc-sale">${L.scSale}</button><button class="btn soft full" type="button" id="sc-in">${L.scIn}</button></div>`);
+  const tally={},order=[];
+  const draw=()=>{const el=$('#sc-list');if(!el)return;el.innerHTML=order.length?order.map(c=>{const it=codeMatches(c)[0];return `<div class="hrow"><div class="w"><b><span class="code">${esc(c)}</span> × ${tally[c]}</b><span class="ref">${it?esc(dn(it)):L.scUnknown}</span></div><button class="btn soft sm" type="button" data-scm="${esc(c)}">−1</button></div>`}).join(''):`<p class="hint">${L.scEmpty}</p>`};
+  const bump=c=>{if(!tally[c]){tally[c]=0;order.unshift(c)}tally[c]++;draw();try{navigator.vibrate&&navigator.vibrate(60)}catch(_){}toast(L.scGot(c))};
+  draw();window.__scanAdd=bump;
+  $('#sc-list').onclick=e=>{const b=e.target.closest('[data-scm]');if(!b)return;const c=b.dataset.scm;tally[c]--;if(tally[c]<=0){delete tally[c];order.splice(order.indexOf(c),1)}draw()};
+  const go=type=>{if(!order.length)return toast(L.scEmpty);
+    const lines=order.slice().reverse().map(c=>{const it=codeMatches(c)[0];return {code:c,pick:it?it.id:'new',type:it?type:'in',qty:tally[c]}});
+    stopScan();inputForm(lines[0],lines.slice(1))};
+  $('#sc-sale').onclick=()=>go('sale');$('#sc-in').onclick=()=>go('in');
+  const fail=()=>{const e=$('#sc-err');if(e){e.textContent=L.scNoCam;e.hidden=false}};
+  let stream;try{stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:false})}catch(e){return fail()}
+  const v=$('#sc-v');if(!v){stream.getTracks().forEach(x=>x.stop());return}
+  const me={on:true,stream};scan=me;v.srcObject=stream;try{await v.play()}catch(_){}
+  let det=null;if('BarcodeDetector' in window){try{const f=await BarcodeDetector.getSupportedFormats();if(f.includes('qr_code'))det=new BarcodeDetector({formats:['qr_code']})}catch(_){}}
+  if(!det){try{await loadLib('jsqr',()=>window.jsQR)}catch(_){return fail()}}
+  const cv=document.createElement('canvas'),cx=cv.getContext('2d',{willReadFrequently:true});let last='',seen=0;
+  const tick=async()=>{if(scan!==me||!me.on)return;let code='';
+    try{if(v.readyState>=2&&v.videoWidth){if(det){const r=await det.detect(v);if(r[0])code=r[0].rawValue}
+      else{const w=Math.min(640,v.videoWidth),h=Math.round(v.videoHeight*w/v.videoWidth);cv.width=w;cv.height=h;cx.drawImage(v,0,0,w,h);const r=window.jsQR(cx.getImageData(0,0,w,h).data,w,h,{inversionAttempts:'dontInvert'});if(r)code=r.data}}}catch(_){}
+    code=String(code||'').trim().slice(0,40);
+    // count a label once while it stays in view; move away and back to count it again
+    if(code){if(code!==last||Date.now()-seen>900)bump(code);last=code;seen=Date.now()}
+    setTimeout(tick,150)};
+  tick()}
+
+// --- send the sales ranking to the Trend Radar app (share sheet; data after #JAEGO#) ---
+async function trendShare(){const L=t();
+  const all=items.map(i=>({i,j:calc(i)})).filter(o=>o.j.made>0&&o.j.days>=7);
+  if(!all.length)return toast(L.trendNone);
+  const row=o=>({code:o.i.ref||'',name:o.i.name||o.i.namePt||o.i.ref||'',namePt:o.i.namePt||'',kind:o.i.kind||'',rate:Math.round(o.j.rate),perDay:Math.round(o.j.perDay*10)/10,sold:o.j.sold,made:o.j.made,days:o.j.days});
+  const best=all.slice().sort((a,b)=>b.j.perDay-a.j.perDay).slice(0,15).map(row);
+  const worst=all.filter(o=>o.j.days>=21&&o.j.rate<50).sort((a,b)=>a.j.rate-b.j.rate).slice(0,15).map(row);
+  const data={v:1,at:Date.now(),best,worst};
+  const text='📊 판매 순위 / Ranking de vendas\n👍 '+best.slice(0,5).map(x=>`${x.name} ${x.rate}%`).join(', ')+(worst.length?'\n👎 '+worst.slice(0,5).map(x=>`${x.name} ${x.rate}%`).join(', '):'')+'\n\n#JAEGO#'+JSON.stringify(data);
+  if(navigator.share){try{await navigator.share({text});return}catch(e){if(e&&e.name==='AbortError')return}}
+  try{await navigator.clipboard.writeText(text);toast(L.trendCopied)}catch(e){toast(L.trendNone)}}
+
 // ---------- hooks used by the storage / AI layer ----------
 window.App={
-  attach(d){this.detach();db=d;items=[];moves=[];loaded=false;let first=true;
+  attach(d,opt){this.detach();db=d;items=[];moves=[];debts=[];team=[];role=(opt&&opt.role)||'owner';ownerName=(opt&&opt.ownerName)||'';loaded=false;let first=true;
     unsub.push(db.collection('styles').onSnapshot(snap=>{items=snap.docs.map(x=>({id:x.id,...x.data()}));loaded=true;if(dbState==='wait'||dbState==='err')dbState='ok';
       if(first){first=false;if(items.length&&!items.some(i=>i.month===month))month=monthsList().find(m=>items.some(i=>i.month===m))||month}
       render()},()=>{dbState='err';loaded=true;render()}));
     unsub.push(db.doc('config/rules').onSnapshot(s=>{if(s.exists){rules={...DEF,...s.data()};render()}},()=>{}));
     unsub.push(db.collection('moves').orderBy('at','desc').limit(8).onSnapshot(snap=>{moves=snap.docs.map(x=>({id:x.id,...x.data()}));renderHist()},()=>{}));
+    unsub.push(db.collection('debts').onSnapshot(snap=>{debts=snap.docs.map(x=>({id:x.id,...x.data()}));render();if(document.querySelector('.sheet .dsum'))debtBook()},()=>{}));
+    if(role==='owner')unsub.push(db.collection('team').onSnapshot(snap=>{team=snap.docs.map(x=>x.data().email||x.id);drawTeam()},()=>{}));
     render()},
   detach(){unsub.forEach(f=>{try{f()}catch(e){}});unsub=[];db=null},
   setAi(fn,opts){ai=fn;aiOpts=opts||{images:null}},
@@ -1056,7 +1314,7 @@ render();
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
-import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, collection, doc, setDoc, updateDoc, deleteDoc, onSnapshot, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
+import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, collection, doc, getDoc, setDoc, updateDoc, deleteDoc, onSnapshot, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
 import { getAI, getGenerativeModel, GoogleAIBackend } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-ai.js";
 import { initializeAppCheck, ReCaptchaEnterpriseProvider } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app-check.js";
 
@@ -1077,7 +1335,7 @@ const lg = () => LG[document.documentElement.lang === 'ko' ? 'ko' : 'pt'];
 App.onRender = () => { const L = lg();
   $('#lgTitle').textContent = L.title; $('#lgSub').textContent = L.sub; $('#loginTxt').textContent = L.btn;
   $('#logoutBtn').textContent = L.out; $('#whoName').textContent = user ? (user.email || '') : (localMode ? L.local : '');
-  $('#setupBtn').textContent = L.setup; $('#trendBtn').textContent = L.trendBtn; $('#logoutBtn').hidden = !user;
+  $('#setupBtn').textContent = L.setup; $('#logoutBtn').hidden = !user;
   $('#suCfgL').textContent = L.suCfgL; $('#suKeyL').textContent = L.suKeyL; $('#suSave').textContent = L.suSave; $('#suLocal').textContent = L.suLocal; $('#suLocalHint').textContent = L.suLocalHint;
   if (!$('#setup').hidden) $('#lgSub').textContent = L.suSub; };
 App.render();
@@ -1086,20 +1344,6 @@ const valid = c => c && c.apiKey && !String(c.apiKey).startsWith('PASTE') && c.p
 let cfg = window.FIREBASE_CONFIG || {};
 if (!valid(cfg)) { try { cfg = JSON.parse(ls.get('fbcfg') || '{}'); } catch (e) { cfg = {}; } }
 const loginBox = $('#login'), err = $('#lgErr');
-/* 📤 트렌드 레이더로 판매 순위 보내기 (공유 창 → 트렌드 레이더) */
-$('#trendBtn').onclick = async () => {
-  const all = items.map(i => ({ i, j: calc(i) })).filter(o => o.j.made > 0 && o.j.days >= 7);
-  if (!all.length) return toast(L.trendNone);
-  const row = o => ({ code: o.i.ref || '', name: o.i.name || o.i.namePt || o.i.ref || '', namePt: o.i.namePt || '', kind: o.i.kind || '',
-    rate: Math.round(o.j.rate), perDay: Math.round(o.j.perDay * 10) / 10, sold: o.j.sold, made: o.j.made, days: o.j.days });
-  const best = all.slice().sort((a, b) => b.j.perDay - a.j.perDay).slice(0, 15).map(row);
-  const worst = all.filter(o => o.j.days >= 21 && o.j.rate < 50).sort((a, b) => a.j.rate - b.j.rate).slice(0, 15).map(row);
-  const data = { v: 1, at: Date.now(), best, worst };
-  const text = '📊 판매 순위 / Ranking de vendas\n👍 ' + best.slice(0, 5).map(x => `${x.name} ${x.rate}%`).join(', ') +
-    (worst.length ? '\n👎 ' + worst.slice(0, 5).map(x => `${x.name} ${x.rate}%`).join(', ') : '') + '\n\n#JAEGO#' + JSON.stringify(data);
-  if (navigator.share) { try { await navigator.share({ text }); return; } catch (e) { if (e && e.name === 'AbortError') return; } }
-  try { await navigator.clipboard.writeText(text); toast(L.trendCopied); } catch (e) { toast(L.trendNone); }
-};
 $('#setupBtn').onclick = () => { ls.del('fbcfg'); ls.del('localMode'); location.reload(); };
 function parseCfg(text) {
   const o = {}; const re = /["']?(\w+)["']?\s*:\s*["']([^"']+)["']/g; let m;
@@ -1175,10 +1419,24 @@ if (!valid(cfg) && ls.get('localMode') === '1') {
     } };
   getRedirectResult(auth).catch(() => {});
   $('#logoutBtn').onclick = () => signOut(auth);
-  onAuthStateChanged(auth, u => {
+  // --- staff: an owner lists a Gmail; that person then works on the owner's data ---
+  const em = u => String(u.email || '').toLowerCase();
+  App.team = {
+    add: async e => { await setDoc(doc(fs, `staffOf/${e}`), { owner: user.uid, ownerName: user.displayName || user.email || '', at: new Date().toISOString() });
+      await setDoc(doc(fs, `users/${user.uid}/team/${e}`), { email: e, at: new Date().toISOString() }); },
+    remove: async e => { await deleteDoc(doc(fs, `users/${user.uid}/team/${e}`)); await deleteDoc(doc(fs, `staffOf/${e}`)).catch(() => {}); }
+  };
+  onAuthStateChanged(auth, async u => {
     user = u;
     if (!u) { App.detach(); loginBox.hidden = false; App.setState('wait'); return; }
-    loginBox.hidden = true; App.attach(makeDb(u.uid)); App.setState(navigator.onLine ? 'wait' : 'off');
+    loginBox.hidden = true;
+    let mode = null; const key = 'staffMode-' + u.uid;
+    try { const s = await getDoc(doc(fs, `staffOf/${em(u)}`));
+      if (s.exists() && s.data().owner && s.data().owner !== u.uid) mode = { role: 'staff', owner: s.data().owner, ownerName: s.data().ownerName || '' };
+      if (mode) ls.set(key, JSON.stringify(mode)); else ls.del(key);
+    } catch (e) { try { mode = JSON.parse(ls.get(key) || 'null'); } catch (_) {} }
+    if (user !== u) return;
+    App.attach(makeDb(mode ? mode.owner : u.uid), mode || { role: 'owner' }); App.setState(navigator.onLine ? 'wait' : 'off');
   });
   addEventListener('offline', () => user && App.setState('off'));
   addEventListener('online', () => user && App.setState('ok'));
