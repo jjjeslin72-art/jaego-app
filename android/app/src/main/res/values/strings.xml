@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">재고 정리판</string>
+    <string name="launch_url">https://jjjeslin72-art.github.io/jaego-app/</string>
+    <string name="asset_statements" translatable="false">[{ \"relation\": [\"delegate_permission/common.handle_all_urls\"], \"target\": { \"namespace\": \"web\", \"site\": \"https://jjjeslin72-art.github.io\" } }]</string>
+</resources>

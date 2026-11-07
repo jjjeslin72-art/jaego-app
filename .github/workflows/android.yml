@@ -1,0 +1,29 @@
+name: Android app
+on:
+  push:
+    paths: ['android/**', '.github/workflows/android.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '17' }
+      - uses: gradle/actions/setup-gradle@v4
+        with: { gradle-version: '8.14' }
+      - name: Build unsigned APK and AAB
+        env: { VERSION_CODE: '${{ github.run_number }}' }
+        run: gradle -p android --no-daemon assembleRelease bundleRelease
+      - name: Collect files (signing happens outside GitHub)
+        run: |
+          mkdir out
+          cp android/app/build/outputs/apk/release/*.apk out/app-unsigned.apk
+          cp android/app/build/outputs/bundle/release/*.aab out/app-unsigned.aab
+          BT=$(ls -d $ANDROID_HOME/build-tools/* | sort -V | tail -1)
+          cp $BT/lib/apksigner.jar out/ && cp $BT/zipalign out/ && ldd $BT/zipalign > out/zipalign-ldd.txt || true
+          echo "${{ github.run_number }}" > out/version.txt
+      - uses: actions/upload-artifact@v4
+        with: { name: android-unsigned, path: out/ }

@@ -1,0 +1,8 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.juya.controleestoque",
+    "sha256_cert_fingerprints": ["34:B0:6D:FD:85:B0:49:6F:E2:90:6C:B2:29:CF:B9:FF:F6:5B:75:EE:4E:6D:28:C3:4E:4C:47:63:47:2D:22:41"]
+  }
+}]
