@@ -249,6 +249,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
   <div class="list" id="list"></div>
   <details class="histd"><summary id="histTitle"></summary><div class="hist" id="hist"></div></details>
   <div class="status" id="status"></div>
+  <button class="btn soft full" type="button" id="trendBtn" style="margin:14px 0 6px"></button>
   <div class="who"><span id="whoName"></span><span><button class="linkbtn" type="button" id="setupBtn"></button> · <button class="linkbtn" type="button" id="logoutBtn"></button></span></div>
 </div>
 <div class="fabs">
@@ -292,7 +293,7 @@ const lbl=i=>i?[i.ref,dn(i)].filter(Boolean).join(' · '):'';
 const hasHangul=s=>/[\uac00-\ud7a3]/.test(String(s||''));
 
 const T={
-ko:{h1:'재고 정리판',sub:'상품의 입고·판매·재고·수익을 한눈에',monthL:(y,m)=>`${y}년 ${m}월 입고`,
+ko:{trendBtn:'📤 트렌드 레이더로 판매 순위 보내기',trendNone:'보낼 판매 기록이 아직 없어요',trendCopied:'복사했어요. 트렌드 레이더 앱의 공유로 붙여 넣어 주세요',h1:'재고 정리판',sub:'상품의 입고·판매·재고·수익을 한눈에',monthL:(y,m)=>`${y}년 ${m}월 입고`,
  sales:'이번 달 매출',salesNote:'도매 판매 × 도매가 + 소매 판매 × 소매가',profit:'판매 이익',profitNote:'판매한 상품에서 남은 돈 (판매 금액 − 원가)',
  prodCost:'생산비 총액',cash:'현금 수익',cashNote:'매출 − 생산비 (안 팔린 재고까지 뺀 금액)',stockVal:'남은 재고 가치',margin:'이익률',
  noCost:'원가가 없는 상품은 수익 계산에서 빠져요.',
@@ -345,7 +346,7 @@ ko:{h1:'재고 정리판',sub:'상품의 입고·판매·재고·수익을 한�
  tApplied:(a,b)=>`판매 ${a}${U()} · 입고 ${b}${U()} 반영했어요`,
  hTitle:'최근 입력 기록',hEmpty:'입력하기로 넣은 내용이 여기에 기록돼요. 잘못 넣었으면 되돌릴 수 있어요.',
  hSum:(s,i)=>[s?`판매 ${s}${U()}`:'',i?`입고 ${i}${U()}`:''].filter(Boolean).join(' · '),hSrc:{photo:'사진',voice:'말',text:'글',manual:'직접'},hUndo:'되돌리기',hUndoQ:'정말 되돌릴까요?',hUndone:'되돌림',tUndone:'되돌렸어요'},
-pt:{h1:'Controle de Estoque',sub:'Entrada, vendas, estoque e lucro dos produtos',monthL:(y,m)=>`Entrada ${String(m).padStart(2,'0')}/${y}`,
+pt:{trendBtn:'📤 Enviar ranking de vendas ao Trend Radar',trendNone:'Ainda não há vendas para enviar',trendCopied:'Copiado. Cole no app Trend Radar',h1:'Controle de Estoque',sub:'Entrada, vendas, estoque e lucro dos produtos',monthL:(y,m)=>`Entrada ${String(m).padStart(2,'0')}/${y}`,
  sales:'Faturamento do mês',salesNote:'vendas atacado × preço atacado + vendas varejo × preço varejo',profit:'Lucro das vendas',profitNote:'o que sobrou dos produtos vendidos (vendas − custo)',
  prodCost:'Custo total de produção',cash:'Resultado em caixa',cashNote:'faturamento − custo de produção (inclui o estoque parado)',stockVal:'Valor do estoque',margin:'Margem',
  noCost:'Produtos sem custo ficam fora do cálculo de lucro.',
@@ -1076,7 +1077,7 @@ const lg = () => LG[document.documentElement.lang === 'ko' ? 'ko' : 'pt'];
 App.onRender = () => { const L = lg();
   $('#lgTitle').textContent = L.title; $('#lgSub').textContent = L.sub; $('#loginTxt').textContent = L.btn;
   $('#logoutBtn').textContent = L.out; $('#whoName').textContent = user ? (user.email || '') : (localMode ? L.local : '');
-  $('#setupBtn').textContent = L.setup; $('#logoutBtn').hidden = !user;
+  $('#setupBtn').textContent = L.setup; $('#trendBtn').textContent = L.trendBtn; $('#logoutBtn').hidden = !user;
   $('#suCfgL').textContent = L.suCfgL; $('#suKeyL').textContent = L.suKeyL; $('#suSave').textContent = L.suSave; $('#suLocal').textContent = L.suLocal; $('#suLocalHint').textContent = L.suLocalHint;
   if (!$('#setup').hidden) $('#lgSub').textContent = L.suSub; };
 App.render();
@@ -1085,6 +1086,20 @@ const valid = c => c && c.apiKey && !String(c.apiKey).startsWith('PASTE') && c.p
 let cfg = window.FIREBASE_CONFIG || {};
 if (!valid(cfg)) { try { cfg = JSON.parse(ls.get('fbcfg') || '{}'); } catch (e) { cfg = {}; } }
 const loginBox = $('#login'), err = $('#lgErr');
+/* 📤 트렌드 레이더로 판매 순위 보내기 (공유 창 → 트렌드 레이더) */
+$('#trendBtn').onclick = async () => {
+  const all = items.map(i => ({ i, j: calc(i) })).filter(o => o.j.made > 0 && o.j.days >= 7);
+  if (!all.length) return toast(L.trendNone);
+  const row = o => ({ code: o.i.ref || '', name: o.i.name || o.i.namePt || o.i.ref || '', namePt: o.i.namePt || '', kind: o.i.kind || '',
+    rate: Math.round(o.j.rate), perDay: Math.round(o.j.perDay * 10) / 10, sold: o.j.sold, made: o.j.made, days: o.j.days });
+  const best = all.slice().sort((a, b) => b.j.perDay - a.j.perDay).slice(0, 15).map(row);
+  const worst = all.filter(o => o.j.days >= 21 && o.j.rate < 50).sort((a, b) => a.j.rate - b.j.rate).slice(0, 15).map(row);
+  const data = { v: 1, at: Date.now(), best, worst };
+  const text = '📊 판매 순위 / Ranking de vendas\n👍 ' + best.slice(0, 5).map(x => `${x.name} ${x.rate}%`).join(', ') +
+    (worst.length ? '\n👎 ' + worst.slice(0, 5).map(x => `${x.name} ${x.rate}%`).join(', ') : '') + '\n\n#JAEGO#' + JSON.stringify(data);
+  if (navigator.share) { try { await navigator.share({ text }); return; } catch (e) { if (e && e.name === 'AbortError') return; } }
+  try { await navigator.clipboard.writeText(text); toast(L.trendCopied); } catch (e) { toast(L.trendNone); }
+};
 $('#setupBtn').onclick = () => { ls.del('fbcfg'); ls.del('localMode'); location.reload(); };
 function parseCfg(text) {
   const o = {}; const re = /["']?(\w+)["']?\s*:\s*["']([^"']+)["']/g; let m;
