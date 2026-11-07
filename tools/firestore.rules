@@ -1,9 +1,28 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // 각 사람은 자기 데이터만 읽고 쓸 수 있어요 / Cada pessoa só acessa os próprios dados
+    function signedIn() { return request.auth != null; }
+    function isOwner(uid) { return signedIn() && request.auth.uid == uid; }
+    function myEmail() { return request.auth.token.email.lower(); }
+    function isStaff(uid) {
+      return signedIn() && request.auth.token.email != null && request.auth.token.email_verified == true
+        && exists(/databases/$(database)/documents/users/$(uid)/team/$(myEmail()));
+    }
+    // 사장님: 전부 / Dono: tudo
     match /users/{uid}/{document=**} {
-      allow read, write: if request.auth != null && request.auth.uid == uid;
+      allow read, write: if isOwner(uid);
+    }
+    // 직원: 상품·입력 기록·외상, 설정은 읽기만 / Funcionário: produtos, lançamentos e fiado; configurações só leitura
+    match /users/{uid}/styles/{id} { allow read, write: if isStaff(uid); }
+    match /users/{uid}/moves/{id} { allow read, write: if isStaff(uid); }
+    match /users/{uid}/debts/{id} { allow read, write: if isStaff(uid); }
+    match /users/{uid}/config/{id} { allow read: if isStaff(uid); }
+    match /users/{uid}/team/{email} { allow read: if signedIn() && request.auth.token.email != null && myEmail() == email; }
+    // 직원 찾기표 / Quem é funcionário de quem
+    match /staffOf/{email} {
+      allow read: if signedIn() && request.auth.token.email != null && myEmail() == email;
+      allow create: if signedIn() && request.resource.data.owner == request.auth.uid;
+      allow update, delete: if signedIn() && resource.data.owner == request.auth.uid;
     }
   }
 }

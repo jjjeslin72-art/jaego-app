@@ -24,6 +24,10 @@ style = style.replace('</style>', '''.login{position:fixed;inset:0;z-index:40;ba
 body = body.replace("Claude 사용을 허락해야 읽을 수 있어요. 다시 누르면 다시 물어봐요.", "읽기 기능을 쓸 수 없어요. 인터넷 연결을 확인해 주세요.")
 body = body.replace("É preciso permitir o Claude para ler. Toque de novo para ver o pedido.", "A leitura não está disponível. Verifique a internet.")
 body = re.sub(r"rcInPreview:'[^']*',", '', body)
+# the published app keeps its own copy of the helper libraries (works offline, no outside CDN)
+_lib = "const LIB={xlsx:'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js',qr:'https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js',jsqr:'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js'};"
+assert _lib in body, 'LIB line changed'
+body = body.replace(_lib, "const LIB={xlsx:'lib/xlsx.full.min.js',qr:'lib/qrcode.js',jsqr:'lib/jsQR.js'};")
 body = body.replace('<!--PWA-USER-->', '<div class="who"><span id="whoName"></span><span><button class="linkbtn" type="button" id="setupBtn"></button> · <button class="linkbtn" type="button" id="logoutBtn"></button></span></div>')
 
 login = '''<div class="login" id="login" hidden><div class="box">
@@ -47,7 +51,7 @@ module = '''<script src="firebase-config.js"></script>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/__V__/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/__V__/firebase-auth.js";
-import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, collection, doc, setDoc, updateDoc, deleteDoc, onSnapshot, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/__V__/firebase-firestore.js";
+import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, collection, doc, getDoc, setDoc, updateDoc, deleteDoc, onSnapshot, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/__V__/firebase-firestore.js";
 import { getAI, getGenerativeModel, GoogleAIBackend } from "https://www.gstatic.com/firebasejs/__V__/firebase-ai.js";
 import { initializeAppCheck, ReCaptchaEnterpriseProvider } from "https://www.gstatic.com/firebasejs/__V__/firebase-app-check.js";
 
@@ -152,10 +156,24 @@ if (!valid(cfg) && ls.get('localMode') === '1') {
     } };
   getRedirectResult(auth).catch(() => {});
   $('#logoutBtn').onclick = () => signOut(auth);
-  onAuthStateChanged(auth, u => {
+  // --- staff: an owner lists a Gmail; that person then works on the owner's data ---
+  const em = u => String(u.email || '').toLowerCase();
+  App.team = {
+    add: async e => { await setDoc(doc(fs, `staffOf/${e}`), { owner: user.uid, ownerName: user.displayName || user.email || '', at: new Date().toISOString() });
+      await setDoc(doc(fs, `users/${user.uid}/team/${e}`), { email: e, at: new Date().toISOString() }); },
+    remove: async e => { await deleteDoc(doc(fs, `users/${user.uid}/team/${e}`)); await deleteDoc(doc(fs, `staffOf/${e}`)).catch(() => {}); }
+  };
+  onAuthStateChanged(auth, async u => {
     user = u;
     if (!u) { App.detach(); loginBox.hidden = false; App.setState('wait'); return; }
-    loginBox.hidden = true; App.attach(makeDb(u.uid)); App.setState(navigator.onLine ? 'wait' : 'off');
+    loginBox.hidden = true;
+    let mode = null; const key = 'staffMode-' + u.uid;
+    try { const s = await getDoc(doc(fs, `staffOf/${em(u)}`));
+      if (s.exists() && s.data().owner && s.data().owner !== u.uid) mode = { role: 'staff', owner: s.data().owner, ownerName: s.data().ownerName || '' };
+      if (mode) ls.set(key, JSON.stringify(mode)); else ls.del(key);
+    } catch (e) { try { mode = JSON.parse(ls.get(key) || 'null'); } catch (_) {} }
+    if (user !== u) return;
+    App.attach(makeDb(mode ? mode.owner : u.uid), mode || { role: 'owner' }); App.setState(navigator.onLine ? 'wait' : 'off');
   });
   addEventListener('offline', () => user && App.setState('off'));
   addEventListener('online', () => user && App.setState('ok'));
