@@ -429,6 +429,7 @@ for(const lg of ['ko','pt']){const base=T[lg].cats;Object.defineProperty(T[lg],'
 let lang='ko'; try{lang=localStorage.getItem('lang')||'ko'}catch(e){}
 const t=()=>T[lang];
 Object.assign(T.ko,{
+ rvDate:'날짜 (지난 영수증이면 날짜를 바꾸세요)',
  lnNewSale:'처음 보는 코드예요. 새 상품으로 등록하면서 판매도 같이 잡아요.',lnLeft:'지금 남은 재고 (모르면 비워두세요)',rvAutoIn:n=>`재고가 모자라서 ${n}${U()}만큼은 입고로 같이 잡아요.`,
  trendBtn:'📤 트렌드 레이더로 판매 순위 보내기',trendNone:'보낼 판매 기록이 아직 없어요',trendCopied:'복사했어요. 트렌드 레이더 앱의 공유로 붙여 넣어 주세요',
  tools:{debt:'외상 장부',scan:'QR 스캔',label:'QR 라벨',xls:'엑셀',team:'직원'},
@@ -443,6 +444,7 @@ Object.assign(T.ko,{
  scTitle:'QR 스캔',scHint:'라벨의 QR을 카메라에 비추세요. 한 번 찍을 때마다 1장씩 올라가요. 같은 상품을 또 찍을 땐 카메라를 잠깐 뗐다가 다시 비추세요.',scNoCam:'카메라를 열지 못했어요. 카메라 사용을 허락해 주세요.',scSale:'판매로 넣기',scIn:'입고로 넣기',scEmpty:'아직 찍은 게 없어요',scGot:c=>`${c} 찍었어요`,scUnknown:'등록 안 된 코드 (입고로 들어가요)'
 });
 Object.assign(T.pt,{
+ rvDate:'Data (se a nota for antiga, mude a data)',
  lnNewSale:'Código novo. Cadastra o produto e já lança a venda.',lnLeft:'Estoque que sobrou agora (opcional)',rvAutoIn:n=>`Faltou estoque: ${n} ${U()} entram como entrada junto.`,
  trendBtn:'📤 Enviar ranking de vendas ao Trend Radar',trendNone:'Ainda não há vendas para enviar',trendCopied:'Copiado. Cole no app Trend Radar',
  tools:{debt:'Fiado',scan:'Ler QR',label:'Etiquetas QR',xls:'Excel',team:'Equipe'},
@@ -488,7 +490,7 @@ function advice(j){const L=t();
   if(j.cat==='retail')return L.adRetail(j.stock);
   return L.adEarly(j.days,rules.minDays);
 }
-function monthsList(){const s=new Set(items.map(i=>i.month).filter(Boolean));s.add(month);s.add(new Date().toISOString().slice(0,7));return [...s].sort().reverse()}
+function monthsList(){const s=new Set(items.map(i=>i.month).filter(Boolean));s.add(month);const d=new Date();d.setDate(1);for(let k=0;k<13;k++){s.add(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`);d.setMonth(d.getMonth()-1)}return [...s].sort().reverse()}
 function mLabel(m){const [y,mm]=m.split('-');return t().monthL(y,+mm)}
 const byRecent=(a,b)=>String(b.madeDate||'').localeCompare(String(a.madeDate||''));
 
@@ -842,6 +844,7 @@ function inputForm(preset,more){const L=t();stopScan();
   <div id="rv-lines" style="display:flex;flex-direction:column;gap:10px"></div>
   <button class="btn soft full" type="button" id="ln-add">${L.inAdd}</button>
   ${debtBoxHtml()}
+  <div class="field"><label for="rv-date">${L.rvDate}</label><input id="rv-date" type="date" value="${todayStr()}" max="${todayStr()}"></div>
   <button class="btn full" type="button" id="rv-apply"></button>`);
   wireDebtBox();
   const drawThumbs=()=>{$('#rc-thumbs').innerHTML=rc.photos.map((p,k)=>`<div class="thumb"><img src="${p.url}" alt=""><button type="button" data-rm="${k}" aria-label="x">×</button></div>`).join('')};
@@ -1032,7 +1035,7 @@ async function applyInput(){const L=t();
   const hasSale=$('#rv-debt')&&!$('#rv-debt').hidden, cust=hasSale?$('#d-cust').value.trim():'', later=hasSale&&rc.debt&&rc.debt.mode==='later', dAmt=later?Math.round((+$('#d-amt').value||0)*100)/100:0;
   if(later&&!cust){toast(L.dEName);$('#d-cust').focus();return} if(later&&!(dAmt>0)){toast(L.dEAmt);$('#d-amt').focus();return}
   $('#rv-apply').disabled=true;
-  const now=new Date().toISOString(), today=now.slice(0,10), patches={}, logLines=[];
+  const now=new Date().toISOString(), today=(($('#rv-date')&&$('#rv-date').value)||todayStr()).slice(0,10), patches={}, logLines=[];
   try{
     for(const l of rc.lines){const qn=+l.qty||0;if(isBlank(l))continue;
       if(l.pick==='new'){const sale=l.type==='sale',left=sale?(+l.left||0):0,hs=szSum(l.sz);
@@ -1050,10 +1053,10 @@ async function applyInput(){const L=t();
       if(p.sold>p.made){const it=items.find(i=>i.id===id),short=p.sold-p.made;p.made=p.sold;logLines.push({id,code:(it&&it.ref)||'',name:it?dn(it):'',type:'in',qty:short,auto:true,sz:{}})}
       for(const k of Object.keys(p.sz||{})){const z=p.sz[k];if(z&&(+z.s||0)>(+z.m||0))z.m=+z.s}
       await patchItem(id,{...p,updatedAt:now})}
-    const mvId=await addMove({at:now,source:rc.source||'manual',lines:logLines,undone:false,...(cust?{cust}:{})});
+    const mvId=await addMove({at:now,date:today,source:rc.source||'manual',lines:logLines,undone:false,...(cust?{cust}:{})});
     if(later){try{await saveDebt({cust,phone:$('#d-ph').value.trim(),amt:dAmt,paid:0,due:$('#d-due').value||'',at:now,src:'sale',moveId:mvId||'',lines:logLines.filter(l=>l.type==='sale').map(l=>`${l.code||l.name}×${l.qty}`).join(', ').slice(0,200)})}catch(_){toast(L.tSaveErr)}}
     const s=logLines.filter(l=>l.type==='sale').reduce((a,l)=>a+l.qty,0),i=logLines.filter(l=>l.type==='in').reduce((a,l)=>a+l.qty,0);
-    rc.photos.forEach(p=>URL.revokeObjectURL(p.url));rc=null;closeSheet();toast(L.tApplied(s,i));
+    rc.photos.forEach(p=>URL.revokeObjectURL(p.url));rc=null;closeSheet();if(logLines.some(x=>x.created)&&today.slice(0,7)!==month){month=today.slice(0,7);filter='all';render()}toast(L.tApplied(s,i));
   }catch(e){toast(L.tSaveErr);$('#rv-apply').disabled=false}
 }
 async function undoMove(m){const L=t();
