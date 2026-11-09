@@ -12,5 +12,5 @@ window.FIREBASE_CONFIG = {
   appCheckSiteKey: "PASTE_RECAPTCHA_SITE_KEY",
 
   // 영수증을 읽는 AI 모델
-  aiModel: "gemini-3.5-flash"
+  aiModel: "gemini-3.8-flash"
 };

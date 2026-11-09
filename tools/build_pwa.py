@@ -134,12 +134,20 @@ if (!valid(cfg) && ls.get('localMode') === '1') {
   // --- AI: Gemini through Firebase AI Logic ---
   try {
     const ai = getAI(app, { backend: new GoogleAIBackend() });
-    const model = getGenerativeModel(ai, { model: cfg.aiModel || 'gemini-3.5-flash', generationConfig: { responseMimeType: 'application/json', temperature: 0.1 } });
+    // each model has its own free daily quota: if one is used up (or busy), try the next
+    const names = [...new Set([cfg.aiModel || 'gemini-3.8-flash', 'gemini-3.8-flash', 'gemini-3.5-flash', 'gemini-3.5-flash-lite', 'gemini-3.1-flash-lite', 'gemini-2.5-flash-lite'])];
+    const models = names.map(n => getGenerativeModel(ai, { model: n, generationConfig: { responseMimeType: 'application/json', temperature: 0.1 } }));
+    const soft = e => /429|quota|exhausted|rate|503|unavailable|overloaded|404|not found|500|internal|deadline/i.test(String((e && (e.message || e.code)) || ''));
     const b64 = b => new Promise((res, rej) => { const fr = new FileReader(); fr.onload = () => res(String(fr.result).split(',')[1]); fr.onerror = rej; fr.readAsDataURL(b); });
     App.setAi(async (prompt, imgs) => {
       const parts = [{ text: prompt }];
       for (const b of imgs || []) parts.push({ inlineData: { data: await b64(b), mimeType: b.type || 'image/jpeg' } });
-      const r = await model.generateContent(parts);
+      let r, last;
+      for (const m of models) {
+        try { r = await m.generateContent(parts); break; }
+        catch (e) { last = e; if (!soft(e)) throw e; }
+      }
+      if (!r) { const q = new Error(String((last && last.message) || 'quota')); q.code = /429|quota|exhausted/i.test(q.message) ? 'quota' : 'busy'; throw q; }
       const txt = r.response.text().trim().replace(/^```(?:json)?\\s*/i, '').replace(/```$/, '');
       return JSON.parse(txt);
     }, { images: { maxCount: 4 } });

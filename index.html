@@ -429,6 +429,7 @@ for(const lg of ['ko','pt']){const base=T[lg].cats;Object.defineProperty(T[lg],'
 let lang='ko'; try{lang=localStorage.getItem('lang')||'ko'}catch(e){}
 const t=()=>T[lang];
 Object.assign(T.ko,{
+ rcQuota:'오늘 쓸 수 있는 무료 AI 읽기를 다 썼어요. 내일 다시 되거나, Firebase를 Blaze(사용한 만큼 내는 요금)로 바꾸면 계속 쓸 수 있어요. 지금은 말이나 글로 "2611 20 판매"처럼 넣어주세요.',rcBusy:'AI가 지금 바빠서 못 읽었어요. 잠시 뒤 다시 눌러 주세요.',
  rvDate:'날짜 (지난 영수증이면 날짜를 바꾸세요)',
  lnNewSale:'처음 보는 코드예요. 새 상품으로 등록하면서 판매도 같이 잡아요.',lnLeft:'지금 남은 재고 (모르면 비워두세요)',rvAutoIn:n=>`재고가 모자라서 ${n}${U()}만큼은 입고로 같이 잡아요.`,
  trendBtn:'📤 트렌드 레이더로 판매 순위 보내기',trendNone:'보낼 판매 기록이 아직 없어요',trendCopied:'복사했어요. 트렌드 레이더 앱의 공유로 붙여 넣어 주세요',
@@ -444,6 +445,7 @@ Object.assign(T.ko,{
  scTitle:'QR 스캔',scHint:'라벨의 QR을 카메라에 비추세요. 한 번 찍을 때마다 1장씩 올라가요. 같은 상품을 또 찍을 땐 카메라를 잠깐 뗐다가 다시 비추세요.',scNoCam:'카메라를 열지 못했어요. 카메라 사용을 허락해 주세요.',scSale:'판매로 넣기',scIn:'입고로 넣기',scEmpty:'아직 찍은 게 없어요',scGot:c=>`${c} 찍었어요`,scUnknown:'등록 안 된 코드 (입고로 들어가요)'
 });
 Object.assign(T.pt,{
+ rcQuota:'Acabou a leitura grátis por IA de hoje. Volta amanhã, ou mude o Firebase para o plano Blaze (paga só o que usar). Agora, fale ou escreva, ex.: "2611 20 venda".',rcBusy:'A IA está ocupada agora. Tente de novo em instantes.',
  rvDate:'Data (se a nota for antiga, mude a data)',
  lnNewSale:'Código novo. Cadastra o produto e já lança a venda.',lnLeft:'Estoque que sobrou agora (opcional)',rvAutoIn:n=>`Faltou estoque: ${n} ${U()} entram como entrada junto.`,
  trendBtn:'📤 Enviar ranking de vendas ao Trend Radar',trendNone:'Ainda não há vendas para enviar',trendCopied:'Copiado. Cole no app Trend Radar',
@@ -964,7 +966,8 @@ async function readReceipt(){const L=t(), err=$('#rc-err');err.hidden=true;stopM
     drawLines();
   }catch(e){const c=e&&e.code;err.className='err';
     const msg=String((e&&(e.message||e.code))||'');
-    err.textContent=c==='not_granted'?L.rcDenied:c==='rate_limited'?L.rcLimit:/not.?enabled|has not been used|permission|app.?check|api.?key|403|forbidden|billing|disabled/i.test(msg)?L.rcAiOff:L.rcFail;err.hidden=false;try{console.warn('AI read failed',e)}catch(_){}}
+    const quota=c==='quota'||/429|quota|exhausted/i.test(msg);
+    err.textContent=c==='not_granted'?L.rcDenied:c==='rate_limited'?L.rcLimit:quota?L.rcQuota:c==='busy'?L.rcBusy:(/not.?enabled|has not been used|permission|app.?check|api.?key|401|403|forbidden|billing|disabled/i.test(msg)?L.rcAiOff:L.rcFail)+(msg?` (${msg.replace(/https?:\/\/\S+/g,'').slice(0,100).trim()})`:'');err.hidden=false;try{console.warn('AI read failed',e)}catch(_){}}
   $('#rc-busy').hidden=true;$('#rc-go').disabled=false;
 }
 function lineMatchHtml(l,k){const L=t();
@@ -1410,12 +1413,20 @@ if (!valid(cfg) && ls.get('localMode') === '1') {
   // --- AI: Gemini through Firebase AI Logic ---
   try {
     const ai = getAI(app, { backend: new GoogleAIBackend() });
-    const model = getGenerativeModel(ai, { model: cfg.aiModel || 'gemini-3.5-flash', generationConfig: { responseMimeType: 'application/json', temperature: 0.1 } });
+    // each model has its own free daily quota: if one is used up (or busy), try the next
+    const names = [...new Set([cfg.aiModel || 'gemini-3.8-flash', 'gemini-3.8-flash', 'gemini-3.5-flash', 'gemini-3.5-flash-lite', 'gemini-3.1-flash-lite', 'gemini-2.5-flash-lite'])];
+    const models = names.map(n => getGenerativeModel(ai, { model: n, generationConfig: { responseMimeType: 'application/json', temperature: 0.1 } }));
+    const soft = e => /429|quota|exhausted|rate|503|unavailable|overloaded|404|not found|500|internal|deadline/i.test(String((e && (e.message || e.code)) || ''));
     const b64 = b => new Promise((res, rej) => { const fr = new FileReader(); fr.onload = () => res(String(fr.result).split(',')[1]); fr.onerror = rej; fr.readAsDataURL(b); });
     App.setAi(async (prompt, imgs) => {
       const parts = [{ text: prompt }];
       for (const b of imgs || []) parts.push({ inlineData: { data: await b64(b), mimeType: b.type || 'image/jpeg' } });
-      const r = await model.generateContent(parts);
+      let r, last;
+      for (const m of models) {
+        try { r = await m.generateContent(parts); break; }
+        catch (e) { last = e; if (!soft(e)) throw e; }
+      }
+      if (!r) { const q = new Error(String((last && last.message) || 'quota')); q.code = /429|quota|exhausted/i.test(q.message) ? 'quota' : 'busy'; throw q; }
       const txt = r.response.text().trim().replace(/^```(?:json)?\s*/i, '').replace(/```$/, '');
       return JSON.parse(txt);
     }, { images: { maxCount: 4 } });
