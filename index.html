@@ -39,7 +39,8 @@ h2{font-family:var(--display);font-weight:400;font-size:21px;margin:0}
 .top p{margin:2px 0 0;color:var(--muted);font-size:13px}
 .ctrl{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .lang{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--surface)}
-.lang button{border:0;background:none;color:var(--muted);padding:6px 12px;font-size:13px;font-weight:600}
+.lang{flex-wrap:wrap}
+.lang button{border:0;background:none;color:var(--muted);padding:6px 10px;font-size:13px;font-weight:600}
 .lang button[aria-pressed="true"]{background:var(--accent);color:var(--surface)}
 select,input,textarea{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:9px 10px;width:100%;box-sizing:border-box}
 textarea{min-height:84px;resize:vertical}
@@ -260,7 +261,7 @@ body.staff #moneyd,body.staff .money2,body.staff .costinfo,body.staff #rulesBtn,
   <div class="top">
     <div><h1 id="h1"></h1><p id="sub"></p></div>
     <div class="ctrl">
-      <div class="lang" role="group" aria-label="언어 / Idioma"><button type="button" data-lang="ko">한국어</button><button type="button" data-lang="pt">Português</button></div>
+      <div class="lang" role="group" aria-label="언어 / Idioma / Language / 语言"><button type="button" data-lang="ko">한국어</button><button type="button" data-lang="pt">Português</button><button type="button" data-lang="en">English</button><button type="button" data-lang="zh">中文</button></div>
       <select class="month" id="month" aria-label="month"></select>
     </div>
   </div>
@@ -304,15 +305,15 @@ const BIZ={
 };
 const bt=()=>(typeof rules!=='undefined'&&BIZ[rules.bizType])?rules.bizType:'clothes';
 const B=()=>BIZ[bt()];
-const U=()=>lang==='pt'?((typeof rules!=='undefined'&&rules.unitPt)||B().unit[1]):((typeof rules!=='undefined'&&rules.unit)||B().unit[0]);
+const U=()=>lang==='en'?'pcs':lang==='zh'?(bt()==='clothes'?'件':'个'):lang==='pt'?((typeof rules!=='undefined'&&rules.unitPt)||B().unit[1]):((typeof rules!=='undefined'&&rules.unit)||B().unit[0]);
 const KINDS_LIST=()=>{const c=(typeof rules!=='undefined'&&Array.isArray(rules.kinds))?rules.kinds.filter(Boolean):[];return c.length?c.map(x=>[x,x,x]):B().kinds};
-const kindLabel=k=>{if(!k)return '';const r=KINDS_LIST().find(x=>x[0]===k)||Object.values(BIZ).flatMap(b=>b.kinds).find(x=>x[0]===k);return r?(lang==='pt'?r[2]:r[1]):String(k)};
+const kindLabel=k=>{if(!k)return '';const r=KINDS_LIST().find(x=>x[0]===k)||Object.values(BIZ).flatMap(b=>b.kinds).find(x=>x[0]===k);return r?kindName(r):String(k)};
 const KIND_WORDS=[[/블라우스|blusa|camisa|셔츠/,'blusa'],[/반바지|\bshorts?\b/,'short'],[/바지|calça|calca|팬츠|jeans/,'calca'],[/원피스|vestido/,'vestido'],[/치마|스커트|saia/,'saia'],[/크롭|cropped|\btop\b/,'cropped'],[/세트|conjunto/,'conjunto'],[/재킷|자켓|jaqueta|blazer/,'jaqueta'],[/점프수트|macac[aã]o/,'macacao']];
 const findKind=s=>{s=String(s||'').toLowerCase();if(!s)return '';
   for(const [k,ko,pt] of KINDS_LIST()){if(k==='outro')continue;for(const w of [ko,pt].join('·').toLowerCase().split(/[·\s,]+/))if(w.length>=2&&s.includes(w))return k}
   if(bt()==='clothes')for(const [re,k] of KIND_WORDS)if(re.test(s))return k;return ''};
 const kindChips=(sel,attr)=>`<div class="kinds" role="group">${KINDS_LIST().map(([k])=>`<button type="button" ${attr}="${esc(k)}" aria-pressed="${sel===k}">${esc(kindLabel(k))}</button>`).join('')}</div>`;
-const dn=i=>{if(!i)return '';const n=lang==='pt'?(i.namePt||i.name||''):(i.name||i.namePt||'');const kl=kindLabel(i.kind);return n?(kl&&!n.includes(kl)?kl+' · '+n:n):kl};
+const dn=i=>{if(!i)return '';const n=lang==='ko'?(i.name||i.namePt||''):(i.namePt||i.name||'');const kl=kindLabel(i.kind);return n?(kl&&!n.includes(kl)?kl+' · '+n:n):kl};
 const lbl=i=>i?[i.ref,dn(i)].filter(Boolean).join(' · '):'';
 const hasHangul=s=>/[\uac00-\ud7a3]/.test(String(s||''));
 
@@ -425,6 +426,7 @@ pt:{h1:'Controle de Estoque',sub:'Entrada, vendas, estoque e lucro dos produtos'
  hSum:(s,i)=>[s?`${s} ${U()} vendidas`:'',i?`${i} ${U()} de entrada`:''].filter(Boolean).join(' · '),hSrc:{photo:'Foto',voice:'Voz',text:'Texto',manual:'Manual'},hUndo:'Desfazer',hUndoQ:'Desfazer mesmo?',hUndone:'Desfeito',tUndone:'Desfeito'}
 };
 for(const lg of ['ko','pt']){const base=T[lg].cats;Object.defineProperty(T[lg],'cats',{get(){return {...base,re:B().re[lg==='ko'?0:1].slice(0,2)}}})}
+// 영어·중국어는 아래(T.en/T.zh)에서 업종별 '다시 주문' 이름을 정함
 let lang='ko'; try{lang=localStorage.getItem('lang')||'ko'}catch(e){}
 const t=()=>T[lang];
 Object.assign(T.ko,{
@@ -454,6 +456,148 @@ Object.assign(T.pt,{
  scTitle:'Ler QR',scHint:'Aponte a câmera para o QR da etiqueta. Cada leitura soma 1 peça. Para ler o mesmo produto de novo, afaste a câmera e aponte outra vez.',scNoCam:'Não foi possível abrir a câmera. Permita o uso da câmera.',scSale:'Lançar como venda',scIn:'Lançar como entrada',scEmpty:'Nada lido ainda',scGot:c=>`${c} lido`,scUnknown:'Código não cadastrado (entra como entrada)'
 });
 
+T.en=Object.setPrototypeOf({h1:'Stock Board',sub:'Stock in, sales, inventory and profit at a glance',monthL:(y,m)=>`Stock in ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][m-1]} ${y}`,
+ sales:'Sales this month',salesNote:'wholesale sold × wholesale price + retail sold × retail price',profit:'Profit on sales',profitNote:'what is left from sold items (sales − cost)',
+ prodCost:'Total production cost',cash:'Cash result',cashNote:'sales − production cost (includes unsold stock)',stockVal:'Stock value',margin:'Margin',
+ noCost:'Products without cost are left out of the profit.',
+ cats:{re:['Remake','produce again'],watch:['Watch','keep selling'],sale:['Clearance','sell off wholesale'],retail:['Retail','sell the rest retail'],early:['Too early','just arrived']},
+ styles:'Products',made:'In',sold:'Sold',stock:'Stock',get pcs(){return U()},rate:'Sold',all:'All products',catList:t=>`Products: ${t}`,showAll:'Show all',
+ qPh:'Search by code or name',searchRes:n=>`${n} product(s) found`,noFound:'No product found. Type the code in Enter to add it.',
+ rulesBtn:'Settings',add:'+ Add product',rcBtn:'Receipt · Photo · Voice',noCode:'No code',day:d=>`${d} days since stock in`,noDate:'no date',
+ costL:'Cost',priceL:'Wholesale',priceVL:'Retail',retailN:n=>`${n} retail`,get unitProfit(){return `Profit/${U()}`},itemSales:'Sales',itemProfit:'Profit',
+ adRe:(pd,q)=>`<b>Remake</b> · Sells about ${pd} ${U()} a day. Make about <b>${q} ${U()}</b> more.`,
+ adWatch:r=>`<b>Keep selling</b> · ${r}% sold. Show it in the window or post it on social media.`,
+ adSale:(s,p,o)=>`<b>Send to clearance</b> · ${s} ${U()} in stock.`+(p?` From ${p[0]} to <b>${p[1]}</b> (${o}% off).`:''),
+ belowCost:c=>` <span class="warn-t">The discounted price is below cost (${c}).</span>`,
+ adRetail:s=>`<b>Retail</b> · ${s} ${U()} left, too few for wholesale. Sell in the shop, Instagram or TikTok Shop.`,
+ adEarly:(d,m)=>`<b>Wait</b> · ${d} days since stock in. We classify after ${m} days.`,
+ adWait:'<b>Waiting for stock</b> · Nothing has come in yet. Take a photo of the delivery note to add it.',
+ sellBtn:'Enter sales',edit:'Edit',close:'Close',save:'Save',
+ emptyMonth:m=>`No products in ${m}.<br>Tap <b>Enter</b> and type a code to add one.`,emptyCat:'No products in this group.',loading:'Loading…',
+ fAdd:'Add product',fEdit:'Edit product',fCode:'Code',fCodePh:'e.g. 2611',fName:'Korean name (optional)',fNamePh:'예: 린넨 롱 원피스',fNamePt:'Name (optional)',fNamePtPh:'e.g. Long linen dress',fNameHint:'Products are identified by code. The name is optional.',get fCost(){return `Cost (R$ per ${U()})`},get fPrice(){return `Wholesale price (R$ per ${U()})`},get fPriceV(){return `Retail price (R$ per ${U()})`},fSoldV:'Of this, sold retail',fKind:'What kind of product?',eSoldV:'Retail is more than total sold.',eKind:'New code. Choose the product type.',chL:'Sale type',chA:'Wholesale',chV:'Retail',viewTable:'See all as a table',viewCards:'See as cards',thCode:'Code',thName:'Product',thCat:'Status',tblHint:'Tap a row to edit. Swipe sideways to see more.',total:'Total',
+ fMade:'Qty in (production)',fSold:'Qty sold',fDate:'Stock-in date',fDateHint:'The product goes into the month of its stock-in date. You can leave the quantity at 0 and add it later from a receipt.',
+ eCode:'Enter the code.',eName:'Enter the product name.',eSold:'Sold is more than stock in. Check the numbers.',
+ eDup:(n)=>`This code is already used in the same month: "${n}".`,dupOpen:'Open that product',
+ del:'Delete this product',delQ:'Delete for real? This cannot be undone.',cancel:'Cancel',delete:'Delete',
+ sNow:(s,k)=>`Sold so far: ${s} ${U()} · Stock: ${k} ${U()}`,sAdd:"Add today's sales",sAddPh:'e.g. 12',sTot:'Or fix the total sold',sSave:'Save sales',sErr:m=>`You can't sell more than came in (${m} ${U()}).`,
+ rTitle:'Settings',rExpl:['% sold = sold ÷ stock in','<b>Remake</b> · % sold above the limit','<b>Watch</b> · % sold in the middle','<b>Clearance</b> · slow sales and a lot of stock','<b>Retail</b> · slow sales and little stock'],
+ bizPick:'First time? Choose your business',bizH:'Business and product types',bizL:'What do you sell?',unitL:'Unit (Korean)',unitPtL:'Unit (Portuguese)',kindsL:'Product types (comma-separated; empty = default)',kindsHint:'e.g. bags, shoes, caps. When adding a new product you pick one of these.',rulesH:'Rules',rRe:'Remake from (%)',rLow:'Slow sales below (%)',get rRetail(){return `Retail up to (${U()})`},rDays:'Classify after (days)',rOff:'Clearance discount (%)',rSave:'Save rules',rReset:'Back to default',rErr:'Slow sales must be lower than the remake limit',
+ tSaved:'Saved',tDeleted:'Deleted',tSold:s=>`Sales saved: ${s} ${U()}`,tRules:'Rules saved',tReset:'Rules back to default',tSaveErr:'Could not save. Check the internet.',tDelErr:'Could not delete.',
+ stOk:'Saved automatically · same on phone and computer',stOff:'Works offline. Syncs when the connection is back.',stNo:'No connection to storage. What you type is lost when you close the page.',stErr:'Could not load the data. Open the page again.',
+ inTitle:'Enter',inBtn:'Enter',cardIn:'Enter sale / stock in',inCapture:'Enter everything by photo or voice',inRead:'Read with AI and put below',inLines:'Lines to enter',inAdd:'+ Add a line by code',
+ inEmpty:'Type a code or read a photo/voice. A new code becomes a new product.',inReadDone:n=>`${n} line(s) read. Check below and enter.`,
+ lnCode:'Code',lnNewTag:'New product',lnNew:'New code. Choose the type to add it; the quantity counts as stock in.',lnNoCode:'Enter the code.',lnNoCodeName:n=>`"${n}" · enter the code.`,lnMonth:'Which month is the product from?',lnRemove:'Remove',eNewName:'Enter the new product name.',
+ rcTitle:'Enter by receipt, photo or voice',rcKind:'What are you entering?',kAuto:'Detect',kSale:'Sale · out',kIn:'Stock in',
+ rcCam:'Take photo',phAddShort:'+ Photo',szTitle:'Quantity by size',szUn:'No size',szUnHint:n=>`${n} ${U()} in stock without a size.`,bySize:'Enter by size',sizesL:'Sizes (comma-separated)',sizesHint:'e.g. S, M, L, XL, U or 36, 38, 40, 42. U = one size. To not use sizes, write "none".',none:'none',vm:{grid:'Grid',cards:'Cards',table:'Table'},moreMoney:'Details ▾',qeTitle:'Edit prices and quantities',qeHint:'Tap the numbers to edit prices and quantities',qeQty:'Quantities',qePrice:'Prices',qeStock:'Current stock (real count)',qeStockHint:'When stock in or sales change, stock follows. If the real count is different, type the real number here.',slBtn:'Post on StockLink',slAgain:'Post on StockLink again',slTitle:'Post on the StockLink clearance board',slLoginHint:'Log in with your StockLink e-mail and password. After the first time, just post.',slEmail:'E-mail',slPw:'Password',slLogin:'Log in to StockLink',
+ slNoComp:'This account has no company. Add the company (CNPJ) in the StockLink app first.',slComp:'Post as which company?',slCompOne:n=>`It will be posted as <b>${n}</b>.`,slPhoto:'The product photo goes with it.',slNoPhoto:'Product without a photo. Add one in Edit to send it.',
+ slTitleL:'Title',slCat:'Category',slPrice:'Clearance price (R$)',slQty:'Quantity',slPriceType:'Price type',slPeca:'Per piece',slLote:'Whole lot',slDesc:'Description (optional)',
+ slDecl:'I declare I have this stock, the products are original and legal, and the photos, prices and information are true. I am responsible for this ad and the deal.',
+ waBtn:'Send to WhatsApp group',waAll:n=>`Send all ${n} to the WhatsApp group`,waHint:'Goes with photo, sizes, quantity and price. Tap WhatsApp and choose the customer group.',waCopied:'Text copied. Paste it in the WhatsApp group.',waNone:'No products to send',slDoneH:'Posted on StockLink!',slDoneWa:'Send it to the customer group too?',later:'Later',
+ slGo:'Post on StockLink',slSending:'Posting…',slDone:'Posted on StockLink. Buyers will contact you on WhatsApp.',slAs:e=>`StockLink account: ${e}`,slLogout:'Log out of StockLink',slOut:'You logged out of StockLink',slAlready:d=>`Already posted on ${d}. Posting again creates another ad.`,
+ slETitle:'The title needs at least 2 letters.',slEPrice:'Enter the price.',slEQty:'Enter at least 1.',slEDecl:'Check the declaration.',slESub:'Could not post: the StockLink free period or subscription ended, or the company is suspended. Check the StockLink app.',slELogin:'Wrong e-mail or password. If you have not confirmed your e-mail yet, check your inbox.',slEFail:'Could not connect to StockLink. Check the internet and try again.',phTitle:'Product photo',phCam:'Take photo',phGal:'Choose photo',phDel:'Remove photo',phErr:'Could not use this photo. Try another one.',rcAiOff:'AI photo reading is not on yet (AI Logic must be turned on in Firebase). For now, say or type "2611 20 sale".',rcCamHint:'If the camera does not open, tap "Choose photo" and pick the camera, or choose a photo you already took.',rcGal:'Choose photo',rcMic:'Speak',rcMicStop:'Stop',
+ rcTextL:'Or type',get rcTextPh(){return `e.g. sold 20 ${U()} of 2611, 300 ${U()} of 2598 came in`},
+ rcMicHint:'The microphone cannot be used directly here. Tap the text box below and use the keyboard microphone.',
+ rcListening:'Listening… say one short line at a time. e.g. "2611 twenty pieces sold". Tap again for more.',
+ rcRead:'Read and check quantities',rcNeed:'Take a photo, speak or type something.',rcBusy:'Reading… with a photo it takes 20 to 40 seconds.',
+ rcNoAi:'AI photo reading is not on yet. It works after setting up Firebase. For now, say or type "2611 20 pieces sale" or type the code below.',rcDenied:'Reading is not available. Check the internet.',rcFail:'Could not read. Take the photo closer with good light, or type it, and try again.',rcLimit:'Too many requests. Try again in a moment.',
+ rcMax:n=>`Up to ${n} photos at a time.`,
+ rvTitle:'Check what was read',rvLead:'Fix anything wrong and tap enter.',rvNone:'No product read. Check the photo or text and try again.',
+ rvProduct:'Product',rvNew:'+ Add as new',rvSkip:'Skip',rvChoose:'Choose the product',get rvQty(){return `Qty (${U()})`},rvSale:'Sale',rvIn:'Stock in',
+ rvRead:'Text read',rvNewCode:'New code',rvNewName:'Korean name (optional)',
+ rvEOver:(n,s)=>`"${n}" has only ${s} ${U()} in stock. Check the quantity or change it to stock in.`,rvENewSale:'Code not registered. Check the code or, if it is a new product, change it to stock in.',rvEPick:'Choose the product or mark skip.',rvENew:'Enter the code and name of the new product.',rvEQty:'Enter at least 1 piece.',
+ rvApply:n=>`Enter ${n} item(s)`,rvBack:'Read again',rvNote:'AI note',
+ tApplied:(a,b)=>`Entered: ${a} ${U()} sold · ${b} ${U()} in`,
+ hTitle:'Recent entries',hEmpty:'Everything you enter shows here. If you make a mistake, you can undo it.',
+ hSum:(s,i)=>[s?`${s} ${U()} sold`:'',i?`${i} ${U()} in`:''].filter(Boolean).join(' · '),hSrc:{photo:'Photo',voice:'Voice',text:'Text',manual:'Manual'},hUndo:'Undo',hUndoQ:'Undo for real?',hUndone:'Undone',tUndone:'Undone',
+ trendBtn:'📤 Send sales ranking to Trend Radar',trendNone:'No sales to send yet',trendCopied:'Copied. Paste it in the Trend Radar app',
+ tools:{debt:'Credit book',scan:'Scan QR',label:'QR labels',xls:'Excel',team:'Staff'},
+ reSz:'How many to make per size',reOrder:n=>`Send production order (${n})`,reOrderHead:'Production order',reTotal:'Total',
+ dPay:'Payment',dNow:'Paid now',dLater:'On credit',dCust:'Customer name',dCustPh:'e.g. Maria Shop',dAmt:'Amount on credit (R$)',dDue:'Due date',dPhone:'Customer WhatsApp (optional)',dNote:'Note (optional)',
+ dTitle:'Credit book',dTotal:'Total to receive',dOver:'Overdue',dEmpty:'Nothing on credit. When you enter a sale, choose "On credit" and it shows here.',dAdd:'+ Add credit',dRecv:'Receive payment',dRecvAmt:'Amount received (R$)',dRecvOk:'Payment recorded',
+ dRemind:'Remind on WhatsApp',dLeft:'Left',dDueOn:d=>`Due ${d}`,dOverdue:'Overdue',dDone:'Paid',dSaved:'Credit saved',dEName:'Enter the customer name',dEAmt:'Enter the amount',dDel:'Delete',dDelQ:'Sure?',dHistory:'History',dSaleOf:'Sale',dManual:'Written by hand',dSave:'Save',
+ tmTitle:'Use with staff',tmHint:"Add the staff member's Gmail. They open the same app address, log in with that Gmail and can only enter sales and stock in. Cost, profit, sales and credit are hidden from them.",tmEmail:"Staff Gmail",tmAdd:'Add',tmSend:'Send instructions',tmNone:'No staff yet',tmRemove:'Remove',tmBad:'Check the Gmail address',tmAdded:'Staff added. Send the instructions.',tmErr:'Could not save. Check that the new Firebase rules are published.',tmPreview:'Staff works on the app address (Google login).',staffBadge:n=>`Staff of ${n||'shop'} · enter sales and stock in`,
+ xBusy:'Making the Excel file…',xDone:'Excel file downloaded',xErr:'Could not make the Excel file. Check the internet.',
+ xH:{p:['Code','Product','In','Sold','Sold retail','Stock','Sold (%)','Status','Cost','Wholesale','Retail','Sales','Profit'],s:['Code','Size','In','Sold','Stock'],d:['Customer','Phone','Date','Amount','Received','Left','Due','Note']},xS:['Products','Sizes','Credit'],
+ lbTitle:'Print QR labels',lbHint:'Print labels for the pieces. Then in "Scan QR", just point the camera to enter the sale.',lbAll1:'All 1',lbAll0:'All 0',lbPrint:'Print',lbNone:'Enter how many labels to print',lbEmpty:'No products with a code this month',lbErr:'Could not make the labels. Check the internet.',
+ scTitle:'Scan QR',scHint:'Point the camera at the label QR. Each scan adds 1 piece. To scan the same product again, move the camera away and point again.',scNoCam:'Could not open the camera. Allow camera access.',scSale:'Enter as sale',scIn:'Enter as stock in',scEmpty:'Nothing scanned yet',scGot:c=>`${c} scanned`,scUnknown:'Code not registered (goes in as stock in)'
+},T.pt);
+
+T.zh=Object.setPrototypeOf({h1:'库存管理板',sub:'进货·销售·库存·利润一目了然',monthL:(y,m)=>`${y}年${m}月 进货`,
+ sales:'本月销售额',salesNote:'批发销量 × 批发价 + 零售销量 × 零售价',profit:'销售利润',profitNote:'卖出商品剩下的钱(销售额 − 成本)',
+ prodCost:'总生产成本',cash:'现金结果',cashNote:'销售额 − 生产成本(含未卖库存)',stockVal:'库存价值',margin:'利润率',
+ noCost:'没填成本的商品不计入利润。',
+ cats:{re:['再生产','再做一批'],watch:['观察','继续卖'],sale:['清仓','批发甩卖'],retail:['零售','剩下的零售卖'],early:['太早','刚进货']},
+ styles:'商品',made:'进货',sold:'已售',stock:'库存',get pcs(){return U()},rate:'售出',all:'全部商品',catList:t=>`商品: ${t}`,showAll:'看全部',
+ qPh:'按编码或名称搜索',searchRes:n=>`找到 ${n} 个商品`,noFound:'没找到商品。在「录入」里输入编码即可添加。',
+ rulesBtn:'设置',add:'+ 添加商品',rcBtn:'单据·照片·语音',noCode:'无编码',day:d=>`进货 ${d} 天`,noDate:'无日期',
+ costL:'成本',priceL:'批发',priceVL:'零售',retailN:n=>`零售 ${n}`,get unitProfit(){return `每${U()}利润`},itemSales:'销售额',itemProfit:'利润',
+ adRe:(pd,q)=>`<b>建议再生产</b> · 每天约卖 ${pd}${U()}。再做 <b>${q}${U()}</b> 左右比较好。`,
+ adWatch:r=>`<b>继续卖</b> · 已售 ${r}%。放橱窗或发到社交媒体推广。`,
+ adSale:(s,p,o)=>`<b>建议清仓</b> · 库存 ${s}${U()}。`+(p?`从 ${p[0]} 降到 <b>${p[1]}</b>(${o}% 折扣)。`:''),
+ belowCost:c=>` <span class="warn-t">折扣价低于成本(${c})。</span>`,
+ adRetail:s=>`<b>零售</b> · 剩 ${s}${U()},批发太少。在店里、Instagram 或 TikTok Shop 卖。`,
+ adEarly:(d,m)=>`<b>再等等</b> · 进货 ${d} 天。${m} 天后再分类。`,
+ adWait:'<b>等待进货</b> · 还没有进货。拍进货单即可加上。',
+ sellBtn:'录入销售',edit:'编辑',close:'关闭',save:'保存',
+ emptyMonth:m=>`${m}还没有商品。<br>点 <b>录入</b> 输入编码即可添加。`,emptyCat:'这一类没有商品。',loading:'加载中…',
+ fAdd:'添加商品',fEdit:'编辑商品',fCode:'编码',fCodePh:'例:2611',fName:'韩文名(可选)',fNamePh:'예: 린넨 롱 원피스',fNamePt:'名称(可选)',fNamePtPh:'例:亚麻长裙',fNameHint:'商品按编码区分,名称可不填。',get fCost(){return `成本(每${U()} R$)`},get fPrice(){return `批发价(每${U()} R$)`},get fPriceV(){return `零售价(每${U()} R$)`},fSoldV:'其中零售卖出',fKind:'什么类型的商品?',eSoldV:'零售数量大于总销量。',eKind:'新编码,请选择商品类型。',chL:'销售方式',chA:'批发',chV:'零售',viewTable:'用表格看全部',viewCards:'用卡片看',thCode:'编码',thName:'商品',thCat:'状态',tblHint:'点一行可编辑。左右滑动看更多。',total:'合计',
+ fMade:'进货数量(生产)',fSold:'销售数量',fDate:'进货日期',fDateHint:'商品归入进货日期所在的月份。进货数量可先填 0,之后用单据补上。',
+ eCode:'请输入编码。',eName:'请输入商品名称。',eSold:'销量大于进货量,请检查数字。',
+ eDup:(n)=>`同一个月已有这个编码:「${n}」。`,dupOpen:'打开该商品',
+ del:'删除这个商品',delQ:'确定删除?无法恢复。',cancel:'取消',delete:'删除',
+ sNow:(s,k)=>`目前已售 ${s}${U()} · 库存 ${k}${U()}`,sAdd:'加上今天的销量',sAddPh:'例:12',sTot:'或改总销量',sSave:'保存销量',sErr:m=>`不能卖得比进货多(${m}${U()})。`,
+ rTitle:'设置',rExpl:['售出率 = 已售 ÷ 进货','<b>再生产</b> · 售出率高于标准','<b>观察</b> · 售出率中等','<b>清仓</b> · 卖得慢且库存多','<b>零售</b> · 卖得慢且库存少'],
+ bizPick:'第一次使用?请选择行业',bizH:'行业和商品类型',bizL:'你卖什么?',unitL:'单位(韩文)',unitPtL:'单位(葡语)',kindsL:'商品类型(用逗号分开;空 = 默认)',kindsHint:'例:包、鞋、帽子。添加新商品时从中选择。',rulesH:'标准',rRe:'再生产标准(%)',rLow:'卖得慢低于(%)',get rRetail(){return `零售最多(${U()})`},rDays:'几天后分类',rOff:'清仓折扣(%)',rSave:'保存标准',rReset:'恢复默认',rErr:'卖得慢的标准要低于再生产标准',
+ tSaved:'已保存',tDeleted:'已删除',tSold:s=>`已保存销量:${s}${U()}`,tRules:'标准已保存',tReset:'标准已恢复默认',tSaveErr:'保存失败,请检查网络。',tDelErr:'删除失败。',
+ stOk:'自动保存 · 手机和电脑看到的一样',stOff:'没网也能用,有网后自动同步。',stNo:'连不上存储,关闭页面后输入的内容会消失。',stErr:'数据加载失败,请重新打开页面。',
+ inTitle:'录入',inBtn:'录入',cardIn:'录入销售/进货',inCapture:'用照片或语音一次录入',inRead:'用 AI 读取并放到下面',inLines:'要录入的项目',inAdd:'+ 按编码加一行',
+ inEmpty:'输入编码或读取照片/语音。新编码会成为新商品。',inReadDone:n=>`读到 ${n} 行。检查下面后录入。`,
+ lnCode:'编码',lnNewTag:'新商品',lnNew:'新编码。选择类型即可添加,数量算作进货。',lnNoCode:'请输入编码。',lnNoCodeName:n=>`「${n}」· 请输入编码。`,lnMonth:'这是哪个月的商品?',lnRemove:'移除',eNewName:'请输入新商品名称。',
+ rcTitle:'用单据、照片或语音录入',rcKind:'要录入什么?',kAuto:'自动判断',kSale:'销售 · 出货',kIn:'进货',
+ rcCam:'拍照',phAddShort:'+ 照片',szTitle:'各尺码数量',szUn:'无尺码',szUnHint:n=>`有 ${n}${U()} 库存没有指定尺码。`,bySize:'按尺码录入',sizesL:'尺码(用逗号分开)',sizesHint:'例:S, M, L, XL, U 或 36, 38, 40, 42。U = 均码。不用尺码就写「无」。',none:'无',vm:{grid:'格子',cards:'卡片',table:'表格'},moreMoney:'详细 ▾',qeTitle:'修改价格和数量',qeHint:'点数字即可修改价格和数量',qeQty:'数量',qePrice:'价格',qeStock:'当前库存(实际点数)',qeStockHint:'进货或销量变化时库存会跟着变。如果实际点数不同,在这里填实际数字。',slBtn:'发布到 StockLink',slAgain:'再次发布到 StockLink',slTitle:'发布到 StockLink 清仓板',slLoginHint:'用 StockLink 账号的邮箱和密码登录。第一次之后直接发布即可。',slEmail:'邮箱',slPw:'密码',slLogin:'登录 StockLink',
+ slNoComp:'这个账号没有公司信息。请先在 StockLink 应用里登记公司(CNPJ)。',slComp:'用哪家公司发布?',slCompOne:n=>`将以 <b>${n}</b> 发布。`,slPhoto:'商品照片会一起发。',slNoPhoto:'商品没有照片。在编辑里加上就会一起发。',
+ slTitleL:'标题',slCat:'类别',slPrice:'清仓价(R$)',slQty:'数量',slPriceType:'价格方式',slPeca:'按件',slLote:'整批',slDesc:'说明(可选)',
+ slDecl:'我声明我有这批库存,商品为正品且来源合法,照片、价格和信息属实。我对此广告和交易负责。',
+ waBtn:'发到 WhatsApp 群',waAll:n=>`把 ${n} 个发到 WhatsApp 群`,waHint:'会带照片、尺码、数量和价格。点 WhatsApp 选客户群。',waCopied:'已复制文字,粘贴到 WhatsApp 群。',waNone:'没有可发的商品',slDoneH:'已发布到 StockLink!',slDoneWa:'也发到客户群吗?',later:'以后',
+ slGo:'发布到 StockLink',slSending:'发布中…',slDone:'已发布到 StockLink。买家会通过 WhatsApp 联系你。',slAs:e=>`StockLink 账号:${e}`,slLogout:'退出 StockLink',slOut:'已退出 StockLink',slAlready:d=>`${d} 已发布过。再发布会生成另一个广告。`,
+ slETitle:'标题至少 2 个字。',slEPrice:'请输入价格。',slEQty:'至少填 1。',slEDecl:'请勾选声明。',slESub:'无法发布:StockLink 免费期或订阅已结束,或公司被暂停。请在 StockLink 应用里查看。',slELogin:'邮箱或密码错误。如果还没确认邮箱,请查看收件箱。',slEFail:'连不上 StockLink,请检查网络后重试。',phTitle:'商品照片',phCam:'拍照',phGal:'选照片',phDel:'删除照片',phErr:'这张照片不能用,请换一张。',rcAiOff:'AI 照片读取还没开启(需在 Firebase 打开 AI Logic)。现在可以说或写「2611 20 销售」。',rcCamHint:'如果相机打不开,点「选照片」再选相机,或选已经拍好的照片。',rcGal:'选照片',rcMic:'说话',rcMicStop:'停止',
+ rcTextL:'或者写',get rcTextPh(){return `例:2611 卖了 20${U()},2598 进货 300${U()}`},
+ rcMicHint:'这里不能直接用麦克风。点下面的文字框,用键盘上的麦克风。',
+ rcListening:'正在听… 一次说一句短的。例:「2611 卖了二十件」。要说更多请再点一次。',
+ rcRead:'读取并检查数量',rcNeed:'拍照、说话或写点什么。',rcBusy:'读取中… 有照片要 20~40 秒。',
+ rcNoAi:'AI 照片读取还没开启,设置 Firebase 后可用。现在可以说或写「2611 20件 销售」,或在下面输入编码。',rcDenied:'无法读取,请检查网络。',rcFail:'读不出来。请靠近、光线好一点再拍,或用文字写,然后重试。',rcLimit:'请求太多,请稍后再试。',
+ rcMax:n=>`一次最多 ${n} 张照片。`,
+ rvTitle:'检查读取结果',rvLead:'改正错误后点录入。',rvNone:'没读到商品。检查照片或文字后重试。',
+ rvProduct:'商品',rvNew:'+ 作为新商品添加',rvSkip:'跳过',rvChoose:'选择商品',get rvQty(){return `数量(${U()})`},rvSale:'销售',rvIn:'进货',
+ rvRead:'读到的文字',rvNewCode:'新编码',rvNewName:'韩文名(可选)',
+ rvEOver:(n,s)=>`「${n}」库存只有 ${s}${U()}。检查数量或改成进货。`,rvENewSale:'编码未登记。检查编码;如果是新商品,改成进货。',rvEPick:'请选择商品或标记跳过。',rvENew:'请输入新商品的编码和名称。',rvEQty:'至少填 1 件。',
+ rvApply:n=>`录入 ${n} 项`,rvBack:'重新读取',rvNote:'AI 备注',
+ tApplied:(a,b)=>`已录入:售出 ${a}${U()} · 进货 ${b}${U()}`,
+ hTitle:'最近录入',hEmpty:'录入的内容都会显示在这里。录错了可以撤销。',
+ hSum:(s,i)=>[s?`售出 ${s}${U()}`:'',i?`进货 ${i}${U()}`:''].filter(Boolean).join(' · '),hSrc:{photo:'照片',voice:'语音',text:'文字',manual:'手动'},hUndo:'撤销',hUndoQ:'确定撤销?',hUndone:'已撤销',tUndone:'已撤销',
+ trendBtn:'📤 把销量排名发到 Trend Radar',trendNone:'还没有可发的销售记录',trendCopied:'已复制,请粘贴到 Trend Radar 应用',
+ tools:{debt:'赊账本',scan:'扫 QR',label:'QR 标签',xls:'Excel',team:'员工'},
+ reSz:'每个尺码做多少',reOrder:n=>`发送生产单(${n})`,reOrderHead:'生产单',reTotal:'合计',
+ dPay:'付款',dNow:'当场付款',dLater:'赊账',dCust:'客户名称',dCustPh:'例:Maria 店',dAmt:'赊账金额(R$)',dDue:'到期日',dPhone:'客户 WhatsApp(可选)',dNote:'备注(可选)',
+ dTitle:'赊账本',dTotal:'应收合计',dOver:'已逾期',dEmpty:'没有赊账。录入销售时选「赊账」就会显示在这里。',dAdd:'+ 记赊账',dRecv:'收款',dRecvAmt:'收到金额(R$)',dRecvOk:'已记录收款',
+ dRemind:'用 WhatsApp 提醒',dLeft:'剩余',dDueOn:d=>`${d} 到期`,dOverdue:'逾期',dDone:'已付清',dSaved:'已记赊账',dEName:'请填客户名称',dEAmt:'请填金额',dDel:'删除',dDelQ:'确定吗?',dHistory:'记录',dSaleOf:'销售',dManual:'手动记录',dSave:'保存',
+ tmTitle:'和员工一起用',tmHint:'填员工的 Gmail。员工打开同一个应用地址,用这个 Gmail 登录,只能录入销售和进货。成本、利润、销售额和赊账对员工隐藏。',tmEmail:'员工 Gmail',tmAdd:'添加',tmSend:'发送说明',tmNone:'还没有员工',tmRemove:'移除',tmBad:'请检查 Gmail 地址',tmAdded:'已添加员工,请发送说明。',tmErr:'保存失败。请确认新的 Firebase 规则已发布。',tmPreview:'员工功能在应用地址(Google 登录)上可用。',staffBadge:n=>`${n||'店铺'} 员工 · 录入销售和进货`,
+ xBusy:'正在生成 Excel…',xDone:'Excel 文件已下载',xErr:'无法生成 Excel,请检查网络。',
+ xH:{p:['编码','商品','进货','已售','零售已售','库存','售出率(%)','状态','成本','批发','零售','销售额','利润'],s:['编码','尺码','进货','已售','库存'],d:['客户','电话','日期','金额','已收','剩余','到期日','备注']},xS:['商品','尺码','赊账'],
+ lbTitle:'打印 QR 标签',lbHint:'给衣服打印标签。之后在「扫 QR」里用相机对准就能录入销售。',lbAll1:'全部 1',lbAll0:'全部 0',lbPrint:'打印',lbNone:'请填要打印的标签数量',lbEmpty:'这个月没有带编码的商品',lbErr:'无法生成标签,请检查网络。',
+ scTitle:'扫 QR',scHint:'把相机对准标签上的 QR。每扫一次加 1 件。要再扫同一个商品,先移开相机再对准。',scNoCam:'无法打开相机,请允许使用相机。',scSale:'作为销售录入',scIn:'作为进货录入',scEmpty:'还没扫到',scGot:c=>`已扫 ${c}`,scUnknown:'编码未登记(作为进货录入)'
+},T.pt);
+
+for(const lg of ['en','zh']){const base=T[lg].cats;Object.defineProperty(T[lg],'cats',{get(){const cl=bt()==='clothes';return {...base,re:lg==='en'?(cl?['Remake','produce again']:['Reorder','order again']):(cl?['再生产','再做一批']:['补货','再订货'])}}})}
+const LOC={ko:'ko-KR',pt:'pt-BR',en:'en-US',zh:'zh-CN'};
+const KIND_I18N={blusa:['Blouse','衬衫'],calca:['Pants','裤子'],vestido:['Dress','连衣裙'],saia:['Skirt','半身裙'],short:['Shorts','短裤'],cropped:['Crop top','短上衣'],conjunto:['Set','套装'],jaqueta:['Jacket','外套'],macacao:['Jumpsuit','连体裤'],outro:['Other','其他'],
+ snack:['Snacks','零食'],bebida:['Drinks','饮料'],congelado:['Frozen','冷冻食品'],molho:['Sauces','酱料'],massa:['Noodles','面类'],grao:['Rice & grains','米和谷物'],
+ skincare:['Skincare','护肤'],make:['Makeup','彩妆'],cabelo:['Hair','美发'],corpo:['Body','身体护理'],perfume:['Perfume','香水'],
+ bolsa:['Bags','包'],calcado:['Shoes','鞋'],acessorio:['Accessories','配饰'],cozinha:['Kitchen','厨具'],casa:['Home','家居用品'],papelaria:['Stationery','文具'],
+ capa:['Cases & films','手机壳·贴膜'],audio:['Earphones & speakers','耳机·音箱'],cabo:['Chargers & cables','充电器·数据线'],eletro:['Small appliances','小家电']};
+const BIZ_I18N={clothes:['Clothing & fashion','服装·时尚'],food:['Food & drinks','食品·饮料'],beauty:['Cosmetics & beauty','化妆品·美容'],goods:['Accessories & goods','杂货·配饰'],tech:['Electronics & phones','电子·手机配件'],other:['Other business','其他行业']};
+const bizName=b=>lang==='pt'?b.pt:lang==='en'||lang==='zh'?(BIZ_I18N[Object.keys(BIZ).find(k=>BIZ[k]===b)]||[b.pt,b.ko])[lang==='en'?0:1]:b.ko;
+const kindName=x=>lang==='pt'?x[2]:lang==='en'||lang==='zh'?((KIND_I18N[x[0]]||[x[2],x[2]])[lang==='en'?0:1]):x[1];
 const DEF={minDays:20,reRate:70,lowRate:40,retailMax:30,saleOff:30,bizType:'clothes',unit:'',unitPt:'',kinds:[],sizes:[],noSizes:false};
 let view='grid';try{view=localStorage.getItem('view2')||'grid'}catch(e){}
 let rules={...DEF}, items=[], moves=[], db=null, ai=null, aiOpts={images:null}, filter='all', q='', loaded=false, dbState='wait', unsub=[];
@@ -464,7 +608,7 @@ function daysSince(d){if(!d)return 999;return Math.max(0,Math.floor((Date.now()-
 // sizes: each product can keep 입고/판매 per size in it.sz = {P:{m,s}, M:{m,s}, ...}
 const SZ=()=>{if(typeof rules==='undefined')return ['P','M','G','GG','U'];if(rules.noSizes)return [];const c=Array.isArray(rules.sizes)?rules.sizes.filter(Boolean):[];return c.length?c:(bt()==='clothes'?['P','M','G','GG','U']:[])};
 // U = tamanho único (one size)
-const szLabel=k=>k==='U'?(lang==='pt'?'Único':'프리(U)'):k;
+const szLabel=k=>k==='U'?({pt:'Único',en:'One size',zh:'均码'}[lang]||'프리(U)'):k;
 const szKeys=it=>{const ks=[...SZ()];for(const k of Object.keys((it&&it.sz)||{}))if(!ks.includes(k))ks.push(k);return ks};
 const szSum=(o,f)=>Object.values(o||{}).reduce((a,v)=>a+Math.max(0,+(f?(v||{})[f]:v)||0),0);
 function addSz(base,delta,field,sign){const out=JSON.parse(JSON.stringify(base||{}));for(const [k,n] of Object.entries(delta||{})){const q=Math.max(0,Math.floor(+n||0));if(!q)continue;out[k]=out[k]||{m:0,s:0};out[k][field]=Math.max(0,(+out[k][field]||0)+sign*q)}return out}
@@ -485,7 +629,10 @@ function advice(j){const L=t();
   if(j.cat==='retail')return L.adRetail(j.stock);
   return L.adEarly(j.days,rules.minDays);
 }
-function monthsList(){const s=new Set(items.map(i=>i.month).filter(Boolean));s.add(month);s.add(new Date().toISOString().slice(0,7));return [...s].sort().reverse()}
+function monthsList(){const s=new Set(items.map(i=>i.month).filter(Boolean));s.add(month);
+  // 지난 24개월 + 앞으로 3개월은 항상 고를 수 있게
+  const d=new Date();d.setDate(1);for(let k=-24;k<=3;k++){const x=new Date(d.getFullYear(),d.getMonth()+k,1);s.add(x.getFullYear()+'-'+String(x.getMonth()+1).padStart(2,'0'));}
+  return [...s].sort().reverse()}
 function mLabel(m){const [y,mm]=m.split('-');return t().monthL(y,+mm)}
 const byRecent=(a,b)=>String(b.madeDate||'').localeCompare(String(a.madeDate||''));
 
@@ -575,9 +722,9 @@ async function slPost(it,db,user){const L=t(),j=calc(it);
   // buyers on StockLink read Portuguese: prefer the Portuguese name or type
   const ptName=it.namePt||((KINDS_LIST().find(x=>x[0]===it.kind)||[])[2])||it.name||'';
   const title=[it.ref,ptName].filter(Boolean).join(' ').slice(0,120)||it.ref;
-  const cat=SL_FROM_KIND[it.kind]||'outros', CL=lang==='pt'?SL_CAT_PT:SL_CAT_KO;
+  const cat=SL_FROM_KIND[it.kind]||'outros', CL=lang==='ko'?SL_CAT_KO:SL_CAT_PT;
   $('#sl-body').outerHTML=`<div id="sl-body" style="display:flex;flex-direction:column;gap:10px">
-    ${it.slId?`<div class="advice c-re">${L.slAlready(new Date(it.slAt).toLocaleDateString(lang==='ko'?'ko-KR':'pt-BR'))}</div>`:''}
+    ${it.slId?`<div class="advice c-re">${L.slAlready(new Date(it.slAt).toLocaleDateString(LOC[lang]||'pt-BR'))}</div>`:''}
     ${comps.length>1?`<div class="field"><label for="sl-comp">${L.slComp}</label><select id="sl-comp">${comps.map(c=>`<option value="${c.id}">${esc(c.nome)}</option>`).join('')}</select></div>`:`<p class="hint">${L.slCompOne(esc(comps[0].nome))}</p>`}
     ${safeImg(it.photo)?`<div class="phrow"><img class="pthumb big" src="${safeImg(it.photo)}" alt=""><span class="hint">${L.slPhoto}</span></div>`:`<p class="hint">${L.slNoPhoto}</p>`}
     <div class="field"><label for="sl-title">${L.slTitleL}</label><input id="sl-title" maxlength="120" value="${esc(title)}"></div>
@@ -649,7 +796,7 @@ function table(rows){const L=t();const T2=f=>rows.reduce((a,i)=>a+f(i.j),0);
   ${rows.map(i=>{const j=i.j;return `<tr data-edit="${i.id}" class="${CLS[j.cat]}"><td class="l code-c">${safeImg(i.photo)?`<img class="tthumb" src="${safeImg(i.photo)}" alt="">`:''}${esc(i.ref||'—')}</td><td class="l">${esc(dn(i)||'—')}</td><td>${num(j.made)}</td><td>${num(j.sold)}</td><td>${num(j.stock)}</td><td>${j.rate.toFixed(0)}%</td><td class="l"><span class="dot"></span>${L.cats[j.cat][0]}</td><td class="own">${brl(j.sales)}</td><td class="own" style="${j.profit<0?'color:var(--retail)':''}">${j.profit===null?'—':brl(j.profit)}</td></tr>`}).join('')}
   </tbody><tfoot><tr><td class="l code-c">${L.total}</td><td class="l">${rows.length}</td><td>${num(T2(j=>j.made))}</td><td>${num(T2(j=>j.sold))}</td><td>${num(T2(j=>j.stock))}</td><td></td><td></td><td class="own">${brl(T2(j=>j.sales))}</td><td class="own">${brl(rows.reduce((a,i)=>a+(i.j.profit||0),0))}</td></tr></tfoot></table></div>`}
 function render(){
-  const L=t(); document.documentElement.lang=lang==='ko'?'ko':'pt-BR';
+  const L=t(); document.documentElement.lang={ko:'ko',pt:'pt-BR',en:'en',zh:'zh-CN'}[lang]||'pt-BR';
   document.querySelectorAll('[data-lang]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.lang===lang));
   $('#h1').textContent=L.h1; $('#sub').textContent=L.sub; $('#rulesBtn').textContent=L.rulesBtn; document.querySelectorAll('[data-vm]').forEach(b=>{b.textContent=L.vm[b.dataset.vm];b.setAttribute('aria-pressed',b.dataset.vm===view)}); $('#rcBtnTxt').textContent=L.inBtn;
   $('#q').placeholder=L.qPh; $('#q').setAttribute('aria-label',L.qPh); $('#histTitle').textContent=L.hTitle;
@@ -695,7 +842,7 @@ function renderHist(){const L=t();
   if(!moves.length){$('#hist').innerHTML=`<div class="hint">${L.hEmpty}</div>`;return}
   $('#hist').innerHTML=moves.map(m=>{
     const s=(m.lines||[]).filter(l=>l.type==='sale').reduce((a,l)=>a+l.qty,0), i=(m.lines||[]).filter(l=>l.type==='in').reduce((a,l)=>a+l.qty,0);
-    const when=new Date(m.at).toLocaleString(lang==='ko'?'ko-KR':'pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+    const when=new Date(m.at).toLocaleString(LOC[lang]||'pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
     const names=(m.lines||[]).map(l=>l.code||l.name).slice(0,4).join(', ')+((m.lines||[]).length>4?'…':'');
     return `<div class="hrow ${m.undone?'undone':''}"><div class="w"><b>${esc(L.hSum(s,i))}</b><span class="ref">${esc(when)} · ${esc(L.hSrc[m.source]||'')} · ${esc(names)}</span></div>${m.undone?`<span class="ref">${L.hUndone}</span>`:`<button class="btn soft sm" type="button" data-undo="${m.id}">${L.hUndo}</button>`}</div>`}).join('');
 }
@@ -728,7 +875,7 @@ async function addMove(m){
 // ---------- product form ----------
 function dupOf(code,mon,selfId){const c=normCode(code);if(!c)return null;return items.find(i=>i.id!==selfId&&normCode(i.ref)===c&&i.month===mon)||null}
 function itemForm(it,preset){const L=t();
-  const v=it||{madeDate:new Date().toISOString().slice(0,10),made:0,sold:0,price:'',priceV:'',cost:'',ref:'',name:'',namePt:'',kind:'',soldV:0,...(preset||{})};
+  const today=new Date().toISOString().slice(0,10);const v=it||{madeDate:(month&&today.slice(0,7)!==month)?month+'-01':today,made:0,sold:0,price:'',priceV:'',cost:'',ref:'',name:'',namePt:'',kind:'',soldV:0,...(preset||{})};
   openSheet(`${head(it?L.fEdit:L.fAdd)}
   <div class="two"><div class="field"><label for="f-ref">${L.fCode}</label><input id="f-ref" value="${esc(v.ref)}" placeholder="${L.fCodePh}" autocomplete="off" autocapitalize="characters"></div>
   <div class="field"><label for="f-date">${L.fDate}</label><input id="f-date" type="date" value="${esc(v.madeDate)}"></div></div>
@@ -773,12 +920,12 @@ function rulesForm(){const L=t();
   const custom=Array.isArray(rules.kinds)?rules.kinds.join(', '):'';
   openSheet(`${head(L.rTitle)}
   <h3 class="sh">${L.bizH}</h3>
-  <div class="field"><label for="r-biz">${L.bizL}</label><select id="r-biz">${Object.entries(BIZ).map(([k,b])=>`<option value="${k}" ${bt()===k?'selected':''}>${lang==='pt'?b.pt:b.ko}</option>`).join('')}</select></div>
+  <div class="field"><label for="r-biz">${L.bizL}</label><select id="r-biz">${Object.entries(BIZ).map(([k,b])=>`<option value="${k}" ${bt()===k?'selected':''}>${bizName(b)}</option>`).join('')}</select></div>
   <div class="two"><div class="field"><label for="r-unit">${L.unitL}</label><input id="r-unit" value="${esc(rules.unit||'')}" placeholder="${esc(B().unit[0])}"></div>
   <div class="field"><label for="r-unitpt">${L.unitPtL}</label><input id="r-unitpt" value="${esc(rules.unitPt||'')}" placeholder="${esc(B().unit[1])}"></div></div>
   <div class="field"><label for="r-sizes">${L.sizesL}</label><input id="r-sizes" value="${esc(rules.noSizes?L.none:(Array.isArray(rules.sizes)?rules.sizes.join(', '):''))}" placeholder="${bt()==='clothes'?'P, M, G, GG, U':L.none}"></div>
   <p class="hint">${L.sizesHint}</p>
-  <div class="field"><label for="r-kinds">${L.kindsL}</label><input id="r-kinds" value="${esc(custom)}" placeholder="${esc(B().kinds.map(x=>lang==='pt'?x[2]:x[1]).join(', '))}"></div>
+  <div class="field"><label for="r-kinds">${L.kindsL}</label><input id="r-kinds" value="${esc(custom)}" placeholder="${esc(B().kinds.map(kindName).join(', '))}"></div>
   <p class="hint">${L.kindsHint}</p>
   <h3 class="sh">${L.rulesH}</h3>
   <div class="rules">${L.rExpl.map(x=>`<span>${x}</span>`).join('')}</div>
@@ -788,7 +935,7 @@ function rulesForm(){const L=t();
   <div class="field"><label for="r-days">${L.rDays}</label><input id="r-days" type="number" value="${rules.minDays}"></div></div>
   <div class="field"><label for="r-off">${L.rOff}</label><input id="r-off" type="number" value="${rules.saleOff}"></div>
   <button class="btn full" type="button" id="r-save">${L.rSave}</button><button class="btn soft full" type="button" id="r-reset">${L.rReset}</button>`);
-  $('#r-biz').onchange=e=>{const b=BIZ[e.target.value];$('#r-unit').placeholder=b.unit[0];$('#r-unitpt').placeholder=b.unit[1];$('#r-kinds').placeholder=b.kinds.map(x=>lang==='pt'?x[2]:x[1]).join(', ')};
+  $('#r-biz').onchange=e=>{const b=BIZ[e.target.value];$('#r-unit').placeholder=b.unit[0];$('#r-unitpt').placeholder=b.unit[1];$('#r-kinds').placeholder=b.kinds.map(kindName).join(', ')};
   $('#r-save').onclick=async()=>{const n=(id,d)=>{const x=+$(id).value;return Number.isFinite(x)&&x>=0?x:d};
     const szRaw=$('#r-sizes').value.trim(),noSizes=/^(없음|nenhum|-|0)$/i.test(szRaw),sizes=noSizes?[]:szRaw.split(/[,\n/]/).map(x=>x.trim().toUpperCase()).filter(Boolean).slice(0,20);
     const kinds=$('#r-kinds').value.split(/[,\n]/).map(x=>x.trim()).filter(Boolean).slice(0,30);
@@ -865,7 +1012,7 @@ function toggleMic(){const L=t(), msg=$('#rc-micMsg'), btn=$('#rc-mic');
   const hint=()=>{msg.textContent=L.rcMicHint;msg.hidden=false;btn.classList.remove('on');$('#rc-micTxt').textContent=L.rcMic;rec=null;$('#rc-text').focus()};
   if(!SR)return hint();
   try{rec=new SR()}catch(e){return hint()}
-  rec.lang=lang==='ko'?'ko-KR':'pt-BR';rec.continuous=false;rec.interimResults=true;rec.maxAlternatives=1;
+  rec.lang=LOC[lang]||'pt-BR';rec.continuous=false;rec.interimResults=true;rec.maxAlternatives=1;
   const base=$('#rc-text').value.trim();
   // one sentence per tap; rebuild from all results each time (Android Chrome repeats results otherwise)
   rec.onresult=e=>{let said='';for(let k=0;k<e.results.length;k++)said+=e.results[k][0].transcript;said=said.replace(/\s+/g,' ').trim();
@@ -898,7 +1045,7 @@ Rules:
 
 Return ONLY a JSON object, no other text:
 {"lines":[{"code":"2611","name":"Vestido linho","kind":"vestido","channel":"atacado","qty":20,"type":"sale","read":"2611 vestido P4 M8 G8"}],"note":""}
-"note": anything unclear, written in ${lang==='ko'?'Korean':'Portuguese'}; empty if nothing.
+"note": anything unclear, written in ${{ko:'Korean',pt:'Portuguese',en:'English',zh:'Simplified Chinese'}[lang]||'Portuguese'}; empty if nothing.
 ${nImg?`\n${nImg} photo(s) are attached.`:''}${text?`\nOwner's text or speech:\n"""${text}"""`:''}`;
 }
 function matchItem(l){
@@ -1111,7 +1258,7 @@ function reSizes(j){if(j.cat!=='re'||!j.hasSz)return [];
 function reSzHtml(j){const L=t(),r=reSizes(j);if(!r.length)return '';
   return `<div class="resz"><span>${L.reSz}</span><div class="szrow">${r.map(x=>`<span class="sz plus">${esc(szLabel(x.k))} <b>+${x.n}</b></span>`).join('')}<span class="sz">${L.reTotal} <b>${r.reduce((a,x)=>a+x.n,0)}</b></span></div></div>`}
 function reOrderText(list){const L=t();
-  return `🧵 *${L.reOrderHead}* · ${new Date().toLocaleDateString(lang==='ko'?'ko-KR':'pt-BR')}\n\n`+list.map(i=>{const j=calc(i),r=reSizes(j),tot=r.length?r.reduce((a,x)=>a+x.n,0):reQty(j);
+  return `🧵 *${L.reOrderHead}* · ${new Date().toLocaleDateString(LOC[lang]||'pt-BR')}\n\n`+list.map(i=>{const j=calc(i),r=reSizes(j),tot=r.length?r.reduce((a,x)=>a+x.n,0):reQty(j);
     return `• *${i.ref||'—'}* ${dn(i)}\n   ${r.length?r.map(x=>`${szLabel(x.k)} ${x.n}`).join(' · ')+` = ${tot}${U()}`:`${tot}${U()}`}`}).join('\n')}
 
 // --- 2. 외상 / fiado ---
@@ -1308,7 +1455,7 @@ render();
   </div>
   <button class="gbtn" type="button" id="loginBtn"><svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg><span id="loginTxt"></span></button>
   <p id="lgErr" style="color:var(--retail);font-size:13px" hidden></p>
-  <div class="lang" role="group" aria-label="언어 / Idioma"><button type="button" data-lang="ko">한국어</button><button type="button" data-lang="pt">Português</button></div>
+  <div class="lang" role="group" aria-label="언어 / Idioma / Language / 语言"><button type="button" data-lang="ko">한국어</button><button type="button" data-lang="pt">Português</button><button type="button" data-lang="en">English</button><button type="button" data-lang="zh">中文</button></div>
 </div></div>
 <script src="firebase-config.js"></script>
 <script type="module">
@@ -1331,7 +1478,15 @@ const LG = {
 };
 let user = null, localMode = false;
 const ls = { get: k => { try { return localStorage.getItem(k) } catch (e) { return null } }, set: (k, v) => { try { localStorage.setItem(k, v) } catch (e) {} }, del: k => { try { localStorage.removeItem(k) } catch (e) {} } };
-const lg = () => LG[document.documentElement.lang === 'ko' ? 'ko' : 'pt'];
+LG.en = { title: 'Stock Board', sub: 'Log in with Google to keep your products saved safely.', btn: 'Log in with Google', out: 'Log out', err: 'Could not log in. Tap again.',
+    suSub: 'Set up only once. Paste the settings copied from Firebase.', suCfgL: 'Firebase settings (paste the whole const firebaseConfig = { ... })', suKeyL: 'Security key (reCAPTCHA key ID, optional)',
+    suSave: 'Save and start', suLocal: 'Try on this phone only, without Firebase', suLocalHint: 'You can try it without setup. Data stays only on this phone, and AI receipt reading works after setting up Firebase.',
+    suErr: 'Could not read the settings. Check that apiKey, projectId and appId are there.', setup: 'App setup', local: 'Saving on this phone only' };
+LG.zh = { title: '库存管理板', sub: '用 Google 账号登录,商品信息会安全保存。', btn: '用 Google 登录', out: '退出', err: '登录失败,请再点一次。',
+    suSub: '只需设置一次。粘贴从 Firebase 复制的设置。', suCfgL: 'Firebase 设置(粘贴整个 const firebaseConfig = { ... })', suKeyL: '安全密钥(reCAPTCHA 密钥 ID,可不填)',
+    suSave: '保存并开始', suLocal: '不用 Firebase,只在这台手机上试用', suLocalHint: '不设置也能试用。数据只存在这台手机上,单据 AI 读取需要设置 Firebase 后才能用。',
+    suErr: '读不出设置。请确认里面有 apiKey、projectId 和 appId。', setup: '应用设置', local: '只保存在这台手机上' };
+const lg = () => LG[{ ko: 'ko', 'pt-BR': 'pt', en: 'en', 'zh-CN': 'zh' }[document.documentElement.lang] || 'pt'];
 App.onRender = () => { const L = lg();
   $('#lgTitle').textContent = L.title; $('#lgSub').textContent = L.sub; $('#loginTxt').textContent = L.btn;
   $('#logoutBtn').textContent = L.out; $('#whoName').textContent = user ? (user.email || '') : (localMode ? L.local : '');
