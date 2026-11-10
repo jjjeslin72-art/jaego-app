@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>재고 정리판 · Controle de Estoque</title>
 <meta name="description" content="상품 코드·입고·판매·재고·수익 관리 / Controle de código, entrada, vendas, estoque e lucro">
-<meta name="theme-color" content="#33408f">
+<meta name="theme-color" content="#111113">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
@@ -261,7 +261,7 @@ body{letter-spacing:-.01em}
 h1,h2,.histd>summary{font-weight:700;letter-spacing:-.02em}
 h1{font-size:21px}h2{font-size:17px}.histd>summary{font-size:16px}
 .wrap{gap:12px;padding-top:14px}
-.top{align-items:center}
+.top{align-items:center}.top .brand{flex:1;min-width:0}.top .ctrl{width:100%;order:3}.top .ctrl .month{flex:1}
 .brand{display:flex;align-items:center;gap:10px;min-width:0}
 .logo{width:40px;height:40px;flex:none;border-radius:11px;overflow:hidden;box-shadow:0 2px 8px rgba(20,18,40,.25)}.logo svg{width:100%;height:100%;display:block}
 .top p{font-size:12px;margin-top:1px}
@@ -304,6 +304,73 @@ h1{font-size:21px}h2{font-size:17px}.histd>summary{font-size:16px}
 .fab.main{background:linear-gradient(135deg,#3444b0,#1e2770);box-shadow:0 10px 24px rgba(30,39,112,.35);padding:15px 22px}
 .sheet{border-radius:22px 22px 0 0}
 .sheet h2{font-size:18px}
+
+/* ===== Arvin-style skin (v3): near-black, flat grey cards, bold white type, gold Pro ===== */
+html:root:not(#_){--bg:#111113;--surface:#232326;--ink:#f5f5f7;--muted:#9a9aa3;--line:#2f2f34;
+  --accent:#f5f5f7;--accent-soft:#2e2e33;--chalk:#2e2e33;--chalk-ink:#fff;
+  --re:#4ade80;--re-soft:rgba(74,222,128,.13);--watch:#8ab4ff;--watch-soft:rgba(138,180,255,.13);
+  --sale:#fbbf24;--sale-soft:rgba(251,191,36,.13);--retail:#fb7185;--retail-soft:rgba(251,113,133,.14);--early:#a1a1aa;--early-soft:rgba(161,161,170,.12);
+  --gold:linear-gradient(135deg,#fde7a6 0%,#f3c766 45%,#d99a2b 100%);
+  --display:"Poppins","Noto Sans KR","IBM Plex Sans KR",system-ui,sans-serif;--body:"Noto Sans KR","IBM Plex Sans KR",system-ui,-apple-system,sans-serif;
+  --sh:none;color-scheme:dark}
+body{background:var(--bg);letter-spacing:-.015em}
+h1{font-family:var(--display);font-weight:800;font-size:24px;letter-spacing:-.03em}
+h2,.histd>summary{font-family:var(--body);font-weight:800;font-size:19px;letter-spacing:-.03em}
+.wrap{gap:14px}
+.top p{color:var(--muted)}
+.logo{box-shadow:none;border-radius:12px}
+.propill{border:0;border-radius:999px;padding:7px 14px;font-weight:800;font-size:13.5px;color:#3a2600;background:var(--gold);display:inline-flex;align-items:center;gap:6px;box-shadow:0 4px 14px rgba(217,154,43,.25);white-space:nowrap}
+.propill svg{width:16px;height:16px}
+.propill.free{background:#2e2e33;color:var(--ink);box-shadow:none}
+.lang,.vseg{background:var(--surface);border:0;box-shadow:none}
+.lang button,.vseg button{color:var(--muted)}
+.lang button[aria-pressed="true"],.vseg button[aria-pressed="true"],.seg button[aria-pressed="true"],.kinds button[aria-pressed="true"]{background:#f5f5f7;color:#111;border-color:#f5f5f7}
+.month,select,input,textarea,.search input{background:var(--surface);border:1px solid transparent;color:var(--ink);box-shadow:none}
+input:focus,select:focus,textarea:focus{border-color:#4a4a52}
+.moneyd{background:var(--surface);box-shadow:none;border-radius:22px}
+.moneyd::after{display:none}
+.moneyd>summary{color:var(--muted);padding:18px 18px}
+.moneyd>summary b{color:#fff;font-family:var(--display);font-size:24px;font-weight:700}
+.moneyd>summary .more{background:#2f2f34;color:var(--ink)}
+.moneyd .money{color:var(--ink)}.mgrid div{background:#2b2b30}
+.bin,.sum,.tool,.card,.tablewrap,.tile,.hrow,.drow,.adrow,.plgrid>div,.rline,.cap{background:var(--surface);border:0;box-shadow:none;border-radius:20px}
+.bins{gap:8px}.bin{padding:13px 12px 11px}
+.bin::before{box-shadow:none}
+.bin .n{color:var(--ink);font-family:var(--display);font-size:26px}
+.bin[aria-pressed="true"]{background:var(--surface);box-shadow:0 0 0 2px var(--c) inset}
+.bin[aria-pressed="true"] .n{color:var(--c)}
+.sum{padding:14px 4px}.sum>*{border-color:#34343a}.sum b{font-family:var(--display);font-weight:700}
+.tools{gap:8px}
+.tool{border-radius:18px;padding:12px 2px 10px;color:var(--ink)}
+.tool .ti{background:#303036;color:#fff;box-shadow:none;border-radius:12px}
+.tool .lk{background:#55555c;border-color:var(--surface)}
+.tool.over .ti{background:var(--retail-soft);color:var(--retail)}
+.tool.t-admin .ti{background:var(--gold);color:#3a2600}
+.btn{background:#f5f5f7;color:#111;border-radius:14px;font-weight:700}
+.btn.soft{background:#2e2e33;color:var(--ink)}
+.btn.danger{background:var(--retail-soft);color:var(--retail)}
+.btn.wa{background:#25d366;color:#05210f}
+.btn.sl{background:var(--sale-soft);color:var(--sale)}
+.fab.main{background:#f5f5f7;color:#111;box-shadow:0 10px 30px rgba(0,0,0,.6);font-weight:800}
+.fab{background:var(--surface);color:var(--ink)}
+.code{background:#34343a;color:#fff}
+.tbl th,.tbl tfoot td{background:#2a2a2f}.tbl td.code-c{background:var(--surface)}.tbl th,.tbl td{border-color:#303036}
+.sheet{background:#18181b;border-top:0;box-shadow:0 -12px 40px rgba(0,0,0,.6);border-radius:26px 26px 0 0}
+.sheet-wrap{background:rgba(0,0,0,.65)}
+.pick{background:#232326;border:1.5px dashed #4a4a52;color:var(--ink)}
+.toast{background:#f5f5f7;color:#111}
+.empty{border-color:#34343a}
+.sz{background:#2b2b30;border-color:transparent}
+.advice{background:var(--cs);border-radius:12px}
+/* product tiles: photo on white like a catalogue */
+.tile{overflow:hidden;border-radius:20px}
+.tph{background:#f4f4f5;aspect-ratio:1/1}
+.tph:not(:has(img)){background:#2c2c31}
+.tcode{font-family:var(--display);font-weight:700;font-size:24px}
+.tcat{background:rgba(17,17,19,.78);color:var(--c);font-weight:700;left:6px;top:6px;padding:2px 8px}
+.tinfo{padding:8px 10px 10px;gap:2px}
+.tref{font-family:var(--display);font-weight:700;font-size:14px}
+.cthumb img{background:#f4f4f5}
 .login{position:fixed;inset:0;z-index:40;background:var(--bg);display:flex;align-items:center;justify-content:center;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 .login .box{max-width:380px;width:100%;display:flex;flex-direction:column;gap:14px;text-align:center;align-items:center}
 .login img{width:96px;height:96px;border-radius:22px}
@@ -319,6 +386,7 @@ h1{font-size:21px}h2{font-size:17px}.histd>summary{font-size:16px}
   <div class="top">
     <div class="brand"><span class="logo" aria-hidden="true"><svg viewBox="0 0 108 108"><defs><linearGradient id="lgA" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#00e0ff"/><stop offset="1" stop-color="#7c3aed"/></linearGradient><linearGradient id="lgB" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff4ecd"/><stop offset="1" stop-color="#7c3aed"/></linearGradient></defs><rect width="108" height="108" rx="26" fill="#12121f"/><g stroke-linejoin="round" stroke-width="5" fill="none" stroke="url(#lgA)"><path d="M54 18 L82 32 L82 64 L54 78 L26 64 L26 32 Z"/><path d="M26 32 L54 46 L82 32 M54 46 L54 78"/></g><path d="M42 56 l8 8 l15 -18" stroke="url(#lgB)" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round" transform="translate(0,-2)"/></svg></span>
     <div><h1 id="h1"></h1><p id="sub"></p></div></div>
+    <button type="button" class="propill" id="planPill" hidden></button>
     <div class="ctrl">
       <div class="lang" role="group" aria-label="언어 / Idioma"><button type="button" data-lang="ko">한국어</button><button type="button" data-lang="pt">Português</button></div>
       <select class="month" id="month" aria-label="month"></select>
@@ -753,8 +821,10 @@ function render(){
   document.body.classList.toggle('staff',isStaff());if(isStaff())$('#sub').textContent=L.staffBadge(ownerName);
   {const gs=custGroups(),dT=gs.reduce((a,x)=>a+x.left,0),dO=gs.some(x=>x.over);
    const LOCKED=new Set(['debt','scan','label','xls','team']), pc=planChip();
+   {const pp=$('#planPill');pp.hidden=!pc;if(pc){pp.className='propill'+(plan.kind==='free'?' free':'');
+     pp.innerHTML=`<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m2 8 5 4 5-7 5 7 5-4-2 11H4z"/></svg>${plan.kind==='trial'?L.plDays(plan.days):plan.kind==='pro'?'Pro':L.plFree}`}}
    const tile=(k,label,cls,sub,ico)=>`<button type="button" class="tool ${cls||''}" data-tool="${k}"><span class="ti">${icon(ico||k)}${!isPro()&&LOCKED.has(k)?`<i class="lk">${icon('lock')}</i>`:''}</span><span class="tl">${label}</span>${sub?`<span class="tsub">${sub}</span>`:''}</button>`;
-   $('#tools').innerHTML=[pc&&tile('plan',plan.kind==='trial'?L.plTrialShort:plan.kind==='pro'?L.plPro:L.plFree,'t-'+plan.kind,plan.kind==='trial'?L.plDays(plan.days):plan.kind==='pro'&&plan.until?'~'+fmtD(plan.until):'','star'),
+   $('#tools').innerHTML=[
      window.App&&App.admin&&tile('admin',L.adShort,'t-admin','','crown'),
      !isStaff()&&tile('debt',L.tools.debt,dO?'over':'',dT?brl(dT):''),
      tile('scan',L.tools.scan),tile('label',L.tools.label),
@@ -1161,7 +1231,7 @@ document.addEventListener('click',e=>{const tr=e.target.closest('tr[data-edit]')
   if(b.dataset.qe){const it=items.find(i=>i.id===b.dataset.qe);if(it)quickEdit(it);return}
   if(b.dataset.sl){const it=items.find(i=>i.id===b.dataset.sl);if(it)slForm(it);return}
   if(b.dataset.wa){waShare([items.find(i=>i.id===b.dataset.wa)]);return}
-  if(b.dataset.tool){const tk=b.dataset.tool;if(tk==='plan')return proForm();if(tk==='admin')return adminForm();if(needPro())return;({debt:debtBook,scan:scanForm,label:labelForm,xls:exportXls,team:teamForm})[tk]();return}
+  if(b.dataset.tool){const tk=b.dataset.tool;if(tk==='admin')return adminForm();if(needPro())return;({debt:debtBook,scan:scanForm,label:labelForm,xls:exportXls,team:teamForm})[tk]();return}
   if(b.dataset.dcust){custView(b.dataset.dcust);return}
   if(b.dataset.reorder){shareText(reOrderText(items.filter(i=>i.month===month&&calc(i).cat==='re')));return}
   if(b.dataset.waall){const k=b.dataset.waall;waShare(items.filter(i=>i.month===month&&calc(i).cat===k).filter(i=>calc(i).stock>0));return}
@@ -1174,6 +1244,7 @@ document.addEventListener('click',e=>{const tr=e.target.closest('tr[data-edit]')
   if(b.dataset.edit)itemForm(items.find(i=>i.id===b.dataset.edit));
   if(b.dataset.undo){if(b.dataset.armed){const m=moves.find(x=>x.id===b.dataset.undo);if(m)undoMove(m)}else{b.dataset.armed='1';b.textContent=t().hUndoQ;b.classList.replace('soft','danger');setTimeout(()=>{if(b.isConnected){delete b.dataset.armed;b.textContent=t().hUndo;b.classList.replace('danger','soft')}},4000)}}
   if(b.id==='rcBtn')inputForm();
+  if(b.id==='planPill')proForm();
   if(b.id==='trendBtn')trendShare();
   if(b.id==='rulesBtn'||b.id==='bizPick')rulesForm();
 });
