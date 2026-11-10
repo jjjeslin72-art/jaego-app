@@ -94,6 +94,11 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .qehint{display:block;font-size:11.5px;color:var(--accent);font-weight:600;margin-top:4px}
 .btn.sl{background:var(--sale-soft);color:var(--sale)}
 .btn.wa{background:#1fa855;color:#fff}
+.tool.trial{border-color:var(--sale);color:var(--sale)}.tool.pro{border-color:var(--re);color:var(--re)}.tool.free{border-color:var(--retail);color:var(--retail)}
+.plgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.plgrid>div{border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:13.5px}
+.plgrid ul{margin:6px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:3px}.plgrid .pro{border-color:var(--re);background:var(--re-soft)}.plprice{margin:8px 0 0;font-weight:800;font-size:16px}
+.adrow{display:flex;flex-direction:column;gap:6px;border:1px solid var(--line);border-radius:10px;padding:10px 12px}.adrow .w{display:flex;flex-direction:column;gap:2px}.adrow .pill{align-self:flex-start}
+.adbtn{display:flex;gap:6px;flex-wrap:wrap}#ad-q{margin-bottom:4px}
 .err.info{color:var(--re);font-weight:600}
 .tools{display:flex;flex-wrap:wrap;gap:6px}
 .tool{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:7px 12px;font:inherit;font-size:13px;font-weight:600;white-space:nowrap}
@@ -429,6 +434,10 @@ for(const lg of ['ko','pt']){const base=T[lg].cats;Object.defineProperty(T[lg],'
 let lang='ko'; try{lang=localStorage.getItem('lang')||'ko'}catch(e){}
 const t=()=>T[lang];
 Object.assign(T.ko,{
+ plTrial:n=>`무료 체험 ${n}일 남음`,plPro:'유료',plFree:'무료',plTitle:'무료와 유료',plTrialLeft:n=>`지금은 모든 기능을 쓸 수 있는 무료 체험 중이에요. ${n}일 남았어요.`,plProNow:d=>`유료 회원이에요.${d?` ${d}까지 모든 기능을 쓸 수 있어요.`:''}`,plFreeNow:n=>`체험이 끝나서 무료로 쓰고 있어요. 상품은 ${n}개까지, 아래 유료 기능은 잠겨 있어요.`,
+ plFreeList:n=>[`상품 ${n}개까지`,'코드·말·글로 입력','재생산·사우드 분류','매출·이익 계산','왓츠앱 단체방 보내기'],plProList:['상품 무제한','영수증 사진 AI 읽기','외상 장부','직원 같이 쓰기','엑셀 내보내기','QR 라벨·스캔'],
+ plAsk:'유료로 바꾸고 싶어요 (왓츠앱 문의)',plAskHint:'유료로 바꾸려면 이 앱을 알려 준 분께 문의하세요.',plMsg:e=>`안녕하세요! 재고 정리판 유료로 쓰고 싶어요.${e?` (계정: ${e})`:''}`,plLimit:n=>`무료는 상품 ${n}개까지예요. 유료로 바꾸면 무제한이에요.`,
+ adTitle:'관리 (주야 님만 보여요)',adHint:'가입한 사람 목록이에요. 돈을 받으면 "+1달"이나 "+12달"을 누르세요. 남은 기간에 더해져요.',adSearch:'이름이나 이메일로 찾기',adMonth:'달',adNone:'아직 가입한 사람이 없어요.',adSaved:'바꿨어요',
  rcQuota:'오늘 쓸 수 있는 무료 AI 읽기를 다 썼어요. 내일 다시 되거나, Firebase를 Blaze(사용한 만큼 내는 요금)로 바꾸면 계속 쓸 수 있어요. 지금은 말이나 글로 "2611 20 판매"처럼 넣어주세요.',rcBusy:'AI가 지금 바빠서 못 읽었어요. 잠시 뒤 다시 눌러 주세요.',
  rvDate:'날짜 (지난 영수증이면 날짜를 바꾸세요)',
  lnNewSale:'처음 보는 코드예요. 새 상품으로 등록하면서 판매도 같이 잡아요.',lnLeft:'지금 남은 재고 (모르면 비워두세요)',rvAutoIn:n=>`재고가 모자라서 ${n}${U()}만큼은 입고로 같이 잡아요.`,
@@ -445,6 +454,10 @@ Object.assign(T.ko,{
  scTitle:'QR 스캔',scHint:'라벨의 QR을 카메라에 비추세요. 한 번 찍을 때마다 1장씩 올라가요. 같은 상품을 또 찍을 땐 카메라를 잠깐 뗐다가 다시 비추세요.',scNoCam:'카메라를 열지 못했어요. 카메라 사용을 허락해 주세요.',scSale:'판매로 넣기',scIn:'입고로 넣기',scEmpty:'아직 찍은 게 없어요',scGot:c=>`${c} 찍었어요`,scUnknown:'등록 안 된 코드 (입고로 들어가요)'
 });
 Object.assign(T.pt,{
+ plTrial:n=>`Teste grátis: ${n} dias`,plPro:'Pago',plFree:'Grátis',plTitle:'Grátis e pago',plTrialLeft:n=>`Você está no teste grátis com todas as funções. Faltam ${n} dias.`,plProNow:d=>`Você é assinante.${d?` Todas as funções até ${d}.`:''}`,plFreeNow:n=>`O teste acabou e você está no plano grátis: até ${n} produtos; as funções pagas abaixo estão bloqueadas.`,
+ plFreeList:n=>[`Até ${n} produtos`,'Lançar por código, voz ou texto','Repor / saldão automático','Faturamento e lucro','Enviar no grupo do WhatsApp'],plProList:['Produtos ilimitados','Leitura de nota por foto (IA)','Fiado','Funcionários','Exportar para Excel','Etiquetas e leitura QR'],
+ plAsk:'Quero assinar (WhatsApp)',plAskHint:'Para assinar, fale com quem te indicou o app.',plMsg:e=>`Olá! Quero assinar o Controle de Estoque.${e?` (conta: ${e})`:''}`,plLimit:n=>`O plano grátis vai até ${n} produtos. Assinando, é ilimitado.`,
+ adTitle:'Administração (só você vê)',adHint:'Lista de cadastrados. Ao receber, toque "+1 mês" ou "+12 meses"; soma ao tempo que falta.',adSearch:'Buscar por nome ou e-mail',adMonth:' mês',adNone:'Ninguém cadastrado ainda.',adSaved:'Alterado',
  rcQuota:'Acabou a leitura grátis por IA de hoje. Volta amanhã, ou mude o Firebase para o plano Blaze (paga só o que usar). Agora, fale ou escreva, ex.: "2611 20 venda".',rcBusy:'A IA está ocupada agora. Tente de novo em instantes.',
  rvDate:'Data (se a nota for antiga, mude a data)',
  lnNewSale:'Código novo. Cadastra o produto e já lança a venda.',lnLeft:'Estoque que sobrou agora (opcional)',rvAutoIn:n=>`Faltou estoque: ${n} ${U()} entram como entrada junto.`,
@@ -683,7 +696,8 @@ function render(){
   $('#sum').innerHTML=`<span>${L.styles} <b>${mine.length}</b></span><span>${L.made} <b>${num(tm)} ${L.pcs}</b></span><span>${L.sold} <b>${num(ts)} ${L.pcs}</b></span><span>${L.stock} <b>${num(S(j=>j.stock))} ${L.pcs}</b></span>${count('early')?`<span>${L.cats.early[0]} <b>${count('early')}</b></span>`:''}`;
   document.body.classList.toggle('staff',isStaff());if(isStaff())$('#sub').textContent=L.staffBadge(ownerName);
   {const gs=custGroups(),dT=gs.reduce((a,x)=>a+x.left,0),dO=gs.some(x=>x.over);
-   $('#tools').innerHTML=[!isStaff()&&['debt',`💰 ${L.tools.debt}${dT?` <b>${brl(dT)}</b>`:''}`,dO?'over':''],['scan','📷 '+L.tools.scan],['label','🏷️ '+L.tools.label],!isStaff()&&['xls','📊 '+L.tools.xls],!isStaff()&&['team','👥 '+L.tools.team]].filter(Boolean).map(([k,x,c])=>`<button type="button" class="tool ${c||''}" data-tool="${k}">${x}</button>`).join('')}
+   const lk=x=>isPro()?x:x+' 🔒';
+   $('#tools').innerHTML=[planChip(),window.App&&App.admin&&['admin','👑 '+L.adTitle.split(' (')[0]],!isStaff()&&['debt',lk(`💰 ${L.tools.debt}${dT?` <b>${brl(dT)}</b>`:''}`),dO?'over':''],['scan',lk('📷 '+L.tools.scan)],['label',lk('🏷️ '+L.tools.label)],!isStaff()&&['xls',lk('📊 '+L.tools.xls)],!isStaff()&&['team',lk('👥 '+L.tools.team)]].filter(Boolean).map(([k,x,c])=>`<button type="button" class="tool ${c||''}" data-tool="${k}">${x}</button>`).join('')}
   $('#trendBtn').textContent=L.trendBtn;
   renderHist();
   if(!loaded){$('#listTitle').textContent=L.all;$('#list').innerHTML=`<div class="empty">${L.loading}</div>`;return}
@@ -769,7 +783,7 @@ function itemForm(it,preset){const L=t();
     const ref=$('#f-ref').value.trim(), name=$('#f-name').value.trim(), made=Math.max(0,Math.floor(+$('#f-made').value||0)), sold=Math.max(0,Math.floor(+$('#f-sold').value||0)), date=$('#f-date').value, err=$('#f-err');
     const bad=m=>{err.textContent=m;err.hidden=false};
     const soldV=Math.max(0,Math.floor(+$('#f-soldv').value||0));
-    if(!ref)return bad(L.eCode); if(sold>made)return bad(L.eSold); if(soldV>sold)return bad(L.eSoldV); if(checkDup())return;
+    if(!it&&!isPro()&&items.length>=FREE_MAX)return bad(L.plLimit(FREE_MAX)); if(!ref)return bad(L.eCode); if(sold>made)return bad(L.eSold); if(soldV>sold)return bad(L.eSoldV); if(checkDup())return;
     const data={photo:safeImg(fphoto),ref,name,namePt:$('#f-namept').value.trim(),kind:fkind,cost:+$('#f-cost').value||0,price:+$('#f-price').value||0,priceV:+$('#f-pricev').value||0,made,sold,soldV,madeDate:date,month:(date||month).slice(0,7),updatedAt:new Date().toISOString()};
     if(await saveItem(it?.id,data)){month=data.month;q='';$('#q').value='';closeSheet();render();toast(L.tSaved)}
   };
@@ -945,6 +959,7 @@ function localParse(text,kind){
 async function readReceipt(){const L=t(), err=$('#rc-err');err.hidden=true;stopMic();
   const text=($('#rc-text').value||'').trim();rc.text=text;
   if(!rc.photos.length&&!text){err.textContent=L.rcNeed;err.hidden=false;return}
+  if(rc.photos.length&&!isPro()){proForm();return}
   if(!ai&&rc.photos.length){err.textContent=L.rcNoAi;err.hidden=false;return}
   $('#rc-busy').hidden=false;$('#rc-go').disabled=true;
   try{
@@ -1037,6 +1052,8 @@ function wireLines(){const box=$('#rv-lines');
 async function applyInput(){const L=t();
   const hasSale=$('#rv-debt')&&!$('#rv-debt').hidden, cust=hasSale?$('#d-cust').value.trim():'', later=hasSale&&rc.debt&&rc.debt.mode==='later', dAmt=later?Math.round((+$('#d-amt').value||0)*100)/100:0;
   if(later&&!cust){toast(L.dEName);$('#d-cust').focus();return} if(later&&!(dAmt>0)){toast(L.dEAmt);$('#d-amt').focus();return}
+  const nNew=rc.lines.filter(l=>!isBlank(l)&&l.pick==='new').length;
+  if(nNew&&!isPro()&&items.length+nNew>FREE_MAX){toast(L.plLimit(FREE_MAX));proForm();return}
   $('#rv-apply').disabled=true;
   const now=new Date().toISOString(), today=(($('#rv-date')&&$('#rv-date').value)||todayStr()).slice(0,10), patches={}, logLines=[];
   try{
@@ -1083,7 +1100,7 @@ document.addEventListener('click',e=>{const tr=e.target.closest('tr[data-edit]')
   if(b.dataset.qe){const it=items.find(i=>i.id===b.dataset.qe);if(it)quickEdit(it);return}
   if(b.dataset.sl){const it=items.find(i=>i.id===b.dataset.sl);if(it)slForm(it);return}
   if(b.dataset.wa){waShare([items.find(i=>i.id===b.dataset.wa)]);return}
-  if(b.dataset.tool){({debt:debtBook,scan:scanForm,label:labelForm,xls:exportXls,team:teamForm})[b.dataset.tool]();return}
+  if(b.dataset.tool){const tk=b.dataset.tool;if(tk==='plan')return proForm();if(tk==='admin')return adminForm();if(needPro())return;({debt:debtBook,scan:scanForm,label:labelForm,xls:exportXls,team:teamForm})[tk]();return}
   if(b.dataset.dcust){custView(b.dataset.dcust);return}
   if(b.dataset.reorder){shareText(reOrderText(items.filter(i=>i.month===month&&calc(i).cat==='re')));return}
   if(b.dataset.waall){const k=b.dataset.waall;waShare(items.filter(i=>i.month===month&&calc(i).cat===k).filter(i=>calc(i).stock>0));return}
@@ -1202,7 +1219,7 @@ function wireDebtBox(){rc.debt={mode:'now',touched:false};
   $('#d-amt').oninput=()=>{rc.debt.touched=true};
   $('#d-cust').onchange=()=>{if(!$('#d-ph').value)$('#d-ph').value=custPhone($('#d-cust').value)}}
 function saleTotal(){let s=0;for(const l of rc.lines){if(l.type!=='sale'||!(+l.qty>0))continue;if(l.pick==='new'){s+=(+l.qty)*(l.ch==='V'?(+l.priceV||+l.price||0):(+l.price||0));continue}const it=items.find(i=>i.id===l.pick);if(!it)continue;const j=calc(it);s+=(+l.qty)*(l.ch==='V'?(j.priceV||j.price):j.price)}return Math.round(s*100)/100}
-function debtSync(){if(!rc||!rc.debt||!$('#rv-debt'))return;const any=rc.lines.some(l=>l.type==='sale'&&+l.qty>0&&l.pick);
+function debtSync(){if(!rc||!rc.debt||!$('#rv-debt'))return;const any=isPro()&&rc.lines.some(l=>l.type==='sale'&&+l.qty>0&&l.pick);
   $('#rv-debt').hidden=!any;if(!rc.debt.touched){const s=saleTotal();$('#d-amt').value=s?s.toFixed(2):''}}
 
 // --- 3. staff ---
@@ -1293,6 +1310,47 @@ async function trendShare(){const L=t();
   if(navigator.share){try{await navigator.share({text});return}catch(e){if(e&&e.name==='AbortError')return}}
   try{await navigator.clipboard.writeText(text);toast(L.trendCopied)}catch(e){toast(L.trendNone)}}
 
+// --- plans: 14-day trial, then free or paid (set by the app owner in the admin screen) ---
+// plan.kind: 'pro' (paid) | 'trial' | 'free' ; in the preview / phone-only mode everything is open
+let plan={kind:'pro',days:0,until:'',open:true};
+const FREE_MAX=30;
+const isPro=()=>plan.open||plan.kind==='pro'||plan.kind==='trial';
+function needPro(){if(isPro())return false;proForm();return true}
+function planChip(){const L=t();if(plan.open||isStaff())return '';
+  if(plan.kind==='trial')return ['plan',`⭐ ${L.plTrial(plan.days)}`,'trial'];
+  if(plan.kind==='pro')return ['plan',`⭐ ${L.plPro}${plan.until?` ~${fmtD(plan.until)}`:''}`,'pro'];
+  return ['plan',`🔓 ${L.plFree}`,'free']}
+function proForm(){const L=t(),c=(window.App&&App.contact)||{};
+  const msg=encodeURIComponent(L.plMsg((App.me&&App.me.email)||''));
+  openSheet(`${head(L.plTitle)}
+  <div class="advice ${plan.kind==='free'?'c-retail':'c-re'}">${plan.kind==='trial'?L.plTrialLeft(plan.days):plan.kind==='pro'?L.plProNow(plan.until?fmtD(plan.until):''):L.plFreeNow(FREE_MAX)}</div>
+  <div class="plgrid"><div><b>${L.plFree}</b><ul>${L.plFreeList(FREE_MAX).map(x=>`<li>${x}</li>`).join('')}</ul></div>
+  <div class="pro"><b>⭐ ${L.plPro}</b><ul>${L.plProList.map(x=>`<li>${x}</li>`).join('')}</ul>${c.price?`<p class="plprice">${esc(String(c.price).split(' / ')[lang==='ko'?0:1]||c.price)}</p>`:''}</div></div>
+  ${c.wa&&plan.kind!=='pro'?`<a class="btn wa full" href="https://wa.me/${esc(String(c.wa).replace(/\D/g,''))}?text=${msg}" target="_blank" rel="noopener">💬 ${L.plAsk}</a>`:`<p class="hint">${L.plAskHint}</p>`}`)}
+// owner-only admin screen
+function adminForm(){const L=t();if(!(window.App&&App.admin))return;
+  openSheet(`${head('👑 '+L.adTitle)}<p class="hint">${L.adHint}</p>
+  <input id="ad-q" placeholder="${L.adSearch}" autocomplete="off"><div id="ad-list" class="dlist"></div>`);
+  const draw=()=>{const el=$('#ad-list');if(!el)return;const q=norm($('#ad-q').value||''),td=todayStr();
+    const rows=(App.admin.list||[]).filter(r=>!q||norm((r.name||'')+' '+(r.email||'')).includes(q)).sort((a,b)=>String(b.created||'').localeCompare(String(a.created||'')));
+    el.innerHTML=rows.length?rows.map(r=>{const st=planOf(r,td);
+      return `<div class="adrow"><div class="w"><b>${esc(r.name||r.email||r.uid)}</b><span class="ref">${esc(r.email||'')}</span>
+        <span class="pill ${st.kind==='pro'?'c-re':st.kind==='trial'?'c-sale':'c-retail'}">${st.kind==='pro'?`${L.plPro} ~${fmtD(st.until)||'∞'}`:st.kind==='trial'?L.plTrial(st.days):L.plFree}</span></div>
+        <div class="adbtn"><button class="btn soft sm" type="button" data-adm="1" data-u="${esc(r.uid)}">+1${L.adMonth}</button><button class="btn soft sm" type="button" data-adm="12" data-u="${esc(r.uid)}">+12${L.adMonth}</button><button class="btn soft sm" type="button" data-adm="0" data-u="${esc(r.uid)}">${L.plFree}</button></div></div>`}).join(''):`<p class="hint">${L.adNone}</p>`};
+  App.admin.onChange=draw;draw();$('#ad-q').oninput=draw;
+  $('#ad-list').onclick=async e=>{const b=e.target.closest('[data-adm]');if(!b)return;const r=(App.admin.list||[]).find(x=>x.uid===b.dataset.u);if(!r)return;
+    const n=+b.dataset.adm;let data;
+    if(!n)data={plan:'free',until:''};
+    else{const base=r.plan==='pro'&&r.until&&r.until>=todayStr()?new Date(r.until+'T12:00:00'):new Date();base.setMonth(base.getMonth()+n);
+      data={plan:'pro',until:new Date(base.getTime()-base.getTimezoneOffset()*6e4).toISOString().slice(0,10)}}
+    b.disabled=true;try{await App.admin.set(r.uid,data);toast(L.adSaved)}catch(_){toast(L.tmErr)}b.disabled=false}}
+// what a plan document means today
+function planOf(d,td){td=td||todayStr();if(!d)return {kind:'pro',days:0,until:'',open:true};
+  if(d.plan==='pro'&&(!d.until||d.until>=td))return {kind:'pro',days:0,until:d.until||''};
+  const start=d.trialStart?new Date(d.trialStart):null;
+  if(d.plan==='trial'&&start&&!isNaN(start)){const left=14-Math.floor((Date.now()-start.getTime())/864e5);if(left>0)return {kind:'trial',days:left,until:''}}
+  return {kind:'free',days:0,until:''}}
+
 // ---------- hooks used by the storage / AI layer ----------
 window.App={
   attach(d,opt){this.detach();db=d;items=[];moves=[];debts=[];team=[];role=(opt&&opt.role)||'owner';ownerName=(opt&&opt.ownerName)||'';loaded=false;let first=true;
@@ -1306,6 +1364,7 @@ window.App={
     render()},
   detach(){unsub.forEach(f=>{try{f()}catch(e){}});unsub=[];db=null},
   setAi(fn,opts){ai=fn;aiOpts=opts||{images:null}},
+  setPlan(d){plan=d?planOf(d):{kind:'pro',days:0,until:'',open:true};render()},
   setState(s){dbState=s;if(s==='no'){loaded=true}render()},
   render
 };
@@ -1330,7 +1389,7 @@ render();
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
-import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, collection, doc, getDoc, setDoc, updateDoc, deleteDoc, onSnapshot, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
+import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, collection, doc, getDoc, setDoc, updateDoc, serverTimestamp, deleteDoc, onSnapshot, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
 import { getAI, getGenerativeModel, GoogleAIBackend } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-ai.js";
 import { initializeAppCheck, ReCaptchaEnterpriseProvider } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app-check.js";
 
@@ -1450,9 +1509,34 @@ if (!valid(cfg) && ls.get('localMode') === '1') {
       await setDoc(doc(fs, `users/${user.uid}/team/${e}`), { email: e, at: new Date().toISOString() }); },
     remove: async e => { await deleteDoc(doc(fs, `users/${user.uid}/team/${e}`)); await deleteDoc(doc(fs, `staffOf/${e}`)).catch(() => {}); }
   };
+  // --- plans: 14-day trial on first sign-in; the app owner turns paid months on in the admin screen ---
+  App.contact = { wa: cfg.contactWhatsApp || '', price: cfg.priceText || '' };
+  let planUnsub = null, adminUnsub = null;
+  const ts = v => v && typeof v.toDate === 'function' ? v.toDate().toISOString() : (v || '');
+  async function watchPlan(u, mode) {
+    if (planUnsub) { planUnsub(); planUnsub = null; } if (adminUnsub) { adminUnsub(); adminUnsub = null; }
+    App.me = { uid: u.uid, email: u.email || '' }; App.admin = null;
+    const isAdmin = cfg.adminUid && u.uid === cfg.adminUid;
+    if (isAdmin) {   // the owner always has everything and sees the admin list
+      App.setPlan(null);
+      App.admin = { list: [], onChange: null,
+        set: (uid, data) => updateDoc(doc(fs, `plans/${uid}`), data) };
+      adminUnsub = onSnapshot(collection(fs, 'plans'), s => {
+        App.admin.list = s.docs.map(d => ({ uid: d.id, ...d.data(), trialStart: ts(d.data().trialStart), created: ts(d.data().trialStart) }));
+        if (App.admin.onChange) App.admin.onChange(); App.render(); }, () => {});
+      return;
+    }
+    const pid = mode && mode.role === 'staff' ? mode.owner : u.uid, ref = doc(fs, `plans/${pid}`);
+    if (!(mode && mode.role === 'staff')) {
+      try { const s = await getDoc(ref);
+        if (!s.exists()) await setDoc(ref, { plan: 'trial', trialStart: serverTimestamp(), email: u.email || '', name: u.displayName || '' });
+      } catch (e) { App.setPlan(null); return; }   // rules not updated yet: keep everything open
+    }
+    planUnsub = onSnapshot(ref, s => { const ok = s && typeof s.exists === 'function' && s.exists(); App.setPlan(ok ? { ...s.data(), trialStart: ts(s.data().trialStart) } : null); }, () => App.setPlan(null));
+  }
   onAuthStateChanged(auth, async u => {
     user = u;
-    if (!u) { App.detach(); loginBox.hidden = false; App.setState('wait'); return; }
+    if (!u) { App.detach(); if (planUnsub) { planUnsub(); planUnsub = null; } if (adminUnsub) { adminUnsub(); adminUnsub = null; } App.admin = null; loginBox.hidden = false; App.setState('wait'); return; }
     loginBox.hidden = true;
     let mode = null; const key = 'staffMode-' + u.uid;
     try { const s = await getDoc(doc(fs, `staffOf/${em(u)}`));
@@ -1461,6 +1545,7 @@ if (!valid(cfg) && ls.get('localMode') === '1') {
     } catch (e) { try { mode = JSON.parse(ls.get(key) || 'null'); } catch (_) {} }
     if (user !== u) return;
     App.attach(makeDb(mode ? mode.owner : u.uid), mode || { role: 'owner' }); App.setState(navigator.onLine ? 'wait' : 'off');
+    watchPlan(u, mode);
   });
   addEventListener('offline', () => user && App.setState('off'));
   addEventListener('online', () => user && App.setState('ok'));

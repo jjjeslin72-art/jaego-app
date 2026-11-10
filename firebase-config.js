@@ -12,5 +12,10 @@ window.FIREBASE_CONFIG = {
   appCheckSiteKey: "PASTE_RECAPTCHA_SITE_KEY",
 
   // 영수증을 읽는 AI 모델
-  aiModel: "gemini-3.8-flash"
+  aiModel: "gemini-3.8-flash",
+  // 관리 화면은 이 계정에만 보여요 / owner account (admin screen)
+  adminUid: "EAyriVqcohQqHL1aKM2w9H5tDmH3",
+  // 유료 문의 왓츠앱 번호(국가번호 포함, 예: 5511999999999)와 가격 안내
+  contactWhatsApp: "",
+  priceText: "월 R$ 29,90 / R$ 29,90 por mês"
 };

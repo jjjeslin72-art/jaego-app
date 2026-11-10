@@ -51,7 +51,7 @@ module = '''<script src="firebase-config.js"></script>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/__V__/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/__V__/firebase-auth.js";
-import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, collection, doc, getDoc, setDoc, updateDoc, deleteDoc, onSnapshot, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/__V__/firebase-firestore.js";
+import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, collection, doc, getDoc, setDoc, updateDoc, serverTimestamp, deleteDoc, onSnapshot, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/__V__/firebase-firestore.js";
 import { getAI, getGenerativeModel, GoogleAIBackend } from "https://www.gstatic.com/firebasejs/__V__/firebase-ai.js";
 import { initializeAppCheck, ReCaptchaEnterpriseProvider } from "https://www.gstatic.com/firebasejs/__V__/firebase-app-check.js";
 
@@ -171,9 +171,34 @@ if (!valid(cfg) && ls.get('localMode') === '1') {
       await setDoc(doc(fs, `users/${user.uid}/team/${e}`), { email: e, at: new Date().toISOString() }); },
     remove: async e => { await deleteDoc(doc(fs, `users/${user.uid}/team/${e}`)); await deleteDoc(doc(fs, `staffOf/${e}`)).catch(() => {}); }
   };
+  // --- plans: 14-day trial on first sign-in; the app owner turns paid months on in the admin screen ---
+  App.contact = { wa: cfg.contactWhatsApp || '', price: cfg.priceText || '' };
+  let planUnsub = null, adminUnsub = null;
+  const ts = v => v && typeof v.toDate === 'function' ? v.toDate().toISOString() : (v || '');
+  async function watchPlan(u, mode) {
+    if (planUnsub) { planUnsub(); planUnsub = null; } if (adminUnsub) { adminUnsub(); adminUnsub = null; }
+    App.me = { uid: u.uid, email: u.email || '' }; App.admin = null;
+    const isAdmin = cfg.adminUid && u.uid === cfg.adminUid;
+    if (isAdmin) {   // the owner always has everything and sees the admin list
+      App.setPlan(null);
+      App.admin = { list: [], onChange: null,
+        set: (uid, data) => updateDoc(doc(fs, `plans/${uid}`), data) };
+      adminUnsub = onSnapshot(collection(fs, 'plans'), s => {
+        App.admin.list = s.docs.map(d => ({ uid: d.id, ...d.data(), trialStart: ts(d.data().trialStart), created: ts(d.data().trialStart) }));
+        if (App.admin.onChange) App.admin.onChange(); App.render(); }, () => {});
+      return;
+    }
+    const pid = mode && mode.role === 'staff' ? mode.owner : u.uid, ref = doc(fs, `plans/${pid}`);
+    if (!(mode && mode.role === 'staff')) {
+      try { const s = await getDoc(ref);
+        if (!s.exists()) await setDoc(ref, { plan: 'trial', trialStart: serverTimestamp(), email: u.email || '', name: u.displayName || '' });
+      } catch (e) { App.setPlan(null); return; }   // rules not updated yet: keep everything open
+    }
+    planUnsub = onSnapshot(ref, s => { const ok = s && typeof s.exists === 'function' && s.exists(); App.setPlan(ok ? { ...s.data(), trialStart: ts(s.data().trialStart) } : null); }, () => App.setPlan(null));
+  }
   onAuthStateChanged(auth, async u => {
     user = u;
-    if (!u) { App.detach(); loginBox.hidden = false; App.setState('wait'); return; }
+    if (!u) { App.detach(); if (planUnsub) { planUnsub(); planUnsub = null; } if (adminUnsub) { adminUnsub(); adminUnsub = null; } App.admin = null; loginBox.hidden = false; App.setState('wait'); return; }
     loginBox.hidden = true;
     let mode = null; const key = 'staffMode-' + u.uid;
     try { const s = await getDoc(doc(fs, `staffOf/${em(u)}`));
@@ -182,6 +207,7 @@ if (!valid(cfg) && ls.get('localMode') === '1') {
     } catch (e) { try { mode = JSON.parse(ls.get(key) || 'null'); } catch (_) {} }
     if (user !== u) return;
     App.attach(makeDb(mode ? mode.owner : u.uid), mode || { role: 'owner' }); App.setState(navigator.onLine ? 'wait' : 'off');
+    watchPlan(u, mode);
   });
   addEventListener('offline', () => user && App.setState('off'));
   addEventListener('online', () => user && App.setState('ok'));

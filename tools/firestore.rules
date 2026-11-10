@@ -4,6 +4,7 @@ service cloud.firestore {
     function signedIn() { return request.auth != null; }
     function isOwner(uid) { return signedIn() && request.auth.uid == uid; }
     function myEmail() { return request.auth.token.email.lower(); }
+    function isAdmin() { return signedIn() && request.auth.uid == 'EAyriVqcohQqHL1aKM2w9H5tDmH3'; }
     function isStaff(uid) {
       return signedIn() && request.auth.token.email != null && request.auth.token.email_verified == true
         && exists(/databases/$(database)/documents/users/$(uid)/team/$(myEmail()));
@@ -18,6 +19,14 @@ service cloud.firestore {
     match /users/{uid}/debts/{id} { allow read, write: if isStaff(uid); }
     match /users/{uid}/config/{id} { allow read: if isStaff(uid); }
     match /users/{uid}/team/{email} { allow read: if signedIn() && request.auth.token.email != null && myEmail() == email; }
+    // 요금제: 처음 로그인하면 14일 체험이 스스로 만들어지고, 유료는 관리자(주야 님)만 바꿀 수 있어요
+    match /plans/{uid} {
+      allow read: if isOwner(uid) || isStaff(uid) || isAdmin();
+      allow create: if isOwner(uid) && request.resource.data.plan == 'trial'
+        && request.resource.data.trialStart == request.time
+        && request.resource.data.keys().hasOnly(['plan', 'trialStart', 'email', 'name']);
+      allow update, delete: if isAdmin();
+    }
     // 직원 찾기표 / Quem é funcionário de quem
     match /staffOf/{email} {
       allow read: if signedIn() && request.auth.token.email != null && myEmail() == email;
