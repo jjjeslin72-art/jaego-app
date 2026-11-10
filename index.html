@@ -431,6 +431,10 @@ input:focus,select:focus,textarea:focus{border-color:#1b1b1f}
 html:root:not(#_) .c-sale{--c:#d92b2b;--cs:#fde9e9}
 html:root:not(#_) .c-retail{--c:#d49a00;--cs:#fdf4d3}
 .bin.c-sale .n,.bin.c-retail .n{color:var(--c)}
+
+.tools:has(> :nth-child(6)){grid-template-columns:repeat(3,minmax(0,1fr))}
+.tools:has(> :nth-child(6)) .tool{flex-direction:row;justify-content:flex-start;gap:9px;padding:10px 10px;font-size:14px}
+.tools:has(> :nth-child(6)) .tool .ti{width:36px;height:36px;flex:none}
 .login{position:fixed;inset:0;z-index:40;background:var(--bg);display:flex;align-items:center;justify-content:center;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 .login .box{max-width:380px;width:100%;display:flex;flex-direction:column;gap:14px;text-align:center;align-items:center}
 .login img{width:96px;height:96px;border-radius:22px}
