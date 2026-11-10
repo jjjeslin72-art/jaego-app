@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>재고 정리판 · Controle de Estoque</title>
 <meta name="description" content="상품 코드·입고·판매·재고·수익 관리 / Controle de código, entrada, vendas, estoque e lucro">
-<meta name="theme-color" content="#111113">
+<meta name="theme-color" content="#f5f3ef">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
@@ -371,6 +371,61 @@ input:focus,select:focus,textarea:focus{border-color:#4a4a52}
 .tinfo{padding:8px 10px 10px;gap:2px}
 .tref{font-family:var(--display);font-weight:700;font-size:14px}
 .cthumb img{background:#f4f4f5}
+
+/* ===== soft light skin (v4): easy on the eyes, bigger type ===== */
+html:root:not(#_){--bg:#f5f3ef;--surface:#ffffff;--ink:#1b1b1f;--muted:#5f5f68;--line:#e6e2da;
+  --accent:#1b1b1f;--accent-soft:#f0ede7;--chalk:#f0ede7;--chalk-ink:#1b1b1f;
+  --re:#13865a;--re-soft:#e3f4ec;--watch:#3d5bc4;--watch-soft:#e8edfb;--sale:#b86a00;--sale-soft:#fdf0db;--retail:#c23a5c;--retail-soft:#fbe6ec;--early:#6b6b75;--early-soft:#efeff2;
+  --sh:0 1px 2px rgba(40,30,10,.04),0 6px 18px rgba(40,30,10,.06);color-scheme:light}
+body{background:var(--bg);font-size:17px;line-height:1.55}
+h1{background:none;color:var(--ink);-webkit-text-fill-color:var(--ink);font-size:26px}
+h2,.histd>summary{font-size:21px}
+.top p{font-size:14px;color:var(--muted)}
+.lang,.vseg{background:var(--surface);box-shadow:var(--sh)}
+.lang button,.vseg button{font-size:15px;padding:8px 14px;color:var(--muted)}
+.lang button[aria-pressed="true"],.vseg button[aria-pressed="true"],.seg button[aria-pressed="true"],.kinds button[aria-pressed="true"]{background:#1b1b1f;color:#fff;border-color:#1b1b1f}
+.month,select,input,textarea,.search input{background:var(--surface);border:1px solid var(--line);font-size:16.5px;box-shadow:none}
+.month{font-size:16px;padding:9px 14px;box-shadow:var(--sh)}
+input:focus,select:focus,textarea:focus{border-color:#1b1b1f}
+.moneyd{background:var(--surface);box-shadow:var(--sh)}
+.moneyd>summary{font-size:15px;color:var(--muted)}
+.moneyd>summary b{color:var(--ink);font-size:27px}
+.moneyd>summary .more{background:var(--accent-soft);color:var(--ink);font-size:14px}
+.moneyd .money{color:var(--ink)}.mgrid div{background:var(--bg)}.money .lbl{font-size:14px}.mgrid b{font-size:19px}
+.neg,.negt{color:var(--retail)}
+.bin,.sum,.tool,.card,.tablewrap,.tile,.hrow,.drow,.adrow,.plgrid>div,.rline,.cap{background:var(--surface);box-shadow:var(--sh)}
+.bin .n{color:var(--ink);font-size:30px}.bin .t{font-size:14.5px;color:var(--muted)}
+.bin[aria-pressed="true"]{background:var(--cs)}
+.sum{font-size:14px}.sum b{font-size:19px}.sum>*{border-color:var(--line)}
+.tool{font-size:14px;color:var(--ink)}.tool .ti{background:var(--accent-soft);color:var(--ink);width:42px;height:42px}.tool .ti svg{width:23px;height:23px}
+.tool .tsub{font-size:12.5px}.tool .lk{background:#8a8a93}
+.btn{background:#1b1b1f;color:#fff;font-size:16px;padding:11px 15px}.btn.soft{background:var(--accent-soft);color:var(--ink)}.btn.sm{font-size:14.5px;padding:7px 12px}
+.btn.wa{background:#1fa855;color:#fff}
+.fab.main{background:#1b1b1f;color:#fff;font-size:18px;box-shadow:0 10px 26px rgba(0,0,0,.25)}
+.fab{background:var(--surface);color:var(--ink)}
+.code{background:var(--chalk);color:var(--chalk-ink);font-size:14px}
+.tbl{font-size:15.5px}.tbl th{font-size:13.5px;background:#faf8f4;color:var(--muted)}.tbl tfoot td{background:#faf8f4}.tbl td.code-c{background:var(--surface)}.tbl th,.tbl td{border-color:var(--line);padding:11px 10px}
+.sheet{background:var(--surface);box-shadow:0 -10px 30px rgba(0,0,0,.12)}
+.sheet-wrap{background:rgba(20,15,5,.35)}
+.pick{background:var(--bg);border-color:#c9c3b8;color:var(--ink);font-size:15.5px}
+.toast{background:#1b1b1f;color:#fff;font-size:15px}
+.empty{border-color:var(--line);font-size:15.5px}
+.sz{background:var(--surface);border:1px solid var(--line);font-size:13.5px}
+.tph{background:#f1efea}.tph:not(:has(img)){background:var(--cs)}
+.tcat{background:rgba(255,255,255,.92);font-size:12px}
+.tref{font-size:16px}.tnm{font-size:13px}.tst{font-size:13px}.tst b{font-size:15px}.tsz i{font-size:12px;background:var(--bg)}
+.ref{font-size:14px}.hint{font-size:14px}.err{font-size:14.5px}.field{font-size:15px}.caph{font-size:15px}
+.name{font-size:18px}.pname{font-size:16px}.nums{font-size:13.5px}.nums b{font-size:19px}
+.advice{font-size:15.5px}.pill{font-size:13.5px}.hrow{font-size:15px}.hrow .w b{font-size:16px}
+.seg button{font-size:15px;padding:10px 4px}.kinds button{font-size:15px;padding:7px 13px}
+.status{font-size:13.5px}.read{font-size:14px}.szline>summary{font-size:14.5px}
+
+.bin{padding:12px 8px 10px}.bin .t{font-size:13.5px;white-space:normal;overflow:visible;line-height:1.25;word-break:keep-all}.bin .n{font-size:27px}
+.tools{grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}.tool{font-size:12.5px;padding:10px 1px 9px;white-space:nowrap;letter-spacing:-.04em}
+.grid3{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media (min-width:520px){.grid3{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.tph{aspect-ratio:5/4}
+.tst{white-space:nowrap}
 .login{position:fixed;inset:0;z-index:40;background:var(--bg);display:flex;align-items:center;justify-content:center;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 .login .box{max-width:380px;width:100%;display:flex;flex-direction:column;gap:14px;text-align:center;align-items:center}
 .login img{width:96px;height:96px;border-radius:22px}

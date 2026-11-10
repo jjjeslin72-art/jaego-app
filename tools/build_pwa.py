@@ -223,7 +223,7 @@ headhtml = '''<!doctype html>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>재고 정리판 · Controle de Estoque</title>
 <meta name="description" content="상품 코드·입고·판매·재고·수익 관리 / Controle de código, entrada, vendas, estoque e lucro">
-<meta name="theme-color" content="#111113">
+<meta name="theme-color" content="#f5f3ef">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
