@@ -426,6 +426,11 @@ input:focus,select:focus,textarea:focus{border-color:#1b1b1f}
 @media (min-width:520px){.grid3{grid-template-columns:repeat(3,minmax(0,1fr))}}
 .tph{aspect-ratio:5/4}
 .tst{white-space:nowrap}
+
+/* category colours: 사우드 = red, 소매 처리 = yellow */
+html:root:not(#_) .c-sale{--c:#d92b2b;--cs:#fde9e9}
+html:root:not(#_) .c-retail{--c:#d49a00;--cs:#fdf4d3}
+.bin.c-sale .n,.bin.c-retail .n{color:var(--c)}
 .login{position:fixed;inset:0;z-index:40;background:var(--bg);display:flex;align-items:center;justify-content:center;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 .login .box{max-width:380px;width:100%;display:flex;flex-direction:column;gap:14px;text-align:center;align-items:center}
 .login img{width:96px;height:96px;border-radius:22px}
