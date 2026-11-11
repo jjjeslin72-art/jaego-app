@@ -437,6 +437,14 @@ html:root:not(#_) .c-retail{--c:#d49a00;--cs:#fdf4d3}
 .tools:has(> :nth-child(6)) .tool .ti{width:36px;height:36px;flex:none}
 
 .tools{display:flex!important;gap:7px}.tools>.tool{flex:1 1 0;min-width:0}
+
+.plgrid3{display:grid;grid-template-columns:1fr;gap:8px}
+.plgrid3>div{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px 14px;font-size:15px}
+.plgrid3>div>b{font-size:17px}.plgrid3 ul{margin:6px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:3px}
+.plgrid3 .plprice{margin:2px 0 0;font-weight:800;font-size:19px}
+.plgrid3 .pro{border:2px solid #d99a2b;background:#fffaf0}
+.adbtn .adl{font-weight:800;font-size:13.5px;min-width:44px;align-self:center}
+.tool.t-basic .ti{background:var(--re-soft);color:var(--re)}
 .login{position:fixed;inset:0;z-index:40;background:var(--bg);display:flex;align-items:center;justify-content:center;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 .login .box{max-width:380px;width:100%;display:flex;flex-direction:column;gap:14px;text-align:center;align-items:center}
 .login img{width:96px;height:96px;border-radius:22px}
@@ -622,9 +630,13 @@ for(const lg of ['ko','pt']){const base=T[lg].cats;Object.defineProperty(T[lg],'
 let lang='ko'; try{lang=localStorage.getItem('lang')||'ko'}catch(e){}
 const t=()=>T[lang];
 Object.assign(T.ko,{
+ plBasic:'기본',plBasicPrice:'월 R$ 49,90',plProPrice:'월 R$ 79,90',plYear:'1년 한 번에 내면 2달 무료: 기본 R$ 499 / Pro R$ 799',
+ plBasicList:['상품 무제한','코드·말·글로 입력','재생산·사우드 분류','매출·이익 계산','왓츠앱 단체방 보내기','엑셀 내보내기'],
+ plProList2:['기본 기능 전부','영수증 사진 AI 읽기','직원 같이 쓰기','QR 라벨·스캔'],
+ plPaidNow:(k,d)=>`${k} 회원이에요.${d?` ${d}까지 쓸 수 있어요.`:''}`,
  plTrialShort:'무료 체험',plDays:n=>`${n}일 남음`,adShort:'관리',
- plTrial:n=>`무료 체험 ${n}일 남음`,plPro:'유료',plFree:'무료',plTitle:'무료와 유료',plTrialLeft:n=>`지금은 모든 기능을 쓸 수 있는 무료 체험 중이에요. ${n}일 남았어요.`,plProNow:d=>`유료 회원이에요.${d?` ${d}까지 모든 기능을 쓸 수 있어요.`:''}`,plFreeNow:n=>`체험이 끝나서 무료로 쓰고 있어요. 상품은 ${n}개까지, 아래 유료 기능은 잠겨 있어요.`,
- plFreeList:n=>[`상품 ${n}개까지`,'코드·말·글로 입력','재생산·사우드 분류','매출·이익 계산','왓츠앱 단체방 보내기'],plProList:['상품 무제한','영수증 사진 AI 읽기','직원 같이 쓰기','엑셀 내보내기','QR 라벨·스캔'],
+ plTrial:n=>`무료 체험 ${n}일 남음`,plPro:'유료',plFree:'무료',plTitle:'요금제',plTrialLeft:n=>`지금은 모든 기능을 쓸 수 있는 무료 체험 중이에요. ${n}일 남았어요.`,plProNow:d=>`유료 회원이에요.${d?` ${d}까지 모든 기능을 쓸 수 있어요.`:''}`,plFreeNow:n=>`체험이 끝나서 무료로 쓰고 있어요. 상품은 ${n}개까지, 아래 유료 기능은 잠겨 있어요.`,
+ plFreeList:n=>[`상품 ${n}개까지`,'코드·말·글로 입력','재생산·사우드 분류','매출·이익 계산'],plProList:['상품 무제한','영수증 사진 AI 읽기','직원 같이 쓰기','엑셀 내보내기','QR 라벨·스캔'],
  plAsk:'유료로 바꾸고 싶어요 (왓츠앱 문의)',plAskHint:'유료로 바꾸려면 이 앱을 알려 준 분께 문의하세요.',plMsg:e=>`안녕하세요! 재고 정리판 유료로 쓰고 싶어요.${e?` (계정: ${e})`:''}`,plLimit:n=>`무료는 상품 ${n}개까지예요. 유료로 바꾸면 무제한이에요.`,
  adTitle:'관리 (주야 님만 보여요)',adHint:'가입한 사람 목록이에요. 돈을 받으면 "+1달"이나 "+12달"을 누르세요. 남은 기간에 더해져요.',adSearch:'이름이나 이메일로 찾기',adMonth:'달',adNone:'아직 가입한 사람이 없어요.',adSaved:'바꿨어요',
  rcQuota:'오늘 쓸 수 있는 무료 AI 읽기를 다 썼어요. 내일 다시 되거나, Firebase를 Blaze(사용한 만큼 내는 요금)로 바꾸면 계속 쓸 수 있어요. 지금은 말이나 글로 "2611 20 판매"처럼 넣어주세요.',rcBusy:'AI가 지금 바빠서 못 읽었어요. 잠시 뒤 다시 눌러 주세요.',
@@ -643,9 +655,13 @@ Object.assign(T.ko,{
  scTitle:'QR 스캔',scHint:'라벨의 QR을 카메라에 비추세요. 한 번 찍을 때마다 1장씩 올라가요. 같은 상품을 또 찍을 땐 카메라를 잠깐 뗐다가 다시 비추세요.',scNoCam:'카메라를 열지 못했어요. 카메라 사용을 허락해 주세요.',scSale:'판매로 넣기',scIn:'입고로 넣기',scEmpty:'아직 찍은 게 없어요',scGot:c=>`${c} 찍었어요`,scUnknown:'등록 안 된 코드 (입고로 들어가요)'
 });
 Object.assign(T.pt,{
+ plBasic:'Básico',plBasicPrice:'R$ 49,90/mês',plProPrice:'R$ 79,90/mês',plYear:'Pagando o ano todo, 2 meses grátis: Básico R$ 499 / Pro R$ 799',
+ plBasicList:['Produtos ilimitados','Lançar por código, voz ou texto','Repor / saldão automático','Faturamento e lucro','Enviar no grupo do WhatsApp','Exportar para Excel'],
+ plProList2:['Tudo do Básico','Leitura de nota por foto (IA)','Funcionários','Etiquetas e leitura QR'],
+ plPaidNow:(k,d)=>`Você é assinante ${k}.${d?` Válido até ${d}.`:''}`,
  plTrialShort:'Teste grátis',plDays:n=>`faltam ${n} dias`,adShort:'Admin',
- plTrial:n=>`Teste grátis: ${n} dias`,plPro:'Pago',plFree:'Grátis',plTitle:'Grátis e pago',plTrialLeft:n=>`Você está no teste grátis com todas as funções. Faltam ${n} dias.`,plProNow:d=>`Você é assinante.${d?` Todas as funções até ${d}.`:''}`,plFreeNow:n=>`O teste acabou e você está no plano grátis: até ${n} produtos; as funções pagas abaixo estão bloqueadas.`,
- plFreeList:n=>[`Até ${n} produtos`,'Lançar por código, voz ou texto','Repor / saldão automático','Faturamento e lucro','Enviar no grupo do WhatsApp'],plProList:['Produtos ilimitados','Leitura de nota por foto (IA)','Funcionários','Exportar para Excel','Etiquetas e leitura QR'],
+ plTrial:n=>`Teste grátis: ${n} dias`,plPro:'Pago',plFree:'Grátis',plTitle:'Planos',plTrialLeft:n=>`Você está no teste grátis com todas as funções. Faltam ${n} dias.`,plProNow:d=>`Você é assinante.${d?` Todas as funções até ${d}.`:''}`,plFreeNow:n=>`O teste acabou e você está no plano grátis: até ${n} produtos; as funções pagas abaixo estão bloqueadas.`,
+ plFreeList:n=>[`Até ${n} produtos`,'Lançar por código, voz ou texto','Repor / saldão automático','Faturamento e lucro'],plProList:['Produtos ilimitados','Leitura de nota por foto (IA)','Funcionários','Exportar para Excel','Etiquetas e leitura QR'],
  plAsk:'Quero assinar (WhatsApp)',plAskHint:'Para assinar, fale com quem te indicou o app.',plMsg:e=>`Olá! Quero assinar o Controle de Estoque.${e?` (conta: ${e})`:''}`,plLimit:n=>`O plano grátis vai até ${n} produtos. Assinando, é ilimitado.`,
  adTitle:'Administração (só você vê)',adHint:'Lista de cadastrados. Ao receber, toque "+1 mês" ou "+12 meses"; soma ao tempo que falta.',adSearch:'Buscar por nome ou e-mail',adMonth:' mês',adNone:'Ninguém cadastrado ainda.',adSaved:'Alterado',
  rcQuota:'Acabou a leitura grátis por IA de hoje. Volta amanhã, ou mude o Firebase para o plano Blaze (paga só o que usar). Agora, fale ou escreva, ex.: "2611 20 venda".',rcBusy:'A IA está ocupada agora. Tente de novo em instantes.',
@@ -888,8 +904,8 @@ function render(){
   {const gs=custGroups(),dT=gs.reduce((a,x)=>a+x.left,0),dO=gs.some(x=>x.over);
    const LOCKED=new Set(['scan','label','xls','team']), pc=planChip();
    {const pp=$('#planPill');pp.hidden=!pc;if(pc){pp.className='propill'+(plan.kind==='free'?' free':'');
-     pp.innerHTML=`<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m2 8 5 4 5-7 5 7 5-4-2 11H4z"/></svg>${plan.kind==='trial'?L.plDays(plan.days):plan.kind==='pro'?'Pro':L.plFree}`}}
-   const tile=(k,label,cls,sub,ico)=>`<button type="button" class="tool ${cls||''}" data-tool="${k}"><span class="ti">${icon(ico||k)}${!isPro()&&LOCKED.has(k)?`<i class="lk">${icon('lock')}</i>`:''}</span><span class="tl">${label}</span>${sub?`<span class="tsub">${sub}</span>`:''}</button>`;
+     pp.innerHTML=`<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m2 8 5 4 5-7 5 7 5-4-2 11H4z"/></svg>${plan.kind==='trial'?L.plDays(plan.days):plan.kind==='pro'?'Pro':plan.kind==='basic'?L.plBasic:L.plFree}`}}
+   const tile=(k,label,cls,sub,ico)=>`<button type="button" class="tool ${cls||''}" data-tool="${k}"><span class="ti">${icon(ico||k)}${LOCKED.has(k)&&!can(k)?`<i class="lk">${icon('lock')}</i>`:''}</span><span class="tl">${label}</span>${sub?`<span class="tsub">${sub}</span>`:''}</button>`;
    $('#tools').innerHTML=[
      window.App&&App.admin&&tile('admin',L.adShort,'t-admin','','crown'),
      tile('scan',L.tools.scan),tile('label',L.tools.label),
@@ -979,7 +995,7 @@ function itemForm(it,preset){const L=t();
     const ref=$('#f-ref').value.trim(), name=$('#f-name').value.trim(), made=Math.max(0,Math.floor(+$('#f-made').value||0)), sold=Math.max(0,Math.floor(+$('#f-sold').value||0)), date=$('#f-date').value, err=$('#f-err');
     const bad=m=>{err.textContent=m;err.hidden=false};
     const soldV=Math.max(0,Math.floor(+$('#f-soldv').value||0));
-    if(!it&&!isPro()&&items.length>=FREE_MAX)return bad(L.plLimit(FREE_MAX)); if(!ref)return bad(L.eCode); if(sold>made)return bad(L.eSold); if(soldV>sold)return bad(L.eSoldV); if(checkDup())return;
+    if(!it&&!isPaid()&&items.length>=FREE_MAX)return bad(L.plLimit(FREE_MAX)); if(!ref)return bad(L.eCode); if(sold>made)return bad(L.eSold); if(soldV>sold)return bad(L.eSoldV); if(checkDup())return;
     const data={photo:safeImg(fphoto),ref,name,namePt:$('#f-namept').value.trim(),kind:fkind,cost:+$('#f-cost').value||0,price:+$('#f-price').value||0,priceV:+$('#f-pricev').value||0,made,sold,soldV,madeDate:date,month:(date||month).slice(0,7),updatedAt:new Date().toISOString()};
     if(await saveItem(it?.id,data)){month=data.month;q='';$('#q').value='';closeSheet();render();toast(L.tSaved)}
   };
@@ -1155,7 +1171,7 @@ function localParse(text,kind){
 async function readReceipt(){const L=t(), err=$('#rc-err');err.hidden=true;stopMic();
   const text=($('#rc-text').value||'').trim();rc.text=text;
   if(!rc.photos.length&&!text){err.textContent=L.rcNeed;err.hidden=false;return}
-  if(rc.photos.length&&!isPro()){proForm();return}
+  if(rc.photos.length&&!can('photo')){proForm();return}
   if(!ai&&rc.photos.length){err.textContent=L.rcNoAi;err.hidden=false;return}
   $('#rc-busy').hidden=false;$('#rc-go').disabled=true;
   try{
@@ -1249,7 +1265,7 @@ async function applyInput(){const L=t();
   const hasSale=$('#rv-debt')&&!$('#rv-debt').hidden, cust=hasSale?$('#d-cust').value.trim():'', later=hasSale&&rc.debt&&rc.debt.mode==='later', dAmt=later?Math.round((+$('#d-amt').value||0)*100)/100:0;
   if(later&&!cust){toast(L.dEName);$('#d-cust').focus();return} if(later&&!(dAmt>0)){toast(L.dEAmt);$('#d-amt').focus();return}
   const nNew=rc.lines.filter(l=>!isBlank(l)&&l.pick==='new').length;
-  if(nNew&&!isPro()&&items.length+nNew>FREE_MAX){toast(L.plLimit(FREE_MAX));proForm();return}
+  if(nNew&&!isPaid()&&items.length+nNew>FREE_MAX){toast(L.plLimit(FREE_MAX));proForm();return}
   $('#rv-apply').disabled=true;
   const now=new Date().toISOString(), today=(($('#rv-date')&&$('#rv-date').value)||todayStr()).slice(0,10), patches={}, logLines=[];
   try{
@@ -1296,7 +1312,7 @@ document.addEventListener('click',e=>{const tr=e.target.closest('tr[data-edit]')
   if(b.dataset.qe){const it=items.find(i=>i.id===b.dataset.qe);if(it)quickEdit(it);return}
   if(b.dataset.sl){const it=items.find(i=>i.id===b.dataset.sl);if(it)slForm(it);return}
   if(b.dataset.wa){waShare([items.find(i=>i.id===b.dataset.wa)]);return}
-  if(b.dataset.tool){const tk=b.dataset.tool;if(tk==='admin')return adminForm();if(needPro())return;({debt:debtBook,scan:scanForm,label:labelForm,xls:exportXls,team:teamForm})[tk]();return}
+  if(b.dataset.tool){const tk=b.dataset.tool;if(tk==='admin')return adminForm();if(needPro(tk))return;({debt:debtBook,scan:scanForm,label:labelForm,xls:exportXls,team:teamForm})[tk]();return}
   if(b.dataset.dcust){custView(b.dataset.dcust);return}
   if(b.dataset.reorder){shareText(reOrderText(items.filter(i=>i.month===month&&calc(i).cat==='re')));return}
   if(b.dataset.waall){const k=b.dataset.waall;waShare(items.filter(i=>i.month===month&&calc(i).cat===k).filter(i=>calc(i).stock>0));return}
@@ -1521,17 +1537,22 @@ const icon=k=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke
 let plan={kind:'pro',days:0,until:'',open:true};
 const FREE_MAX=30;
 const isPro=()=>plan.open||plan.kind==='pro'||plan.kind==='trial';
-function needPro(){if(isPro())return false;proForm();return true}
+const isPaid=()=>isPro()||plan.kind==='basic';
+const FEAT={xls:'basic',scan:'pro',label:'pro',team:'pro',photo:'pro'};
+const can=k=>FEAT[k]==='pro'?isPro():FEAT[k]==='basic'?isPaid():true;
+function needPro(k){if(can(k))return false;proForm();return true}
 function planChip(){const L=t();if(plan.open||isStaff())return '';
   if(plan.kind==='trial')return ['plan',`⭐ ${L.plTrial(plan.days)}`,'trial'];
-  if(plan.kind==='pro')return ['plan',`⭐ ${L.plPro}${plan.until?` ~${fmtD(plan.until)}`:''}`,'pro'];
+  if(plan.kind==='pro'||plan.kind==='basic')return ['plan',`⭐ ${plan.kind==='pro'?L.plPro:L.plBasic}${plan.until?` ~${fmtD(plan.until)}`:''}`,plan.kind];
   return ['plan',`🔓 ${L.plFree}`,'free']}
 function proForm(){const L=t(),c=(window.App&&App.contact)||{};
   const msg=encodeURIComponent(L.plMsg((App.me&&App.me.email)||''));
+  const now=plan.kind==='trial'?L.plTrialLeft(plan.days):plan.kind==='pro'||plan.kind==='basic'?L.plPaidNow(plan.kind==='pro'?'Pro':L.plBasic,plan.until?fmtD(plan.until):''):L.plFreeNow(FREE_MAX);
+  const col=(cls,name,price,list)=>`<div class="${cls}"><b>${name}</b>${price?`<p class="plprice">${price}</p>`:''}<ul>${list.map(x=>`<li>${x}</li>`).join('')}</ul></div>`;
   openSheet(`${head(L.plTitle)}
-  <div class="advice ${plan.kind==='free'?'c-retail':'c-re'}">${plan.kind==='trial'?L.plTrialLeft(plan.days):plan.kind==='pro'?L.plProNow(plan.until?fmtD(plan.until):''):L.plFreeNow(FREE_MAX)}</div>
-  <div class="plgrid"><div><b>${L.plFree}</b><ul>${L.plFreeList(FREE_MAX).map(x=>`<li>${x}</li>`).join('')}</ul></div>
-  <div class="pro"><b>⭐ ${L.plPro}</b><ul>${L.plProList.map(x=>`<li>${x}</li>`).join('')}</ul>${c.price?`<p class="plprice">${esc(String(c.price).split(' / ')[lang==='ko'?0:1]||c.price)}</p>`:''}</div></div>
+  <div class="advice ${plan.kind==='free'?'c-retail':'c-re'}">${now}</div>
+  <div class="plgrid3">${col('',L.plFree,'',L.plFreeList(FREE_MAX))}${col('basic',L.plBasic,L.plBasicPrice,L.plBasicList)}${col('pro','⭐ Pro',L.plProPrice,L.plProList2)}</div>
+  <p class="hint">${L.plYear}</p>
   ${c.wa&&plan.kind!=='pro'?`<a class="btn wa full" href="https://wa.me/${esc(String(c.wa).replace(/\D/g,''))}?text=${msg}" target="_blank" rel="noopener">💬 ${L.plAsk}</a>`:`<p class="hint">${L.plAskHint}</p>`}`)}
 // owner-only admin screen
 function adminForm(){const L=t();if(!(window.App&&App.admin))return;
@@ -1541,18 +1562,19 @@ function adminForm(){const L=t();if(!(window.App&&App.admin))return;
     const rows=(App.admin.list||[]).filter(r=>!q||norm((r.name||'')+' '+(r.email||'')).includes(q)).sort((a,b)=>String(b.created||'').localeCompare(String(a.created||'')));
     el.innerHTML=rows.length?rows.map(r=>{const st=planOf(r,td);
       return `<div class="adrow"><div class="w"><b>${esc(r.name||r.email||r.uid)}</b><span class="ref">${esc(r.email||'')}</span>
-        <span class="pill ${st.kind==='pro'?'c-re':st.kind==='trial'?'c-sale':'c-retail'}">${st.kind==='pro'?`${L.plPro} ~${fmtD(st.until)||'∞'}`:st.kind==='trial'?L.plTrial(st.days):L.plFree}</span></div>
-        <div class="adbtn"><button class="btn soft sm" type="button" data-adm="1" data-u="${esc(r.uid)}">+1${L.adMonth}</button><button class="btn soft sm" type="button" data-adm="12" data-u="${esc(r.uid)}">+12${L.adMonth}</button><button class="btn soft sm" type="button" data-adm="0" data-u="${esc(r.uid)}">${L.plFree}</button></div></div>`}).join(''):`<p class="hint">${L.adNone}</p>`};
+        <span class="pill ${st.kind==='pro'||st.kind==='basic'?'c-re':st.kind==='trial'?'c-sale':'c-retail'}">${st.kind==='pro'||st.kind==='basic'?`${st.kind==='pro'?'Pro':L.plBasic} ~${fmtD(st.until)||'∞'}`:st.kind==='trial'?L.plTrial(st.days):L.plFree}</span></div>
+        <div class="adbtn"><span class="adl">${L.plBasic}</span><button class="btn soft sm" type="button" data-adm="1" data-k="basic" data-u="${esc(r.uid)}">+1${L.adMonth}</button><button class="btn soft sm" type="button" data-adm="12" data-k="basic" data-u="${esc(r.uid)}">+12${L.adMonth}</button></div>
+        <div class="adbtn"><span class="adl">Pro</span><button class="btn soft sm" type="button" data-adm="1" data-k="pro" data-u="${esc(r.uid)}">+1${L.adMonth}</button><button class="btn soft sm" type="button" data-adm="12" data-k="pro" data-u="${esc(r.uid)}">+12${L.adMonth}</button><button class="btn soft sm" type="button" data-adm="0" data-u="${esc(r.uid)}">${L.plFree}</button></div></div>`}).join(''):`<p class="hint">${L.adNone}</p>`};
   App.admin.onChange=draw;draw();$('#ad-q').oninput=draw;
   $('#ad-list').onclick=async e=>{const b=e.target.closest('[data-adm]');if(!b)return;const r=(App.admin.list||[]).find(x=>x.uid===b.dataset.u);if(!r)return;
     const n=+b.dataset.adm;let data;
     if(!n)data={plan:'free',until:''};
-    else{const base=r.plan==='pro'&&r.until&&r.until>=todayStr()?new Date(r.until+'T12:00:00'):new Date();base.setMonth(base.getMonth()+n);
-      data={plan:'pro',until:new Date(base.getTime()-base.getTimezoneOffset()*6e4).toISOString().slice(0,10)}}
+    else{const k=b.dataset.k||'pro',base=(r.plan==='pro'||r.plan==='basic')&&r.until&&r.until>=todayStr()?new Date(r.until+'T12:00:00'):new Date();base.setMonth(base.getMonth()+n);
+      data={plan:k,until:new Date(base.getTime()-base.getTimezoneOffset()*6e4).toISOString().slice(0,10)}}
     b.disabled=true;try{await App.admin.set(r.uid,data);toast(L.adSaved)}catch(_){toast(L.tmErr)}b.disabled=false}}
 // what a plan document means today
 function planOf(d,td){td=td||todayStr();if(!d)return {kind:'pro',days:0,until:'',open:true};
-  if(d.plan==='pro'&&(!d.until||d.until>=td))return {kind:'pro',days:0,until:d.until||''};
+  if((d.plan==='pro'||d.plan==='basic')&&(!d.until||d.until>=td))return {kind:d.plan,days:0,until:d.until||''};
   const start=d.trialStart?new Date(d.trialStart):null;
   if(d.plan==='trial'&&start&&!isNaN(start)){const left=14-Math.floor((Date.now()-start.getTime())/864e5);if(left>0)return {kind:'trial',days:left,until:''}}
   return {kind:'free',days:0,until:''}}
