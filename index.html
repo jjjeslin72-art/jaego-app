@@ -632,6 +632,7 @@ for(const lg of ['ko','pt']){const base=T[lg].cats;Object.defineProperty(T[lg],'
 let lang='ko'; try{lang=localStorage.getItem('lang')||'ko'}catch(e){}
 const t=()=>T[lang];
 Object.assign(T.ko,{
+ fcQty:u=>`사우드로 보낼 수량 (${u})`,fcPrice:'사우드 가격 (R$, 1장)',fcSaleSave:'사우드 수량·가격 저장',fcSaleDone:(n,u)=>`사우드로 ${n}${u} 보냈어요`,fcAdvice:(n,u,p)=>`사우드로 ${n}${u} 내놓았어요${p?` · 1장 ${p}`:''}. 위 초록 버튼으로 손님 단체방에 보내세요.`,
  fcTitle:'분류 직접 정하기',fcHint:'날짜와 상관없이 바로 사우드나 소매 처리로 옮길 수 있어요.',fcNow:c=>`지금 직접 정한 분류: ${c}`,fcSale:'사우드로 보내기',fcRetail:'소매 처리로 보내기',fcAuto:'자동 분류로 돌리기',fcDone:c=>`${c} 칸으로 옮겼어요`,fcAutoDone:'자동 분류로 돌렸어요',
  plBasic:'기본',plBasicPrice:'월 R$ 49,90',plProPrice:'월 R$ 79,90',plYear:'1년 한 번에 내면 2달 무료: 기본 R$ 499 / Pro R$ 799',
  plBasicList:['상품 무제한','코드·말·글로 입력','재생산·사우드 분류','매출·이익 계산','왓츠앱 단체방 보내기','엑셀 내보내기'],
@@ -658,6 +659,7 @@ Object.assign(T.ko,{
  scTitle:'QR 스캔',scHint:'라벨의 QR을 카메라에 비추세요. 한 번 찍을 때마다 1장씩 올라가요. 같은 상품을 또 찍을 땐 카메라를 잠깐 뗐다가 다시 비추세요.',scNoCam:'카메라를 열지 못했어요. 카메라 사용을 허락해 주세요.',scSale:'판매로 넣기',scIn:'입고로 넣기',scEmpty:'아직 찍은 게 없어요',scGot:c=>`${c} 찍었어요`,scUnknown:'등록 안 된 코드 (입고로 들어가요)'
 });
 Object.assign(T.pt,{
+ fcQty:u=>`Quantidade para o saldão (${u})`,fcPrice:'Preço no saldão (R$, cada)',fcSaleSave:'Salvar quantidade e preço',fcSaleDone:(n,u)=>`${n} ${u} no saldão`,fcAdvice:(n,u,p)=>`${n} ${u} no saldão${p?` · ${p} cada`:''}. Envie ao grupo pelo botão verde.`,
  fcTitle:'Escolher a situação',fcHint:'Mande já para o saldão ou varejo, sem esperar os dias.',fcNow:c=>`Situação escolhida à mão: "${c}".`,fcSale:'Mandar para o saldão',fcRetail:'Mandar para o varejo',fcAuto:'Voltar ao automático',fcDone:c=>`Movido para ${c}`,fcAutoDone:'Voltou ao automático',
  plBasic:'Básico',plBasicPrice:'R$ 49,90/mês',plProPrice:'R$ 79,90/mês',plYear:'Pagando o ano todo, 2 meses grátis: Básico R$ 499 / Pro R$ 799',
  plBasicList:['Produtos ilimitados','Lançar por código, voz ou texto','Repor / saldão automático','Faturamento e lucro','Enviar no grupo do WhatsApp','Exportar para Excel'],
@@ -706,12 +708,13 @@ function calc(it){
   const sales=soldA*price+soldV*(priceV||price);
   const sz=it.sz||{},szList=szKeys(it).map(k=>{const v=sz[k]||{};const m=+v.m||0,s=+v.s||0;return {k,m,s,st:Math.max(0,m-s)}}),szM=szSum(sz,'m'),szS=szSum(sz,'s');
   const hasSz=szM>0||szS>0,szUn=Math.max(0,(made-sold)-(szM-szS));
-  return {made,sold,soldV,soldA,stock,rate,days,cat,price,priceV,cost,perDay:sold/Math.max(days,1),sales,profit:cost?sales-sold*cost:null,prodCost:made*cost,szList,hasSz,szUn};
+  return {force:it.force||'',saleQty:it.saleQty,salePrice:+it.salePrice||0,made,sold,soldV,soldA,stock,rate,days,cat,price,priceV,cost,perDay:sold/Math.max(days,1),sales,profit:cost?sales-sold*cost:null,prodCost:made*cost,szList,hasSz,szUn};
 }
 function advice(j){const L=t();
   if(!j.made)return L.adWait;
   if(j.cat==='re'){const need=Math.max(0,Math.round(j.perDay*30-j.stock));const qn=Math.max(need,Math.round(j.made*0.5/6)*6);return L.adRe(j.perDay.toFixed(1),qn)}
   if(j.cat==='watch')return L.adWatch(j.rate.toFixed(0));
+  if(j.cat==='sale'&&j.force&&j.saleQty!==''&&j.saleQty!=null)return L.fcAdvice(j.saleQty,U(),j.salePrice?brl(j.salePrice):'');
   if(j.cat==='sale'){const sp=j.price*(1-rules.saleOff/100);let s=L.adSale(j.stock,j.price?[brl(j.price),brl(sp)]:null,rules.saleOff);if(j.price&&j.cost&&sp<j.cost)s+=L.belowCost(brl(j.cost));return s}
   if(j.cat==='retail')return L.adRetail(j.stock);
   return L.adEarly(j.days,rules.minDays);
@@ -729,9 +732,14 @@ const safeImg=u=>typeof u==='string'&&u.startsWith('data:image/')?u:'';
 function photoView(src){if(!safeImg(src))return;const L=t();openSheet(`${head(L.phTitle)}<img src="${safeImg(src)}" alt="" style="width:100%;border-radius:12px">`)}
 
 // ---------- quick edit: prices and quantities, any time ----------
-function forceHtml(it){const L=t();return `<h3 class="sh">${L.fcTitle}</h3><p class="hint">${it.force?L.fcNow(L.cats[it.force][0]):L.fcHint}</p>
-  <div class="fcrow">${it.force!=='sale'?`<button class="btn c-sale fcb" type="button" data-fc="sale">${L.fcSale}</button>`:''}${it.force!=='retail'?`<button class="btn c-retail fcb" type="button" data-fc="retail">${L.fcRetail}</button>`:''}${it.force?`<button class="btn soft" type="button" data-fc="">${L.fcAuto}</button>`:''}</div>`}
-function wireForce(it){const L=t();document.querySelectorAll('.sheet [data-fc]').forEach(b=>b.onclick=async()=>{b.disabled=true;try{await patchItem(it.id,{force:b.dataset.fc,updatedAt:new Date().toISOString()});closeSheet();toast(b.dataset.fc?L.fcDone(L.cats[b.dataset.fc][0]):L.fcAutoDone);if(b.dataset.fc){filter=b.dataset.fc;render()}}catch(_){toast(L.tSaveErr);b.disabled=false}})}
+function forceHtml(it){const L=t(),j=calc(it),sq=it.saleQty!=null&&it.saleQty!==''?it.saleQty:j.stock,sp=it.salePrice||(j.price?Math.round(j.price*(1-rules.saleOff/100)*100)/100:'');
+  return `<h3 class="sh">${L.fcTitle}</h3><p class="hint">${it.force?L.fcNow(L.cats[it.force][0]):L.fcHint}</p>
+  <div class="two"><div class="field"><label for="fc-qty">${L.fcQty(U())}</label><input id="fc-qty" type="number" min="0" inputmode="numeric" value="${esc(sq)}"></div>
+  <div class="field"><label for="fc-price">${L.fcPrice}</label><input id="fc-price" type="number" step="0.01" min="0" inputmode="decimal" value="${esc(sp)}"></div></div>
+  <div class="fcrow"><button class="btn c-sale fcb" type="button" data-fc="sale">${it.force==='sale'?L.fcSaleSave:L.fcSale}</button>${it.force!=='retail'?`<button class="btn c-retail fcb" type="button" data-fc="retail">${L.fcRetail}</button>`:''}${it.force?`<button class="btn soft" type="button" data-fc="">${L.fcAuto}</button>`:''}</div>`}
+function wireForce(it){const L=t();document.querySelectorAll('.sheet [data-fc]').forEach(b=>b.onclick=async()=>{const k=b.dataset.fc,p={force:k,updatedAt:new Date().toISOString()};
+    if(k==='sale'){const q=$('#fc-qty').value,pr=$('#fc-price').value;p.saleQty=q===''?'':Math.max(0,Math.floor(+q||0));p.salePrice=pr===''?0:Math.max(0,Math.round(+pr*100)/100)}
+    b.disabled=true;try{await patchItem(it.id,p);closeSheet();toast(k?(k==='sale'&&p.saleQty!==''?L.fcSaleDone(p.saleQty,U()):L.fcDone(L.cats[k][0])):L.fcAutoDone);if(k){filter=k;render()}}catch(_){toast(L.tSaveErr);b.disabled=false}})}
 function quickEdit(it){const L=t(),j=calc(it);
   openSheet(`${head(L.qeTitle)}<p class="hint"><span class="code">${esc(it.ref||'')}</span>${esc(dn(it))}</p>
   <h3 class="sh">${L.qeQty}</h3>
@@ -847,9 +855,9 @@ async function slPost(it,db,user){const L=t(),j=calc(it);
 function waPrice(it,j){if(j.cat==='sale'&&j.price)return Math.round(j.price*(1-rules.saleOff/100)*100)/100;return j.price||j.priceV||0}
 function waItemText(it,o){o=o||{};const j=calc(it),unit=rules.unitPt||B().unit[1];
   const ptName=it.namePt||((KINDS_LIST().find(x=>x[0]===it.kind)||[])[2])||(/[가-힣]/.test(it.name||'')?'':it.name||'');
-  const qty=o.qty!=null?o.qty:j.stock, price=o.price!=null?o.price:waPrice(it,j);
+  const fs=it.force==='sale'&&j.cat==='sale', qty=o.qty!=null?o.qty:(fs&&it.saleQty!=null&&it.saleQty!==''?it.saleQty:j.stock), price=o.price!=null?o.price:(fs&&+it.salePrice?+it.salePrice:waPrice(it,j));
   const fmt=v=>'R$ '+(+v).toFixed(2).replace('.',',');
-  const sz=j.hasSz?j.szList.filter(x=>x.st>0).map(x=>`${x.k==='U'?'Único':x.k} ${x.st}`).join(' · '):'';
+  const sz=j.hasSz&&+qty===j.stock?j.szList.filter(x=>x.st>0).map(x=>`${x.k==='U'?'Único':x.k} ${x.st}`).join(' · '):'';
   return [`📦 *Ref ${it.ref||'—'}*${ptName?' · '+ptName:''}`,sz?`Tamanhos: ${sz}`:'',`Quantidade: ${qty} ${unit}`,price?`Preço: *${fmt(price)}*${o.lote?' o lote':' cada'}`:''].filter(Boolean).join('\n')}
 function waText(list,o){const head=list.some(i=>calc(i).cat==='sale')||o?'🔥 *SALDÃO*':'🛍️ *Ofertas*';
   const sl=list.some(i=>i.slId)||o?'\n\n📲 Também no app StockLink':'';
