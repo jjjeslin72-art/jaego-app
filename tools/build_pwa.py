@@ -212,7 +212,16 @@ if (!valid(cfg) && ls.get('localMode') === '1') {
   addEventListener('offline', () => user && App.setState('off'));
   addEventListener('online', () => user && App.setState('ok'));
 }
-if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+if ('serviceWorker' in navigator) {
+  // new version: switch to it right away (no need to close the app twice)
+  let reloaded = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => { if (!reloaded) { reloaded = true; location.reload(); } });
+  navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then(reg => {
+    const check = () => reg.update().catch(() => {});
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') check(); });
+    setInterval(check, 30 * 60 * 1000);
+  }).catch(() => {});
+}
 </script>
 '''.replace('__V__', FB)
 

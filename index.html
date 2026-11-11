@@ -1330,7 +1330,7 @@ document.addEventListener('click',e=>{const tr=e.target.closest('tr[data-edit]')
   if(b.dataset.waall){const k=b.dataset.waall;waShare(items.filter(i=>i.month===month&&calc(i).cat===k).filter(i=>calc(i).stock>0||i.force));return}
   if(b.dataset.view){const it=items.find(i=>i.id===b.dataset.view);if(it)photoView(it.photo);return}
   if(b.dataset.vm){view=b.dataset.vm;try{localStorage.setItem('view2',view)}catch(e){}render();return}
-  if(b.dataset.open){const it=items.find(i=>i.id===b.dataset.open);if(it)openSheet(`${head(esc(lbl(it)))}${card({...it,j:calc(it)})}`);return}
+  if(b.dataset.open){const it=items.find(i=>i.id===b.dataset.open);if(it){openSheet(`${head(esc(lbl(it)))}${card({...it,j:calc(it)})}${forceHtml(it)}`);wireForce(it)}return}
   if(b.dataset.lang){lang=b.dataset.lang;try{localStorage.setItem('lang',lang)}catch(e){}closeSheet();render()}
   if(b.dataset.f&&b.classList.contains('bin')||b.dataset.f==='all'&&!b.closest('.sheet')){filter=filter===b.dataset.f?'all':b.dataset.f;q='';$('#q').value='';render()}
   if(b.dataset.in){const it=items.find(i=>i.id===b.dataset.in);if(it)inputForm({code:it.ref||'',pick:it.id,type:'sale'})}
@@ -1790,7 +1790,16 @@ if (!valid(cfg) && ls.get('localMode') === '1') {
   addEventListener('offline', () => user && App.setState('off'));
   addEventListener('online', () => user && App.setState('ok'));
 }
-if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+if ('serviceWorker' in navigator) {
+  // new version: switch to it right away (no need to close the app twice)
+  let reloaded = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => { if (!reloaded) { reloaded = true; location.reload(); } });
+  navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then(reg => {
+    const check = () => reg.update().catch(() => {});
+    document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') check(); });
+    setInterval(check, 30 * 60 * 1000);
+  }).catch(() => {});
+}
 </script>
 </body>
 </html>
