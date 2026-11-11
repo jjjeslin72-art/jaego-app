@@ -445,6 +445,8 @@ html:root:not(#_) .c-retail{--c:#d49a00;--cs:#fdf4d3}
 .plgrid3 .pro{border:2px solid #d99a2b;background:#fffaf0}
 .adbtn .adl{font-weight:800;font-size:13.5px;min-width:44px;align-self:center}
 .tool.t-basic .ti{background:var(--re-soft);color:var(--re)}
+
+.fcrow{display:flex;gap:8px;flex-wrap:wrap}.fcb{background:var(--c);color:#fff}
 .login{position:fixed;inset:0;z-index:40;background:var(--bg);display:flex;align-items:center;justify-content:center;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 .login .box{max-width:380px;width:100%;display:flex;flex-direction:column;gap:14px;text-align:center;align-items:center}
 .login img{width:96px;height:96px;border-radius:22px}
@@ -630,6 +632,7 @@ for(const lg of ['ko','pt']){const base=T[lg].cats;Object.defineProperty(T[lg],'
 let lang='ko'; try{lang=localStorage.getItem('lang')||'ko'}catch(e){}
 const t=()=>T[lang];
 Object.assign(T.ko,{
+ fcTitle:'분류 직접 정하기',fcHint:'날짜와 상관없이 바로 사우드나 소매 처리로 옮길 수 있어요.',fcNow:c=>`지금 직접 정한 분류: ${c}`,fcSale:'사우드로 보내기',fcRetail:'소매 처리로 보내기',fcAuto:'자동 분류로 돌리기',fcDone:c=>`${c} 칸으로 옮겼어요`,fcAutoDone:'자동 분류로 돌렸어요',
  plBasic:'기본',plBasicPrice:'월 R$ 49,90',plProPrice:'월 R$ 79,90',plYear:'1년 한 번에 내면 2달 무료: 기본 R$ 499 / Pro R$ 799',
  plBasicList:['상품 무제한','코드·말·글로 입력','재생산·사우드 분류','매출·이익 계산','왓츠앱 단체방 보내기','엑셀 내보내기'],
  plProList2:['기본 기능 전부','영수증 사진 AI 읽기','직원 같이 쓰기','QR 라벨·스캔'],
@@ -655,6 +658,7 @@ Object.assign(T.ko,{
  scTitle:'QR 스캔',scHint:'라벨의 QR을 카메라에 비추세요. 한 번 찍을 때마다 1장씩 올라가요. 같은 상품을 또 찍을 땐 카메라를 잠깐 뗐다가 다시 비추세요.',scNoCam:'카메라를 열지 못했어요. 카메라 사용을 허락해 주세요.',scSale:'판매로 넣기',scIn:'입고로 넣기',scEmpty:'아직 찍은 게 없어요',scGot:c=>`${c} 찍었어요`,scUnknown:'등록 안 된 코드 (입고로 들어가요)'
 });
 Object.assign(T.pt,{
+ fcTitle:'Escolher a situação',fcHint:'Mande já para o saldão ou varejo, sem esperar os dias.',fcNow:c=>`Situação escolhida à mão: "${c}".`,fcSale:'Mandar para o saldão',fcRetail:'Mandar para o varejo',fcAuto:'Voltar ao automático',fcDone:c=>`Movido para ${c}`,fcAutoDone:'Voltou ao automático',
  plBasic:'Básico',plBasicPrice:'R$ 49,90/mês',plProPrice:'R$ 79,90/mês',plYear:'Pagando o ano todo, 2 meses grátis: Básico R$ 499 / Pro R$ 799',
  plBasicList:['Produtos ilimitados','Lançar por código, voz ou texto','Repor / saldão automático','Faturamento e lucro','Enviar no grupo do WhatsApp','Exportar para Excel'],
  plProList2:['Tudo do Básico','Leitura de nota por foto (IA)','Funcionários','Etiquetas e leitura QR'],
@@ -698,6 +702,7 @@ function calc(it){
   const made=+it.made||0, sold=Math.min(+it.sold||0,made), adj=Math.round(+it.adj||0), stock=Math.max(0,made-sold+adj), rate=made?sold/made*100:0, days=daysSince(it.madeDate);
   const price=+it.price||0, priceV=+it.priceV||0, cost=+it.cost||0, soldV=Math.min(+it.soldV||0,sold), soldA=sold-soldV;
   let cat; if(!made)cat='early'; else if(rate>=rules.reRate)cat='re'; else if(days<rules.minDays)cat='early'; else if(rate>=rules.lowRate)cat='watch'; else cat=stock>rules.retailMax?'sale':'retail';
+  if(it.force&&['re','sale','retail','watch'].includes(it.force))cat=it.force;
   const sales=soldA*price+soldV*(priceV||price);
   const sz=it.sz||{},szList=szKeys(it).map(k=>{const v=sz[k]||{};const m=+v.m||0,s=+v.s||0;return {k,m,s,st:Math.max(0,m-s)}}),szM=szSum(sz,'m'),szS=szSum(sz,'s');
   const hasSz=szM>0||szS>0,szUn=Math.max(0,(made-sold)-(szM-szS));
@@ -724,6 +729,9 @@ const safeImg=u=>typeof u==='string'&&u.startsWith('data:image/')?u:'';
 function photoView(src){if(!safeImg(src))return;const L=t();openSheet(`${head(L.phTitle)}<img src="${safeImg(src)}" alt="" style="width:100%;border-radius:12px">`)}
 
 // ---------- quick edit: prices and quantities, any time ----------
+function forceHtml(it){const L=t();return `<h3 class="sh">${L.fcTitle}</h3><p class="hint">${it.force?L.fcNow(L.cats[it.force][0]):L.fcHint}</p>
+  <div class="fcrow">${it.force!=='sale'?`<button class="btn c-sale fcb" type="button" data-fc="sale">${L.fcSale}</button>`:''}${it.force!=='retail'?`<button class="btn c-retail fcb" type="button" data-fc="retail">${L.fcRetail}</button>`:''}${it.force?`<button class="btn soft" type="button" data-fc="">${L.fcAuto}</button>`:''}</div>`}
+function wireForce(it){const L=t();document.querySelectorAll('.sheet [data-fc]').forEach(b=>b.onclick=async()=>{b.disabled=true;try{await patchItem(it.id,{force:b.dataset.fc,updatedAt:new Date().toISOString()});closeSheet();toast(b.dataset.fc?L.fcDone(L.cats[b.dataset.fc][0]):L.fcAutoDone);if(b.dataset.fc){filter=b.dataset.fc;render()}}catch(_){toast(L.tSaveErr);b.disabled=false}})}
 function quickEdit(it){const L=t(),j=calc(it);
   openSheet(`${head(L.qeTitle)}<p class="hint"><span class="code">${esc(it.ref||'')}</span>${esc(dn(it))}</p>
   <h3 class="sh">${L.qeQty}</h3>
@@ -740,7 +748,9 @@ function quickEdit(it){const L=t(),j=calc(it);
   <div class="field"><label for="qe-price">${L.fPrice}</label><input id="qe-price" type="number" step="0.01" min="0" inputmode="decimal" value="${j.price||''}"></div></div>
   <div class="two"><div class="field"><label for="qe-pricev">${L.fPriceV}</label><input id="qe-pricev" type="number" step="0.01" min="0" inputmode="decimal" value="${j.priceV||''}"></div><div></div></div>
   <p class="err" id="qe-err" hidden></p>
-  <button class="btn full" type="button" id="qe-save">${L.save}</button>`);
+  <button class="btn full" type="button" id="qe-save">${L.save}</button>
+  ${forceHtml(it)}`);
+  wireForce(it);
   // changing 입고/판매 moves the stock along; typing the stock yourself keeps your number
   const readSz=()=>{const o={};document.querySelectorAll('.sztbl [data-szm]').forEach(inp=>{const k=inp.dataset.szm,sv=document.querySelector(`.sztbl [data-szs="${CSS.escape(k)}"]`);const m=Math.max(0,Math.floor(+inp.value||0)),so=Math.max(0,Math.floor(+(sv&&sv.value)||0));if(m||so)o[k]={m,s:so}});return o};
   const szSync=()=>{const o=readSz();document.querySelectorAll('[data-szst]').forEach(el=>{const v=o[el.dataset.szst]||{m:0,s:0};el.textContent=Math.max(0,v.m-v.s)});
@@ -921,7 +931,7 @@ function render(){
   if(!mine.length){$('#list').innerHTML=`<div class="empty">${L.emptyMonth(mLabel(month))}${!items.length?`<br><br><button class="btn soft sm" type="button" id="bizPick">${L.bizPick}</button>`:''}</div>`;return}
   const order={re:0,sale:1,retail:2,watch:3,early:4};
   const shown=mine.filter(i=>filter==='all'||i.j.cat===filter).sort((a,b)=>order[a.j.cat]-order[b.j.cat]||b.j.rate-a.j.rate);
-  const waN=(filter==='sale'||filter==='retail')?shown.filter(i=>i.j.stock>0).length:0, reN=filter==='re'?shown.length:0;
+  const waN=(filter==='sale'||filter==='retail')?shown.filter(i=>i.j.stock>0||i.force).length:0, reN=filter==='re'?shown.length:0;
   $('#list').innerHTML=(waN?`<button type="button" class="btn wa full" data-waall="${filter}" style="margin-bottom:10px">💬 ${L.waAll(waN)}</button>`:'')+(reN?`<button type="button" class="btn wa full" data-reorder="1" style="margin-bottom:10px">🧵 ${L.reOrder(reN)}</button>`:'')+(shown.length?(view==='table'?table(shown):view==='grid'?grid(shown):shown.map(card).join('')):`<div class="empty">${L.emptyCat}</div>`);
 }
 function renderHist(){const L=t();
@@ -980,7 +990,9 @@ function itemForm(it,preset){const L=t();
   <p class="hint">${L.fDateHint}</p><p class="err" id="f-err" hidden></p>
   <button class="btn full" type="button" id="f-save">${L.save}</button>
   ${it&&slEnabled()?`<button class="btn sl full" type="button" data-sl="${it.id}">${it.slId?L.slAgain:L.slBtn}</button>`:''}
+  ${it?forceHtml(it):''}
   ${it?`<div id="delZone"><button class="btn danger full" type="button" id="f-del">${L.del}</button></div>`:''}`);
+  if(it)wireForce(it);
   let fphoto=v.photo||'';
   const drawPh=()=>{$('#f-ph').innerHTML=`${safeImg(fphoto)?`<img class="pthumb big" src="${safeImg(fphoto)}" alt="">`:''}<label class="btn soft sm" for="f-pc">${L.phCam}</label><input class="vh" type="file" accept="image/*" capture="environment" id="f-pc"><label class="btn soft sm" for="f-pg">${L.phGal}</label><input class="vh" type="file" accept="image/*" id="f-pg">${fphoto?`<button type="button" class="btn soft sm" id="f-phdel">${L.phDel}</button>`:''}`;
     ['#f-pc','#f-pg'].forEach(id=>$(id).onchange=async e=>{const f=e.target.files&&e.target.files[0];if(!f)return;try{fphoto=await makeThumb(f)}catch(_){toast(L.phErr)}drawPh()});
@@ -1315,7 +1327,7 @@ document.addEventListener('click',e=>{const tr=e.target.closest('tr[data-edit]')
   if(b.dataset.tool){const tk=b.dataset.tool;if(tk==='admin')return adminForm();if(needPro(tk))return;({debt:debtBook,scan:scanForm,label:labelForm,xls:exportXls,team:teamForm})[tk]();return}
   if(b.dataset.dcust){custView(b.dataset.dcust);return}
   if(b.dataset.reorder){shareText(reOrderText(items.filter(i=>i.month===month&&calc(i).cat==='re')));return}
-  if(b.dataset.waall){const k=b.dataset.waall;waShare(items.filter(i=>i.month===month&&calc(i).cat===k).filter(i=>calc(i).stock>0));return}
+  if(b.dataset.waall){const k=b.dataset.waall;waShare(items.filter(i=>i.month===month&&calc(i).cat===k).filter(i=>calc(i).stock>0||i.force));return}
   if(b.dataset.view){const it=items.find(i=>i.id===b.dataset.view);if(it)photoView(it.photo);return}
   if(b.dataset.vm){view=b.dataset.vm;try{localStorage.setItem('view2',view)}catch(e){}render();return}
   if(b.dataset.open){const it=items.find(i=>i.id===b.dataset.open);if(it)openSheet(`${head(esc(lbl(it)))}${card({...it,j:calc(it)})}`);return}
