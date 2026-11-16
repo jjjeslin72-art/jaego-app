@@ -50,8 +50,8 @@ login = '''<div class="login" id="login" hidden><div class="box">
 module = '''<script src="firebase-config.js"></script>
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/__V__/firebase-app.js";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/__V__/firebase-auth.js";
-import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, collection, doc, getDoc, setDoc, updateDoc, serverTimestamp, deleteDoc, onSnapshot, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/__V__/firebase-firestore.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut, deleteUser, reauthenticateWithPopup } from "https://www.gstatic.com/firebasejs/__V__/firebase-auth.js";
+import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, collection, doc, getDoc, getDocs, setDoc, updateDoc, serverTimestamp, deleteDoc, onSnapshot, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/__V__/firebase-firestore.js";
 import { getAI, getGenerativeModel, GoogleAIBackend } from "https://www.gstatic.com/firebasejs/__V__/firebase-ai.js";
 import { initializeAppCheck, ReCaptchaEnterpriseProvider } from "https://www.gstatic.com/firebasejs/__V__/firebase-app-check.js";
 
@@ -166,13 +166,31 @@ if (!valid(cfg) && ls.get('localMode') === '1') {
   $('#logoutBtn').onclick = () => signOut(auth);
   // --- staff: an owner lists a Gmail; that person then works on the owner's data ---
   const em = u => String(u.email || '').toLowerCase();
+  // delete my account and everything I saved (Google Play / LGPD)
+  App.deleteAccount = async () => {
+    const u = auth.currentUser; if (!u) throw new Error('no user');
+    try { await deleteUser(u); } catch (e) {          // Google asks to sign in again first
+      if (e && e.code === 'auth/requires-recent-login') { await reauthenticateWithPopup(u, new GoogleAuthProvider()); }
+      else throw e;
+    }
+    const base = `users/${u.uid}`;
+    for (const c of ['styles', 'moves', 'config', 'team', 'debts']) {
+      const snap = await getDocs(collection(fs, `${base}/${c}`));
+      for (const d of snap.docs) {
+        if (c === 'team') await deleteDoc(doc(fs, `staffOf/${d.id}`)).catch(() => {});
+        await deleteDoc(d.ref);
+      }
+    }
+    try { localStorage.removeItem('staffMode-' + u.uid); } catch (_) {}
+    await deleteUser(auth.currentUser || u).catch(async () => { await signOut(auth); });
+  };
   App.team = {
     add: async e => { await setDoc(doc(fs, `staffOf/${e}`), { owner: user.uid, ownerName: user.displayName || user.email || '', at: new Date().toISOString() });
       await setDoc(doc(fs, `users/${user.uid}/team/${e}`), { email: e, at: new Date().toISOString() }); },
     remove: async e => { await deleteDoc(doc(fs, `users/${user.uid}/team/${e}`)); await deleteDoc(doc(fs, `staffOf/${e}`)).catch(() => {}); }
   };
   // --- plans: 14-day trial on first sign-in; the app owner turns paid months on in the admin screen ---
-  App.contact = { wa: cfg.contactWhatsApp || '', price: cfg.priceText || '' };
+
   let planUnsub = null, adminUnsub = null;
   const ts = v => v && typeof v.toDate === 'function' ? v.toDate().toISOString() : (v || '');
   async function watchPlan(u, mode) {
@@ -182,7 +200,8 @@ if (!valid(cfg) && ls.get('localMode') === '1') {
     if (isAdmin) {   // the owner always has everything and sees the admin list
       App.setPlan(null);
       App.admin = { list: [], onChange: null,
-        set: (uid, data) => updateDoc(doc(fs, `plans/${uid}`), data) };
+        set: (uid, data) => updateDoc(doc(fs, `plans/${uid}`), data),
+        del: uid => deleteDoc(doc(fs, `plans/${uid}`)) };
       adminUnsub = onSnapshot(collection(fs, 'plans'), s => {
         App.admin.list = s.docs.map(d => ({ uid: d.id, ...d.data(), trialStart: ts(d.data().trialStart), created: ts(d.data().trialStart) }));
         if (App.admin.onChange) App.admin.onChange(); App.render(); }, () => {});
